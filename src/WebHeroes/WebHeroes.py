@@ -13,7 +13,8 @@ class WebHeroes:
         static_folder=config.STATIC_PATH
     )
 
-    def __init__(self) -> None:
+    @staticmethod
+    def run() -> None:
         """
         Runs the static WebHeroes.app Flask App.
         """
@@ -22,9 +23,9 @@ class WebHeroes:
     @staticmethod
     @app.route("/")
     def home() -> str:
-        """
-        Invokes on main page visit.
-
-        :return: Returns the rendered main page.
-        """
         return render_template("index.html")
+
+    @staticmethod
+    @app.route("/modding-documentation/")
+    def modding_documentation() -> str:
+        return render_template("modding-documentation.html")

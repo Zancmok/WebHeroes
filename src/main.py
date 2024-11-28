@@ -6,7 +6,7 @@ def main() -> None:
     Runs the main class.
     :return:
     """
-    WebHeroes()
+    WebHeroes.run()
 
 
 if __name__ == '__main__':
