@@ -29,3 +29,10 @@ class WebHeroes:
     @app.route("/modding-documentation/")
     def modding_documentation() -> str:
         return render_template("modding-documentation.html")
+        
+    @staticmethod
+    @app.route("/online-lobbies/")
+    def online_lobbies() -> str:
+        print("Darn")
+        
+        return ""
