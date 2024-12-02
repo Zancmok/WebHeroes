@@ -5,6 +5,7 @@ import WebHeroes.config as config
 class WebHeroes:
     """
     The main class. The class is static.
+    Used as the main connection between the server and the clients.
     """
 
     app: Flask = Flask(
@@ -18,7 +19,11 @@ class WebHeroes:
         """
         Runs the static WebHeroes.app Flask App.
         """
-        WebHeroes.app.run(host=config.HOST, port=config.PORT, debug=config.DEBUG)
+        WebHeroes.app.run(
+            host=config.HOST,
+            port=config.PORT,
+            debug=config.DEBUG
+        )
 
     @staticmethod
     @app.route("/")

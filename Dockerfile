@@ -1,6 +1,6 @@
 FROM python:3.13-slim
 
-LABEL authors="Zancmok, Immanis"
+LABEL authors="Zancmok, immanis70"
 LABEL title="Web Heroes"
 LABEL version="0.0.1"
 
