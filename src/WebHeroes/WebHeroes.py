@@ -38,6 +38,18 @@ class WebHeroes:
         )
 
     @staticmethod
+    def get_user_data(access_token: str) -> OwnUser:
+        """
+        :param access_token: The discord access token.
+        :return: The user.
+        """
+        bearer_client: APIClient = APIClient(access_token, bearer=True)
+
+        current_user: OwnUser = bearer_client.users.get_current_user()
+
+        return current_user
+
+    @staticmethod
     @app.route("/")
     def home() -> str:
         return render_template("index.html")
@@ -64,10 +76,6 @@ class WebHeroes:
 
         session['access_token'] = access_token
 
-        """bearer_client: APIClient = APIClient(access_token, bearer=True)
-
-        current_user: OwnUser = bearer_client.users.get_current_user()"""
-
         return redirect("/online-lobbies/")
 
     @staticmethod
@@ -76,8 +84,6 @@ class WebHeroes:
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
 
-        bearer_client: APIClient = APIClient(session['access_token'], bearer=True)
+        current_user: OwnUser = WebHeroes.get_user_data(session['access_token'])
 
-        current_user: OwnUser = bearer_client.users.get_current_user()
-
-        return f"<h1>{current_user.username}</h1>"
+        return f"<img src=\"{current_user.avatar_url}\"><br><h1>{current_user.username}</h1>"
