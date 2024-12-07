@@ -1,3 +1,4 @@
 .env
 .venv
 .idea
+src/WebHeroes/__pycache__
