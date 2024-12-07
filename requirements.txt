@@ -1,3 +1,4 @@
 flask
 zenora
 python-dotenv
+werkzeug
