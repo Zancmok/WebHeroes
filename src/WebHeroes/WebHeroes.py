@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, jsonify
 from werkzeug import Response
 from zenora import APIClient
 from zenora.models.oauth import OauthResponse
@@ -38,18 +38,6 @@ class WebHeroes:
         )
 
     @staticmethod
-    def get_user_data(access_token: str) -> OwnUser:
-        """
-        :param access_token: The discord access token.
-        :return: The user.
-        """
-        bearer_client: APIClient = APIClient(access_token, bearer=True)
-
-        current_user: OwnUser = bearer_client.users.get_current_user()
-
-        return current_user
-
-    @staticmethod
     @app.route("/")
     def home() -> str:
         return render_template("index.html")
@@ -74,7 +62,13 @@ class WebHeroes:
 
         access_token: str = oauth_response.access_token
 
+        bearer_client: APIClient = APIClient(access_token, bearer=True)
+
+        current_user: OwnUser = bearer_client.users.get_current_user()
+
         session['access_token'] = access_token
+        session['username'] = current_user.username
+        session['avatar_url'] = current_user.avatar_url
 
         return redirect("/online-lobbies/")
 
@@ -83,7 +77,5 @@ class WebHeroes:
     def online_lobbies() -> str | Response:
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
-
-        current_user: OwnUser = WebHeroes.get_user_data(session['access_token'])
-
-        return f"<img src=\"{current_user.avatar_url}\"><br><h1>{current_user.username}</h1>"
+        
+        return render_template("online-lobbies.html")
