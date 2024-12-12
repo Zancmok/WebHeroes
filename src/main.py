@@ -1,5 +1,4 @@
 import os
-from WebHeroes.WebHeroes import WebHeroes
 
 
 def main() -> None:
@@ -10,6 +9,8 @@ def main() -> None:
     if not os.path.exists('.env'):
         print("Cant run, '.env' file missing!")
         return
+
+    from WebHeroes.WebHeroes import WebHeroes
 
     WebHeroes.run()
 
