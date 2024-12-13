@@ -5,12 +5,25 @@ from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
 from zenora.exceptions import APIError
 import WebHeroes.config as config
+from WebHeroes.LobbyManager import LobbyManager
 
 
 class WebHeroes:
     """
-    The main class. The class is static.
-    Used as the main connection between the server and the clients.
+    The main class that serves as the primary interface between the server and clients.
+    It handles the initialization of the Flask application, manages authentication with Discord,
+    and provides necessary setup for the web application to function correctly. This class
+    also manages the routes for various web pages and features.
+
+    This class should be used to configure and run the web server, initialize the required
+    services (like the Discord API client), and serve dynamic content via Flask routes.
+
+    Attributes:
+        app: A Flask instance that handles the web server and routing.
+        discord_client: An instance of the Discord API client used to interact with the Discord OAuth service.
+
+    Methods:
+        run: Initializes and starts the Flask web server.
     """
 
     app: Flask = Flask(
@@ -27,8 +40,14 @@ class WebHeroes:
     @staticmethod
     def run() -> None:
         """
-        Runs the static WebHeroes.app Flask App.
+        Initializes the Flask application and starts the web server. This method must be
+        called to start the web application. It also sets up necessary configurations,
+        including the session secret key.
+
+        :return: None
         """
+
+        LobbyManager.init(WebHeroes.app)
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
