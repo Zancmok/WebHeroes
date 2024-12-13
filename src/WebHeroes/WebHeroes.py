@@ -3,6 +3,7 @@ from werkzeug import Response
 from zenora import APIClient
 from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
+from zenora.exceptions import APIError
 import WebHeroes.config as config
 
 
@@ -50,15 +51,15 @@ class WebHeroes:
     @staticmethod
     @app.route("/oauth/")
     def oauth() -> Response:
-        oauth_code: str = request.args.get('code', '_')
+        oauth_code: str = request.args.get('code', '')
 
-        if oauth_code == '_':
+        try:
+            oauth_response: OauthResponse = WebHeroes.discord_client.oauth.get_access_token(
+                code=oauth_code,
+                redirect_uri=config.REDIRECT_URI
+            )
+        except APIError:
             return redirect("/")
-
-        oauth_response: OauthResponse = WebHeroes.discord_client.oauth.get_access_token(
-            code=oauth_code,
-            redirect_uri=config.REDIRECT_URI
-        )
 
         access_token: str = oauth_response.access_token
 
