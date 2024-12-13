@@ -5,6 +5,7 @@ from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
 from zenora.exceptions import APIError
 import WebHeroes.config as config
+from WebHeroes.RouteManager import RouteManager
 from WebHeroes.LobbyManager import LobbyManager
 
 
@@ -47,7 +48,7 @@ class WebHeroes:
         :return: None
         """
 
-        LobbyManager.init(WebHeroes.app)
+        RouteManager.init(WebHeroes.app)
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
