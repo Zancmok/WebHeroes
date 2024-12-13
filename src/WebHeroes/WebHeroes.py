@@ -58,7 +58,7 @@ class WebHeroes:
         )
 
     @staticmethod
-    @app.route("/")
+    @app.route("/", methods=["GET"])
     def home() -> str:
         return render_template("index.html")
 
@@ -68,7 +68,7 @@ class WebHeroes:
         return render_template("modding-documentation.html")
 
     @staticmethod
-    @app.route("/oauth/")
+    @app.route("/oauth/", methods=["GET"])
     def oauth() -> Response:
         oauth_code: str = request.args.get('code', '')
 
@@ -93,7 +93,7 @@ class WebHeroes:
         return redirect("/online-lobbies/")
 
     @staticmethod
-    @app.route("/online-lobbies/")
+    @app.route("/online-lobbies/", methods=["GET"])
     def online_lobbies() -> str | Response:
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
