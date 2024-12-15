@@ -16,6 +16,4 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 EXPOSE 5000
 
-ENV PYTHONPATH="/app/src:${PYTHONPATH}"
-
 CMD ["python", "/app/src/main.py"]
