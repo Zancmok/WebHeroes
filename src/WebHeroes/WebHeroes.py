@@ -6,7 +6,6 @@ from zenora.models.user import OwnUser
 from zenora.exceptions import APIError
 from ZLib.StaticClass import StaticClass
 import WebHeroes.config as config
-from WebHeroes.RouteManager import RouteManager
 from WebHeroes.LobbyManager import LobbyManager
 
 
