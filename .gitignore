@@ -2,3 +2,4 @@
 .venv
 .idea
 src/WebHeroes/__pycache__
+src/ZLib/__pycache__

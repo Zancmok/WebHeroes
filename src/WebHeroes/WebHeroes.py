@@ -4,12 +4,13 @@ from zenora import APIClient
 from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
 from zenora.exceptions import APIError
+from ZLib.StaticClass import StaticClass
 import WebHeroes.config as config
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.LobbyManager import LobbyManager
 
 
-class WebHeroes:
+class WebHeroes(StaticClass):
     """
     The main class that serves as the primary interface between the server and clients.
     It handles the initialization of the Flask application, manages authentication with Discord,
@@ -48,7 +49,7 @@ class WebHeroes:
         :return: None
         """
 
-        RouteManager.init(WebHeroes.app)
+        LobbyManager.route_manager.register_routes(WebHeroes.app)
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
