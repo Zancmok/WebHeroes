@@ -27,6 +27,7 @@ class LobbyManager(StaticClass):
         return jsonify(
             {
                 'username': session['username'],
-                'avatar_url': session['avatar_url']
+                'avatar_url': session['avatar_url'],
+                'user_id': session['user_id']
             }
         )

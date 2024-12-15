@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, jsonify
+from flask import Flask, render_template, request, session, redirect
 from werkzeug import Response
 from zenora import APIClient
 from zenora.models.oauth import OauthResponse
@@ -90,6 +90,7 @@ class WebHeroes(StaticClass):
         session['access_token'] = access_token
         session['username'] = current_user.username
         session['avatar_url'] = current_user.avatar_url
+        session['user_id'] = current_user.id
 
         return redirect("/online-lobbies/")
 
