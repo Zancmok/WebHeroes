@@ -2,3 +2,4 @@ flask
 zenora
 python-dotenv
 werkzeug
+mysql-connector-python
