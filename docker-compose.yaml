@@ -5,16 +5,16 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000"
-    restart: always
     depends_on:
       - web_heroes_database
+    command: bash -c "sleep 10 && python /app/src/main.py"
   web_heroes_database:
     image: mysql
     ports:
       - "3306:3306"
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: password
-      MYSQL_USER: user
-      MYSQL_PASSWORD: password
-      MYSQL_DATABASE: WebHeroes
+      MYSQL_ROOT_PASSWORD: "password"
+      MYSQL_USER: "user"
+      MYSQL_PASSWORD: "password"
+      MYSQL_DATABASE: "WebHeroes"

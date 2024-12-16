@@ -9,8 +9,13 @@ PORT: int = 5000
 HOST: str = "0.0.0.0"
 STATIC_PATH: str = "../static"
 TEMPLATES_PATH: str = "../templates"
+SQL_PATH: str = "../sql"
 REDIRECT_URI: str = "http://localhost:5000/oauth"
 DISCORD_OAUTH_URL: str = f"https://discord.com/oauth2/authorize?client_id=1313095758970486799&response_type=code&redirect_uri={urllib.parse.quote(REDIRECT_URI)}&scope=identify"
+MYSQL_USER: str = "user"
+MYSQL_PASSWORD: str = "password"
+MYSQL_HOST: str = "web_heroes_database"
+MYSQL_DATABASE: str = "WebHeroes"
 DISCORD_CLIENT_ID: str = os.getenv("DISCORD_CLIENT_ID")
 DISCORD_CLIENT_SECRET: str = os.getenv("DISCORD_CLIENT_SECRET")
 DISCORD_BOT_TOKEN: str = os.getenv("DISCORD_BOT_TOKEN")

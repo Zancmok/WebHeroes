@@ -7,6 +7,7 @@ from zenora.exceptions import APIError
 from ZLib.StaticClass import StaticClass
 import WebHeroes.config as config
 from WebHeroes.LobbyManager import LobbyManager
+from WebHeroes.DatabaseBridge import DatabaseBridge
 
 
 class WebHeroes(StaticClass):
