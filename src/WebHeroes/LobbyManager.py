@@ -1,5 +1,6 @@
 from flask import jsonify, session, Response, Flask
 from WebHeroes.RouteManager import RouteManager
+from WebHeroes.User import User
 from ZLib.StaticClass import StaticClass
 
 
@@ -17,6 +18,7 @@ class LobbyManager(StaticClass):
     """
 
     route_manager: RouteManager = RouteManager()
+    users: list[User] = []
 
     @staticmethod
     @route_manager.route("/get-basic-user-data/", methods=['GET'])
