@@ -10,6 +10,9 @@ def main() -> None:
         print("Cant run, '.env' file missing!")
         return
 
+    if os.getenv("NO_RUN", "false").lower() == "true":
+        return
+
     from WebHeroes.WebHeroes import WebHeroes
 
     WebHeroes.run()

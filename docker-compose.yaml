@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        no_run: "true"
     ports:
       - "5000:5000"
     depends_on:
