@@ -9,7 +9,7 @@ services:
       - "5000:5000"
     depends_on:
       - web_heroes_database
-    command: bash -c "sleep 10 && python /app/src/main.py"
+    command: bash -c "python /app/src/main.py"
   web_heroes_database:
     image: mysql
     ports:
