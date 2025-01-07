@@ -10,6 +10,7 @@ Classes:
 """
 
 from flask import Flask, render_template, request, session, redirect
+from flask_socketio import SocketIO, emit
 from werkzeug import Response
 from zenora import APIClient
 from zenora.models.oauth import OauthResponse
@@ -45,6 +46,8 @@ class WebHeroes(StaticClass):
         static_folder=config.STATIC_PATH
     )
 
+    socket_io: SocketIO = SocketIO(app)
+
     discord_client: APIClient = APIClient(
         token=config.DISCORD_BOT_TOKEN,
         client_secret=config.DISCORD_CLIENT_SECRET
@@ -64,10 +67,12 @@ class WebHeroes(StaticClass):
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
-        WebHeroes.app.run(
+        WebHeroes.socket_io.run(
+            WebHeroes.app,
             host=config.HOST,
             port=config.PORT,
-            debug=config.DEBUG
+            debug=config.DEBUG,
+            use_reloader=False
         )
 
     @staticmethod
@@ -137,5 +142,5 @@ class WebHeroes(StaticClass):
 
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
-        
+
         return render_template("online-lobbies.html")

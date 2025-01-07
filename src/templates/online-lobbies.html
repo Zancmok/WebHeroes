@@ -7,6 +7,7 @@
 		<meta name="description" content="heroes online">
 		<meta name="author" content="Rožle Lipej">
 		<meta name="keywords" content="Heroes,Online">
+		<script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
 	</head>
 
 	<body>
@@ -108,6 +109,12 @@
 		</table>
 
 		<script src="/static/js/temp.js"></script>
+		<script type="text/javascript" charset="utf-8">
+			var socket = io();
+			socket.on('connect', function() {
+				socket.emit('my event', {data: 'I\'m connected!'});
+			});
+		</script>
 	</body>
 
 </html>
