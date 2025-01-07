@@ -1,3 +1,25 @@
+"""
+RouteManager.py
+
+This module defines the `RouteManager` class, which facilitates dynamic route
+registration for a Flask application. The class provides mechanisms for storing route
+definitions and registering them with a Flask app when needed.
+
+Classes:
+    RouteManager: Manages Flask application routes, enabling dynamic route registration
+                  and providing a decorator for route handler functions.
+
+Usage:
+    route_manager = RouteManager()
+
+    @route_manager.route("/example", methods=["GET"])
+    def example_handler():
+        return "Example route"
+
+    app = Flask(__name__)
+    route_manager.register_routes(app)
+"""
+
 from typing import Optional, Callable, Any
 from flask import Flask
 

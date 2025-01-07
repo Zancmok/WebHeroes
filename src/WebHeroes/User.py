@@ -1,3 +1,20 @@
+"""
+User.py
+
+This module defines the `User` class, which represents a user in the application.
+Each user has an ID, a name, an avatar URL, and a presence status.
+
+Classes:
+    User: Represents a user with attributes like ID, name, avatar URL, and presence status.
+
+Usage:
+    from WebHeroes.User import User
+    from WebHeroes.PresenceStatus import PresenceStatus
+
+    new_user = User(user_id=123, name="Alice", avatar_url="http://example.com/avatar.png")
+    print(new_user)
+"""
+
 from WebHeroes.PresenceStatus import PresenceStatus
 
 

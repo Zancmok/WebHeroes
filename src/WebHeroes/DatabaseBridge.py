@@ -1,5 +1,15 @@
+"""
+DatabaseBridge.py
+
+This module defines the `DatabaseBridge` class, which manages the connection to the MySQL database.
+The class is implemented as a static class, establishing the connection during initialization and
+retrying upon failure with a configurable timeout.
+
+Classes:
+    DatabaseBridge: A static class for establishing and managing a MySQL database connection.
+"""
+
 from ZLib.StaticClass import StaticClass
-from ZLib.Console import Console
 import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.errors import DatabaseError
@@ -8,10 +18,21 @@ import time
 
 
 class DatabaseBridge(StaticClass):
+    """
+    A static class responsible for establishing and managing a connection to the MySQL database.
+
+    This class attempts to connect to the database during initialization and retries upon failure
+    until a successful connection is established. The retry interval is defined by the
+    `DATABASE_RECONNECTION_TIMEOUT` setting in the configuration.
+
+    Attributes:
+        database (MySQLConnection): The active MySQL connection instance.
+    """
+
     database: MySQLConnection
 
     while True:
-        Console.print("Connecting to DB!")
+        print("Connecting to DB!")
 
         try:
             database = mysql.connector.connect(
@@ -23,5 +44,5 @@ class DatabaseBridge(StaticClass):
 
             break
         except DatabaseError:
-            Console.warn(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!")
+            print(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!")
             time.sleep(config.DATABASE_RECONNECTION_TIMEOUT)

@@ -1,3 +1,14 @@
+"""
+WebHeroes.py
+
+This module defines the `WebHeroes` class, which serves as the main interface for managing the web server,
+handling authentication, and providing various routes for the Flask application.
+
+Classes:
+    WebHeroes: A static class that configures and manages the Flask web application and its integration
+    with the Discord API.
+"""
+
 from flask import Flask, render_template, request, session, redirect
 from werkzeug import Response
 from zenora import APIClient
@@ -62,16 +73,36 @@ class WebHeroes(StaticClass):
     @staticmethod
     @app.route("/", methods=["GET"])
     def home() -> str:
+        """
+        Handles requests to the home page ("/").
+
+        :return: The rendered template for the index page.
+        """
+
         return render_template("index.html")
 
     @staticmethod
     @app.route("/modding-documentation/")
     def modding_documentation() -> str:
+        def modding_documentation() -> str:
+            """
+            Serves the modding documentation page.
+
+            :return: The rendered template for the modding documentation page.
+            """
+
         return render_template("modding-documentation.html")
 
     @staticmethod
     @app.route("/oauth/", methods=["GET"])
     def oauth() -> Response:
+        """
+        Handles Discord OAuth2 authentication. This route exchanges the authorization code for
+        an access token and retrieves user details, which are then stored in the session.
+
+        :return: A redirect response to the online lobbies page or the home page in case of failure.
+        """
+
         oauth_code: str = request.args.get('code', '')
 
         try:
@@ -98,6 +129,13 @@ class WebHeroes(StaticClass):
     @staticmethod
     @app.route("/online-lobbies/", methods=["GET"])
     def online_lobbies() -> str | Response:
+        """
+        Manages the online lobbies route. If the user is not authenticated, they are redirected
+        to the Discord OAuth2 authorization page. Otherwise, the online lobbies page is rendered.
+
+        :return: The rendered online lobbies template or a redirect response to the OAuth2 URL.
+        """
+
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
         

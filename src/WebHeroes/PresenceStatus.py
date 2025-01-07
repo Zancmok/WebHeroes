@@ -1,3 +1,13 @@
+"""
+PresenceStatus.py
+
+This module defines the `PresenceStatus` enumeration, representing the possible presence
+statuses of a user in the application.
+
+Classes:
+    PresenceStatus: An enumeration representing whether a user is online or offline.
+"""
+
 from enum import Enum
 
 
