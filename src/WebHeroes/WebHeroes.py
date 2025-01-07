@@ -84,12 +84,11 @@ class WebHeroes(StaticClass):
     @staticmethod
     @app.route("/modding-documentation/")
     def modding_documentation() -> str:
-        def modding_documentation() -> str:
-            """
-            Serves the modding documentation page.
+        """
+        Serves the modding documentation page.
 
-            :return: The rendered template for the modding documentation page.
-            """
+        :return: The rendered template for the modding documentation page.
+        """
 
         return render_template("modding-documentation.html")
 
