@@ -1,3 +1,15 @@
+"""
+main.py
+
+This module defines the entry point for running the main logic of the program.
+It checks for the existence of a `.env` file and ensures that the program should
+only run if certain conditions are met. If the conditions are not met, the program
+will notify the user and exit early.
+
+The `main()` function orchestrates the setup and execution of the program, and it
+only runs the core functionality if the environment is correctly configured.
+"""
+
 import os
 
 
