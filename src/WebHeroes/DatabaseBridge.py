@@ -32,7 +32,7 @@ class DatabaseBridge(StaticClass):
     database: MySQLConnection
 
     while True:
-        print("Connecting to DB!")
+        print("Connecting to DB!", flush=True)
 
         try:
             database = mysql.connector.connect(
@@ -44,5 +44,5 @@ class DatabaseBridge(StaticClass):
 
             break
         except DatabaseError:
-            print(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!")
+            print(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!", flush=True)
             time.sleep(config.DATABASE_RECONNECTION_TIMEOUT)

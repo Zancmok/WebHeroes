@@ -109,12 +109,17 @@
 		</table>
 
 		<script src="/static/js/temp.js"></script>
+
 		<script type="text/javascript" charset="utf-8">
-			var socket = io();
-			socket.on('connect', function() {
-				socket.emit('my event', {data: 'I\'m connected!'});
-			});
+			(function init() {
+			  var socket = io()
+
+			  socket.on('log', function(payload) {
+				console.log(payload);
+			  })
+			})()
 		</script>
+
 	</body>
 
 </html>
