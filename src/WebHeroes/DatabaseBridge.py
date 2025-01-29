@@ -14,6 +14,7 @@ import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.errors import DatabaseError
 import WebHeroes.config as config
+from typing import Optional
 import time
 
 
@@ -29,20 +30,26 @@ class DatabaseBridge(StaticClass):
         database (MySQLConnection): The active MySQL connection instance.
     """
 
-    database: MySQLConnection
+    database: Optional[MySQLConnection] = None
 
-    while True:
-        print("Connecting to DB!", flush=True)
+    @staticmethod
+    def init() -> None:
+        """
+        Initializes the DatabaseBridge.
+        :return:
+        """
+        while True:
+            print("Connecting to DB!", flush=True)
 
-        try:
-            database = mysql.connector.connect(
-                host=config.MYSQL_HOST,
-                user=config.MYSQL_USER,
-                password=config.MYSQL_PASSWORD,
-                database=config.MYSQL_DATABASE
-            )
+            try:
+                DatabaseBridge.database = mysql.connector.connect(
+                    host=config.MYSQL_HOST,
+                    user=config.MYSQL_USER,
+                    password=config.MYSQL_PASSWORD,
+                    database=config.MYSQL_DATABASE
+                )
 
-            break
-        except DatabaseError:
-            print(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!", flush=True)
-            time.sleep(config.DATABASE_RECONNECTION_TIMEOUT)
+                break
+            except DatabaseError:
+                print(f"Couldn't connect to DB, retrying in {config.DATABASE_RECONNECTION_TIMEOUT}s!", flush=True)
+                time.sleep(config.DATABASE_RECONNECTION_TIMEOUT)

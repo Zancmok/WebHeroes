@@ -68,6 +68,8 @@ class WebHeroes(StaticClass):
         :return: None
         """
 
+        DatabaseBridge.init()
+
         managers: list[RouteManager] = [
             LobbyManager.route_manager
         ]
