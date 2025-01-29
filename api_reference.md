@@ -2,11 +2,11 @@
 
 ## Endpoints
 
-### 1. `GET /get-basic-user-data/`
+### 1. `WebSocket Event: get-basic-user-data`
 Fetches basic user data (username, avatar URL, and user ID) of the currently authenticated user.
 
 **Request**:
-- Method: `GET`
+- Event: `get-basic-user-data`
 
 **Response**:
 - **200 OK**: If the user is authenticated and has an active session, the response includes their username, avatar URL, and user ID.
