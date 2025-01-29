@@ -19,6 +19,9 @@ from zenora.exceptions import APIError
 from ZLib.StaticClass import StaticClass
 import WebHeroes.config as config
 from WebHeroes.LobbyManager import LobbyManager
+from WebHeroes.User import User
+from WebHeroes.PresenceStatus import PresenceStatus
+from WebHeroes.RouteManager import RouteManager
 from WebHeroes.DatabaseBridge import DatabaseBridge
 import eventlet
 from typing import Optional
@@ -65,7 +68,12 @@ class WebHeroes(StaticClass):
         :return: None
         """
 
-        LobbyManager.route_manager.register_routes(WebHeroes.app)
+        managers: list[RouteManager] = [
+            LobbyManager.route_manager
+        ]
+
+        for manager in managers:
+            manager.register_routes(WebHeroes.app, WebHeroes.socket_io)
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
@@ -166,7 +174,12 @@ class WebHeroes(StaticClass):
         if not session.get('access_token', ''):
             return False
 
-        print(f"Connected", flush=True)
+        session['user'] = User(
+            user_id=session['user_id'],
+            name=session['username'],
+            avatar_url=session['avatar_url'],
+            presence_status=PresenceStatus.online
+        )
 
     @staticmethod
     @socket_io.on('disconnect')
@@ -181,4 +194,4 @@ class WebHeroes(StaticClass):
             reason (str): A string indicating the reason for the disconnection.
         """
 
-        pass
+        session['user'].presence_status = PresenceStatus.offline

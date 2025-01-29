@@ -112,11 +112,22 @@
 
 		<script type="text/javascript" charset="utf-8">
 			(function init() {
-			  var socket = io()
+				var socket = io()
 
-			  socket.on('log', function(payload) {
-				console.log(payload);
-			  })
+				socket.on("connect", () => {
+    				console.log("Connected to server!");
+				});
+
+				socket.on("get-basic-user-data", function(payload) {
+					const nameDisplay = document.getElementById("nameDisplay");
+					const ratingDisplay = document.getElementById("ratingDisplay");
+					const pfpDisplay = document.getElementById("pfp-display");
+
+					nameDisplay.textContent = payload.username;
+					pfpDisplay.src = payload.avatar_url;
+				})
+
+				socket.emit("get-basic-user-data");
 			})()
 		</script>
 
