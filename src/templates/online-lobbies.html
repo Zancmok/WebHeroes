@@ -1,3 +1,4 @@
+
 <!doctype html>
 
 <html lang="en">
@@ -7,7 +8,9 @@
 		<meta name="description" content="heroes online">
 		<meta name="author" content="Rožle Lipej">
 		<meta name="keywords" content="Heroes,Online">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="lobbies.css" />
 	</head>
 
 	<body>
@@ -16,7 +19,7 @@
 			<thead>
 				<tr>
 					<td id="nameDisplay">bos</td>
-					<td rowspan="2"><img id="pfp-display" src="https://www.google.com/search?sca_esv=711f59ee6954731e&rlz=1C1GCEA_enSI1114SI1114&q=img&udm=2&fbs=AEQNm0AIx7nIZTsVA3WcUAKGOWedqUmgl8y2FrYmW4Bi0F9PMc0Jdvnw8hHt7wRdK2tATAmPPPpTWnvMlwd5PsZk3CrJDvE32lruaFgO9LT3mhYlFWbNJ4DQPbDxoSKLMz9nUCIwa_l7xj-1PmBz7iM2XiO4zunXeb5VF5NTzOgWi4Wt9bj8mV4&sa=X&ved=2ahUKEwiDjNOZzJqKAxWtlP0HHTaoG3YQtKgLegQIIRAB&biw=1920&bih=945&dpr=1#vhid=hJPoPb9YPajvXM&vssid=mosaic"></td>
+					<td rowspan="2"><img id="pfp-display" src="https://cdn.discordapp.com/embed/avatars/1.png" width="100em" height="100em"></td>
 				</tr>
 				<tr>
 					<td id="ratingDisplay">rating:</td>
@@ -45,7 +48,7 @@
 		
 		<img></img>
 		
-		<table border="1" style="width:45%;float:left">
+		<table border="1" id="bot">
 			<thead id="lobbies">
 				<tr>
 					<td>*</td><!--save icon probabily-->
@@ -64,7 +67,7 @@
 			
 		</table>
 		
-		<table border="1" style="width:40%;float:left">
+		<table border="1" id="bot2">
 			<thead>
 				<tr>
 					<td>CHAT ICON</td>
@@ -77,7 +80,7 @@
 			</tbody>
 		</table>
 		
-		<table border="1" style="width:15%;float:left">
+		<table border="1" id="bot3">
 			<thead>
 				<tr>
 					<td>PLAYERS ONLINE</td>
@@ -89,24 +92,17 @@
 			</tbody>
 		</table>
 		
-		<table style="width:50%;float:left">
-			<tfoot>
-				<tr>
-					<td><button>NEW GAME</button></td>
-					<td><button>LOAD GAME</button></td>
-					<td><button>JOIN</button></td>
-				</tr>
-			</tfoot>
-		</table>
+		<div id="buttons">
+			<button id="newGame">NEW GAME</button>
+			<button id="loadGame">LOAD GAME</button>
+			<button id="join">JOIN</button>
+		</div>
+
 		
-		<table style="width:50%;float:left">
-			<tfoot>
-				<tr>
-					<td><input type="text" placeholder="-"></td>
-					<td><button>SEND</button></td>
-				</tr>
-			</tfoot>
-		</table>
+
+		<input type="text" placeholder="-" id="message">
+		<button id="send">SEND</button>
+
 
 		<script src="/static/js/temp.js"></script>
 

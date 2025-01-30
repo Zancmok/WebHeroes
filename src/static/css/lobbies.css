@@ -1,0 +1,56 @@
+
+#newGame{
+	position: fixed;
+	bottom: 1em;
+	left: 3em;
+	width:20em;
+}
+
+#loadGame{
+	position: fixed;
+	bottom: 1em;
+	left: 27em;
+	width: 20em;
+}
+
+#join{
+	position: fixed;
+	bottom: 1em;
+	left: 50em;
+	width:20em;
+}
+
+#message{
+	position: fixed;
+	bottom: 1em;
+	right:1em;
+	width:50%;
+}
+
+#send{
+	position: fixed;
+	bottom: 1em;
+	right: 1em;
+}
+
+#bot{
+	width:45%;
+	float:left;
+	position: fixed;
+	top: 8em;
+}
+#bot2{
+	width:40%;
+	float:left;
+	position: fixed;
+	right:17em;
+	top: 8em;
+}
+
+#bot3{
+	width:17em;
+	float:right;
+	position: fixed;
+	right:0em;
+	top:8em;
+}
