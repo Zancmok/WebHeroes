@@ -10,7 +10,7 @@ Classes:
 """
 
 from flask import Flask, render_template, request, session, redirect
-from flask_socketio import SocketIO, emit
+from flask_socketio import SocketIO
 from werkzeug import Response
 from zenora import APIClient
 from zenora.models.oauth import OauthResponse
@@ -19,12 +19,9 @@ from zenora.exceptions import APIError
 from ZLib.StaticClass import StaticClass
 import WebHeroes.config as config
 from WebHeroes.LobbyManager import LobbyManager
-from WebHeroes.User import User
-from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.DatabaseBridge import DatabaseBridge
 import eventlet
-from typing import Optional
 
 
 class WebHeroes(StaticClass):
@@ -157,43 +154,3 @@ class WebHeroes(StaticClass):
             return redirect(config.DISCORD_OAUTH_URL)
 
         return render_template("online-lobbies.html")
-
-    @staticmethod
-    @socket_io.on('connect')
-    def on_connect() -> Optional[bool]:
-        """
-        Handles the 'connect' event for a socket connection.
-
-        This method is triggered when a client attempts to establish a socket connection.
-        If the client's session does not contain an 'access_token', the connection is rejected
-        by returning `False`.
-
-        Returns:
-            Optional[bool]: Returns `False` if the 'access_token' is missing in the session;
-                            otherwise, no return value is provided (implicitly `None`).
-        """
-
-        if not session.get('access_token', ''):
-            return False
-
-        session['user'] = User(
-            user_id=session['user_id'],
-            name=session['username'],
-            avatar_url=session['avatar_url'],
-            presence_status=PresenceStatus.online
-        )
-
-    @staticmethod
-    @socket_io.on('disconnect')
-    def on_disconnect(reason: str) -> None:
-        """
-        Handles the 'disconnect' event for a socket connection.
-
-        This method is triggered when a client disconnects from the socket.
-        Currently, it is a placeholder and does not perform any actions.
-
-        Args:
-            reason (str): A string indicating the reason for the disconnection.
-        """
-
-        session['user'].presence_status = PresenceStatus.offline
