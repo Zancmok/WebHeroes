@@ -47,9 +47,6 @@ Emits basic user information stored in the session.
 ### 2. `WebSocket Event: connect`
 Handles the WebSocket connection event.
 
-#### **Request**
-- **Event**: `get-basic-user-data`
-
 #### **Behavior**
 - If the user is not authenticated (`access_token` missing from session), the connection is rejected.
 - If the user is authenticated but not found in `UserManager`, a new `User` instance is created.
