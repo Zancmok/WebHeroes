@@ -143,7 +143,7 @@ class LobbyManager(StaticClass):
             reason (str): A string indicating the reason for the disconnection.
         """
 
-        user: User = UserManager.get(session['user_id'])
+        user: Optional[User] = UserManager.get(session['user_id'])
 
         if user:
             user.presence_status = PresenceStatus.offline
