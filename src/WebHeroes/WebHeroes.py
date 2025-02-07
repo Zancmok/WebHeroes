@@ -16,7 +16,7 @@ from zenora import APIClient
 from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
 from zenora.exceptions import APIError
-from ZLib.StaticClass import StaticClass
+from ZancmokLib.StaticClass import StaticClass
 import WebHeroes.config as config
 from WebHeroes.LobbyManager import LobbyManager
 from WebHeroes.RouteManager import RouteManager

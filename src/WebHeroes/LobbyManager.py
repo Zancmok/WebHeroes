@@ -14,7 +14,7 @@ from flask_socketio import emit, join_room, leave_room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
 from WebHeroes.UserManager import UserManager
-from ZLib.StaticClass import StaticClass
+from ZancmokLib.StaticClass import StaticClass
 from typing import Optional
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room

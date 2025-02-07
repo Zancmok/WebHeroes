@@ -9,7 +9,7 @@ Classes:
     DatabaseBridge: A static class for establishing and managing a MySQL database connection.
 """
 
-from ZLib.StaticClass import StaticClass
+from ZancmokLib.StaticClass import StaticClass
 import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.errors import DatabaseError
