@@ -2,9 +2,9 @@
 
 ## Index
 - [WebSocket Events](#websocket-events)  
-  - [`get-basic-user-data`](#1-websocket-event-get-basic-user-data)  
-  - [`connect`](#2-websocket-event-connect)  
-  - [`disconnect`](#3-websocket-event-disconnect)  
+  - [`connect`](#1-websocket-event-connect)  
+  - [`disconnect`](#2-websocket-event-disconnect)
+  - [get-lobby-data](#3-websocket-event-get-lobby-data)
 - [GET Methods](#get-methods)  
   - [`GET /`](#1-get-)  
   - [`GET /modding-documentation/`](#2-get-modding-documentation)  
@@ -16,35 +16,7 @@
 
 ## WebSocket Events
 
-### 1. `WebSocket Event: get-basic-user-data`
-Emits basic user information stored in the session.
-
-#### **Request**
-- **Event**: `get-basic-user-data`
-
-#### **Response**
-- **200 OK**: If the user is authenticated and has an active session, the response contains:
-  - `username`: The user's display name.
-  - `avatar_url`: The URL of the user's avatar.
-  - `user_id`: The unique identifier of the user.
-- **Empty JSON Object (`{}`)**: Returned if the user is not authenticated or their session has expired.
-
-#### **Behavior**
-- If the session does not contain an `access_token`, an empty JSON object (`{}`) is emitted.
-- If authenticated, the event retrieves the `username`, `avatar_url`, and `user_id` from the session and emits them.
-
-#### **Response Example**
-```json
-{
-  "username": "john_doe",
-  "avatar_url": "https://example.com/avatar.jpg",
-  "user_id": 123456789
-}
-```
-
----
-
-### 2. `WebSocket Event: connect`
+### 1. `WebSocket Event: connect`
 Handles the WebSocket connection event.
 
 #### **Behavior**
@@ -59,12 +31,32 @@ Handles the WebSocket connection event.
 
 ---
 
-### 3. `WebSocket Event: disconnect`
+### 2. `WebSocket Event: disconnect`
 Handles the WebSocket disconnection event.
 
 #### **Behavior**
 - Updates the user's presence status to `offline` if they exist in `UserManager`.
 - Removes the user from the default lobby room.
+
+---
+
+### 3. WebSocket Event: get-lobby-data
+Fetches and emits the current lobby data, including the details of the user requesting it,
+the list of users in the current lobby, and other available lobbies with their members.
+
+#### **Behavior**
+- If the session does not contain a valid `access_token`, an empty lobby data object is emitted.
+- Otherwise, the function retrieves the user details for the current user (`name`, `avatar_url`, `user_id`, and `presence_status`), and collects the necessary data for users in the current lobby and other lobbies.
+- Emits the collected data, which includes:
+  - The current user's details.
+  - The details of other users in the same lobby.
+  - A list of other available lobbies and their members.
+
+#### **Response**
+- **Emits** the "get-lobby-data" event with a JSON object containing:
+  - `self`: The current user's details.
+  - `users`: A list of users in the current lobby.
+  - `lobbies`: A list of other lobbies with their members' details.
 
 ---
 

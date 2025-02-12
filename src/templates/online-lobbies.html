@@ -114,16 +114,11 @@
     				console.log("Connected to server!");
 				});
 
-				socket.on("get-basic-user-data", function(payload) {
-					const nameDisplay = document.getElementById("nameDisplay");
-					const ratingDisplay = document.getElementById("ratingDisplay");
-					const pfpDisplay = document.getElementById("pfp-display");
-
-					nameDisplay.textContent = payload.username;
-					pfpDisplay.src = payload.avatar_url;
+				socket.on("get-lobby-data", function(payload) {
+					console.log(payload)
 				})
 
-				socket.emit("get-basic-user-data");
+				socket.emit("get-lobby-data");
 			})()
 		</script>
 

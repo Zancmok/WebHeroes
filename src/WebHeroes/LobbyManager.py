@@ -35,6 +35,7 @@ class LobbyManager(StaticClass):
 
     route_manager: RouteManager = RouteManager()
     lobby_room: Room = Room("lobby")
+    other_lobbies: list[Room] = []
 
     @staticmethod
     def join_room(room: Room, user: User) -> None:
@@ -67,33 +68,64 @@ class LobbyManager(StaticClass):
         room.remove(user)
 
     @staticmethod
-    @route_manager.event("get-basic-user-data")
-    def get_basic_user_data() -> None:
+    @route_manager.event("get-lobby-data")
+    def get_lobby_data() -> None:
         """
-        Emits basic user information stored in the session.
+        Fetches and emits the current lobby data, including the details of the user requesting it,
+        the list of users in the current lobby, and other available lobbies with their members.
 
-        This function retrieves the username, avatar URL, and user ID of the currently logged-in user
-        from the session and emits the data via Socket.IO. If the user is not authenticated (i.e., no
-        access token is found in the session), an empty dictionary is emitted instead.
+        The function first checks if the session contains a valid access token. If not, it emits an
+        empty lobby data object. Otherwise, it retrieves the user details for the current user (based
+        on their user ID stored in the session) and collects the necessary data for the lobby and users.
+
+        The emitted data includes:
+        - The current user's details (name, avatar, user ID, and presence status).
+        - The details of other users in the same lobby (name, avatar, user ID, and presence status).
+        - A list of other available lobbies and their members, with each member's name, avatar, user ID,
+        and presence status.
 
         Emits:
-            "get-basic-user-data" (dict): A dictionary containing:
-                - username (str): The user's username.
-                - avatar_url (str): The URL of the user's avatar.
-                - user_id (int): The user's unique ID.
-
-            If the user is not authenticated, an empty dictionary `{}` is emitted.
+            - Event "get-lobby-data" with a JSON object containing:
+                - `self`: The current user's details.
+                - `users`: A list of users in the current lobby.
+                - `lobbies`: A list of other lobbies with their members' details.
         """
 
-        if not session.get('access_token'):
-            emit("get-basic-user-data", {})
-            return
+        if not session.get("access_token"):
+            emit("get-lobby-data", {})
 
-        emit("get-basic-user-data", {
-            'username': session['username'],
-            'avatar_url': session['avatar_url'],
-            'user_id': session['user_id']
+        own_user: User = UserManager.get(session['user_id'])
+
+        emit("get-lobby-data", {
+            "self": {
+                "name": own_user.name,
+                "avatar_url": own_user.avatar_url,
+                "user_id": own_user.user_id,
+                "presence_status": str(own_user.presence_status)
+            },
+            "users": [
+                {
+                    "name": user.name,
+                    "avatar_url": user.avatar_url,
+                    "user_id": user.user_id,
+                    "presence_status": str(user.presence_status)
+                } for user in LobbyManager.lobby_room.children
+            ],
+            "lobbies": [
+                {
+                    "name": lobby.name,
+                    "members": [
+                        {
+                            "name": member.name,
+                            "avatar_url": member.avatar_url,
+                            "user_id": member.user_id,
+                            "presence_status": str(member.presence_status)
+                        } for member in lobby.children
+                    ]
+                } for lobby in LobbyManager.other_lobbies
+            ]
         })
+        
 
     @staticmethod
     @route_manager.event('connect')
