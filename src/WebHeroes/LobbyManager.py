@@ -15,7 +15,7 @@ from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
 from WebHeroes.UserManager import UserManager
 from ZancmokLib.StaticClass import StaticClass
-from typing import Optional
+from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
 
@@ -114,6 +114,13 @@ class LobbyManager(StaticClass):
             "lobbies": [
                 {
                     "name": lobby.name,
+                    "room_id": lobby.room_id,
+                    "owner": {
+                        "name": lobby.owner.name,
+                        "avatar_url": lobby.owner.avatar_url,
+                        "user_id": lobby.owner.user_id,
+                        "presence_status": str(lobby.owner.presence_status)
+                    },
                     "members": [
                         {
                             "name": member.name,
@@ -125,7 +132,33 @@ class LobbyManager(StaticClass):
                 } for lobby in LobbyManager.other_lobbies
             ]
         })
-        
+
+    @staticmethod
+    @route_manager.event('create-lobby')
+    def create_lobby(name: Any) -> None:
+        """
+        # TODO: Make Docstring
+        """
+
+        if not session.get("access_token"):
+            emit("create-lobby", {})
+            return
+
+        # TODO: Make check so only 1 lobby per cyka
+
+        if not name or not type(name) is str:  # TODO: Do better naming limits
+            emit("create-lobby", {})
+            return
+
+        new_lobby: Room = Room(name=name)
+
+        new_lobby.owner = UserManager.get(session['user_id'])
+        new_lobby.add(new_lobby.owner)
+
+        LobbyManager.other_lobbies.append(new_lobby)
+
+        # TODO: Fire 'lobby-update' event!
+        # TODO: Redirect to GET '/lobby/<lobby_id:int>'
 
     @staticmethod
     @route_manager.event('connect')
