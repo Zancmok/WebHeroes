@@ -118,9 +118,13 @@
 					console.log(payload)
 				})
 
+				socket.on("lobby-update", function(payload) {
+					console.log(payload)
+				})
+
 				socket.emit("get-lobby-data");
 
-				socket.emit("create-lobby", "name-blyat-is-nice");
+				socket.emit("create-lobby", "test-lobby");
 			})()
 		</script>
 

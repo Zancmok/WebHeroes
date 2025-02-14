@@ -18,6 +18,7 @@ from ZancmokLib.StaticClass import StaticClass
 from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
+from WebHeroes.LobbyUpdate import LobbyUpdate
 
 
 class LobbyManager(StaticClass):
@@ -92,7 +93,7 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("get-lobby-data", {})
+            emit("get-lobby-data", {}, to=session)
 
         own_user: User = UserManager.get(session['user_id'])
 
@@ -131,7 +132,7 @@ class LobbyManager(StaticClass):
                     ]
                 } for lobby in LobbyManager.other_lobbies
             ]
-        })
+        }, to=session)
 
     @staticmethod
     @route_manager.event('create-lobby')
@@ -141,13 +142,13 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("create-lobby", {})
+            emit("create-lobby", {}, to=session)
             return
 
         # TODO: Make check so only 1 lobby per cyka
 
         if not name or not type(name) is str:  # TODO: Do better naming limits
-            emit("create-lobby", {})
+            emit("create-lobby", {}, to=session)
             return
 
         new_lobby: Room = Room(name=name)
@@ -159,6 +160,16 @@ class LobbyManager(StaticClass):
 
         # TODO: Fire 'lobby-update' event!
         # TODO: Redirect to GET '/lobby/<lobby_id:int>'
+
+    @staticmethod
+    def fire_lobby_update(reason: LobbyUpdate, change: dict[str, Any]) -> None:
+        emit(
+            'lobby-update',
+            {
+                'reason': str(reason),
+                'change': change
+            }
+        )
 
     @staticmethod
     @route_manager.event('connect')
