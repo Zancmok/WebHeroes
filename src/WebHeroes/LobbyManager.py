@@ -9,7 +9,7 @@ Classes:
     LobbyManager: A static class for managing lobby-related routes and user data.
 """
 
-from flask import session
+from flask import session, redirect
 from flask_socketio import emit, join_room, leave_room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
@@ -158,17 +158,40 @@ class LobbyManager(StaticClass):
 
         LobbyManager.other_lobbies.append(new_lobby)
 
-        # TODO: Fire 'lobby-update' event!
+        LobbyManager.fire_lobby_update(LobbyUpdate.new_lobby, {
+            "name": new_lobby.name,
+            "room_id": new_lobby.room_id,
+            "owner": {
+                "name": new_lobby.owner.name,
+                "avatar_url": new_lobby.owner.avatar_url,
+                "user_id": new_lobby.owner.user_id,
+                "presence_status": str(new_lobby.owner.presence_status)
+            },
+            "members": [
+                {
+                    "name": member.name,
+                    "avatar_url": member.avatar_url,
+                    "user_id": member.user_id,
+                    "presence_status": str(member.presence_status)
+                } for member in new_lobby.children
+            ]
+        })
         # TODO: Redirect to GET '/lobby/<lobby_id:int>'
+        # redirect("")
 
     @staticmethod
     def fire_lobby_update(reason: LobbyUpdate, change: dict[str, Any]) -> None:
+        """
+        # TODO: Make Docstring
+        """
+
         emit(
             'lobby-update',
             {
                 'reason': str(reason),
                 'change': change
-            }
+            },
+            namespace=LobbyManager.lobby_room
         )
 
     @staticmethod
