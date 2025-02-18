@@ -9,7 +9,7 @@ Classes:
     LobbyManager: A static class for managing lobby-related routes and user data.
 """
 
-from flask import session, redirect
+from flask import session, redirect, request
 from flask_socketio import emit, join_room, leave_room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
@@ -93,7 +93,7 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("get-lobby-data", {}, to=session)
+            emit("get-lobby-data", {}, to=session['user_sid'])
 
         own_user: User = UserManager.get(session['user_id'])
 
@@ -132,7 +132,7 @@ class LobbyManager(StaticClass):
                     ]
                 } for lobby in LobbyManager.other_lobbies
             ]
-        }, to=session)
+        }, to=session['user_sid'])
 
     @staticmethod
     @route_manager.event('create-lobby')
@@ -142,13 +142,13 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("create-lobby", {}, to=session)
+            emit("create-lobby", {}, to=session['user_sid'])
             return
 
         # TODO: Make check so only 1 lobby per cyka
 
         if not name or not type(name) is str:  # TODO: Do better naming limits
-            emit("create-lobby", {}, to=session)
+            emit("create-lobby", {}, to=session['user_sid'])
             return
 
         new_lobby: Room = Room(name=name)
@@ -211,6 +211,8 @@ class LobbyManager(StaticClass):
 
         if not session.get('access_token', ''):
             return False
+
+        session['user_sid'] = request.sid
 
         if not UserManager.get(session.get('user_id')):
             UserManager.create_user(
