@@ -5,13 +5,7 @@
 from dataclasses import dataclass
 from typing import Any
 from PresenceStatus import PresenceStatus
-
-
-def to_dict(specimen: Any) -> dict[Any, Any]:
-    """
-    # TODO: Write Docstring!
-    :return:
-    """
+from LobbyUpdate import LobbyUpdate
 
 
 @dataclass
@@ -21,6 +15,13 @@ class BaseResponseClass:
     """
 
     type: str
+
+
+def to_dict(specimen: BaseResponseClass) -> dict[Any, Any]:
+    """
+    # TODO: Write Docstring!
+    :return:
+    """
 
 
 @dataclass
@@ -71,3 +72,42 @@ class GetLobbyDataResponse(BaseResponseClass):
     self: User
     users: list[User]
     lobbies: list[Lobby]
+
+
+@dataclass
+class NewUserUpdate(BaseResponseClass):
+    """
+    # TODO: Write Docstring!
+    """
+
+    type = "new-user-update"
+
+
+@dataclass
+class NewLobbyUpdate(BaseResponseClass):
+    """
+    # TODO: Write Docstring!
+    """
+
+    type = "new-lobby-update"
+
+
+@dataclass
+class UserUpdatedUpdate(BaseResponseClass):
+    """
+    # TODO: Write Docstring!
+    """
+
+    type = "user-updated-update"
+
+
+@dataclass
+class LobbyUpdateResponse(BaseResponseClass):
+    """
+    # TODO: Write Docstring!
+    """
+
+    type = "lobby-update"
+
+    change_type: LobbyUpdate
+    change: NewUserUpdate | NewLobbyUpdate | UserUpdatedUpdate
