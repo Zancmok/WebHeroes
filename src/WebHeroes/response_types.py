@@ -4,6 +4,7 @@
 
 from dataclasses import dataclass
 from typing import Any
+from enum import Enum
 from PresenceStatus import PresenceStatus
 from LobbyUpdate import LobbyUpdate
 
@@ -17,11 +18,27 @@ class BaseResponseClass:
     type: str
 
 
-def to_dict(specimen: BaseResponseClass) -> dict[Any, Any]:
+def dictify(data: BaseResponseClass) -> dict[str, Any]:
     """
     # TODO: Write Docstring!
-    :return:
     """
+
+    out: dict[str, Any] = {}
+
+    for attribute in dir(data):
+        if attribute[:2] == "__":
+            continue
+
+        attribute_value: Any = getattr(data, attribute)
+
+        if isinstance(attribute_value, Enum):
+            attribute_value = str(attribute_value)
+        elif isinstance(attribute_value, BaseResponseClass):
+            attribute_value = dictify(attribute_value)
+
+        out[attribute] = attribute_value
+
+    return out
 
 
 @dataclass
@@ -111,3 +128,10 @@ class LobbyUpdateResponse(BaseResponseClass):
 
     change_type: LobbyUpdate
     change: NewUserUpdate | NewLobbyUpdate | UserUpdatedUpdate
+
+x = LobbyUpdateResponse(
+    change_type=LobbyUpdate.new_lobby,
+    change=NewLobbyUpdate()
+)
+
+print(dictify(x))
