@@ -1,26 +1,38 @@
 """
-# TODO: Write Docstring!
+response_types.py
+
+This module defines response data structures and utilities for handling WebHeroes API responses.
 """
 
 from dataclasses import dataclass
 from typing import Any
 from enum import Enum
-from PresenceStatus import PresenceStatus
-from LobbyUpdate import LobbyUpdate
+from ZancmokLib.dataclass_util import auto_defaults
+from WebHeroes.PresenceStatus import PresenceStatus
+from WebHeroes.LobbyUpdate import LobbyUpdate
 
 
 @dataclass
 class BaseResponseClass:
     """
-    # TODO: Write Docstring!
+    Base class for all API response data structures.
+
+    Attributes:
+        response_type (str): The type of response.
     """
 
-    type: str
+    response_type: str
 
 
 def dictify(data: BaseResponseClass) -> dict[str, Any]:
     """
-    # TODO: Write Docstring!
+    Converts a response object into a dictionary, handling nested objects and enums.
+
+    Args:
+        data (BaseResponseClass): The response object to convert.
+
+    Returns:
+        dict[str, Any]: The dictionary representation of the response object.
     """
 
     out: dict[str, Any] = {}
@@ -41,22 +53,30 @@ def dictify(data: BaseResponseClass) -> dict[str, Any]:
     return out
 
 
+@auto_defaults
 @dataclass
 class EmptyResponse(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Represents an empty response with no additional data.
     """
 
-    type = "empty"
+    response_type = "empty"
 
 
+@auto_defaults
 @dataclass
 class User(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Represents a user in the system.
+
+    Attributes:
+        user_id (int): The user's unique identifier.
+        username (str): The user's name.
+        avatar_url (str): The URL to the user's avatar.
+        presence_status (PresenceStatus): The user's online presence status.
     """
 
-    type = "user"
+    response_type = "user"
 
     user_id: int
     username: str
@@ -64,13 +84,20 @@ class User(BaseResponseClass):
     presence_status: PresenceStatus
 
 
+@auto_defaults
 @dataclass
 class Lobby(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Represents a game lobby.
+
+    Attributes:
+        room_id (int): The lobby's unique identifier.
+        name (str): The name of the lobby.
+        owner (User): The owner of the lobby.
+        members (list[User]): List of users in the lobby.
     """
 
-    type = "lobby"
+    response_type = "lobby"
 
     room_id: int
     name: str
@@ -78,60 +105,67 @@ class Lobby(BaseResponseClass):
     members: list[User]
 
 
+@auto_defaults
 @dataclass
 class GetLobbyDataResponse(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Response containing data about available lobbies and users.
+
+    Attributes:
+        self (User): The requesting user.
+        users (list[User]): List of active users.
+        lobbies (list[Lobby]): List of available lobbies.
     """
 
-    type = "get-lobby-data-response"
+    response_type = "get-lobby-data-response"
 
     self: User
     users: list[User]
     lobbies: list[Lobby]
 
 
+@auto_defaults
 @dataclass
 class NewUserUpdate(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Notification about a new user joining the system.
     """
 
-    type = "new-user-update"
+    response_type = "new-user-update"
 
 
+@auto_defaults
 @dataclass
 class NewLobbyUpdate(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Notification about a new lobby being created.
     """
 
-    type = "new-lobby-update"
+    response_type = "new-lobby-update"
 
 
+@auto_defaults
 @dataclass
 class UserUpdatedUpdate(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Notification about a user's information being updated.
     """
 
-    type = "user-updated-update"
+    response_type = "user-updated-update"
 
 
+@auto_defaults
 @dataclass
 class LobbyUpdateResponse(BaseResponseClass):
     """
-    # TODO: Write Docstring!
+    Response containing an update about a lobby.
+
+    Attributes:
+        change_type (LobbyUpdate): The type of change that occurred.
+        change (NewUserUpdate | NewLobbyUpdate | UserUpdatedUpdate): Details of the change.
     """
 
-    type = "lobby-update"
+    response_type = "lobby-update"
 
     change_type: LobbyUpdate
     change: NewUserUpdate | NewLobbyUpdate | UserUpdatedUpdate
-
-x = LobbyUpdateResponse(
-    change_type=LobbyUpdate.new_lobby,
-    change=NewLobbyUpdate()
-)
-
-print(dictify(x))
