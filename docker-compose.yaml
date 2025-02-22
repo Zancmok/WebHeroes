@@ -20,3 +20,7 @@ services:
       MYSQL_USER: "user"
       MYSQL_PASSWORD: "password"
       MYSQL_DATABASE: "WebHeroes"
+    volumes:
+      - web_heroes_db_data:/var/lib/mysql
+volumes:
+  web_heroes_db_data:
