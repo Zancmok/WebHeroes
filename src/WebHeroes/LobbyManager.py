@@ -19,6 +19,7 @@ from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
 from WebHeroes.LobbyUpdate import LobbyUpdate
+from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse
 
 
 class LobbyManager(StaticClass):
@@ -93,46 +94,42 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("get-lobby-data", {}, to=session['user_sid'])
+            emit("get-lobby-data", {}, to=session["user_session_id"])
 
         own_user: User = UserManager.get(session['user_id'])
 
-        emit("get-lobby-data", {
-            "self": {
-                "name": own_user.name,
-                "avatar_url": own_user.avatar_url,
-                "user_id": own_user.user_id,
-                "presence_status": str(own_user.presence_status)
-            },
-            "users": [
-                {
-                    "name": user.name,
-                    "avatar_url": user.avatar_url,
-                    "user_id": user.user_id,
-                    "presence_status": str(user.presence_status)
-                } for user in LobbyManager.lobby_room.children
-            ],
-            "lobbies": [
-                {
-                    "name": lobby.name,
-                    "room_id": lobby.room_id,
-                    "owner": {
-                        "name": lobby.owner.name,
-                        "avatar_url": lobby.owner.avatar_url,
-                        "user_id": lobby.owner.user_id,
-                        "presence_status": str(lobby.owner.presence_status)
-                    },
-                    "members": [
-                        {
-                            "name": member.name,
-                            "avatar_url": member.avatar_url,
-                            "user_id": member.user_id,
-                            "presence_status": str(member.presence_status)
-                        } for member in lobby.children
-                    ]
-                } for lobby in LobbyManager.other_lobbies
-            ]
-        }, to=session['user_sid'])
+        emit("get-lobby-data",
+             dictify(GetLobbyDataResponse(
+                 self=UserResponse(
+                     user_id=own_user.user_id,
+                     username=own_user.name,
+                     avatar_url=own_user.avatar_url,
+                     presence_status=own_user.presence_status
+                 ),
+                 users=[UserResponse(
+                     user_id=user.user_id,
+                     username=user.name,
+                     avatar_url=user.avatar_url,
+                     presence_status=user.presence_status
+                 ) for user in LobbyManager.lobby_room.children],
+                 lobbies=[LobbyResponse(
+                     room_id=lobby.room_id,
+                     name=lobby.name,
+                     owner=UserResponse(
+                         user_id=lobby.owner.user_id,
+                         username=lobby.owner.name,
+                         avatar_url=lobby.owner.avatar_url,
+                         presence_status=lobby.owner.presence_status
+                     ),
+                     members=[UserResponse(
+                         user_id=member.user_id,
+                         username=member.name,
+                         avatar_url=member.avatar_url,
+                         presence_status=member.presence_status
+                     ) for member in lobby.children]
+                 ) for lobby in LobbyManager.other_lobbies]
+             )),
+             to=session["user_session_id"])
 
     @staticmethod
     @route_manager.event('create-lobby')
@@ -142,13 +139,13 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("create-lobby", {}, to=session['user_sid'])
+            emit("create-lobby", {}, to=session["user_session_id"])
             return
 
         # TODO: Make check so only 1 lobby per cyka
 
         if not name or not type(name) is str:  # TODO: Do better naming limits
-            emit("create-lobby", {}, to=session['user_sid'])
+            emit("create-lobby", {}, to=session["user_session_id"])
             return
 
         new_lobby: Room = Room(name=name)
@@ -212,7 +209,7 @@ class LobbyManager(StaticClass):
         if not session.get('access_token', ''):
             return False
 
-        session['user_sid'] = request.sid
+        session["user_session_id"] = request.sid
 
         if not UserManager.get(session.get('user_id')):
             UserManager.create_user(
