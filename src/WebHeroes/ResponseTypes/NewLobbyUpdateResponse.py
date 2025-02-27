@@ -12,4 +12,4 @@ class NewLobbyUpdateResponse(BaseResponseClass):
     Notification about a new lobby being created.
     """
 
-    response_type: str = field(default="new-lobby-update", kw_only=True)
+    object_type: str = field(default="new-lobby-update", kw_only=True)

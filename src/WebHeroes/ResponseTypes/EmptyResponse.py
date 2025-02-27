@@ -12,4 +12,4 @@ class EmptyResponse(BaseResponseClass):
     Represents an empty response with no additional data.
     """
 
-    response_type: str = field(default="empty", kw_only=True)
+    object_type: str = field(default="empty", kw_only=True)

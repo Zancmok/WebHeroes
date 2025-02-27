@@ -11,7 +11,7 @@ class BaseResponseClass:
     Base class for all API response data structures.
 
     Attributes:
-        response_type (str): The type of response.
+        object_type (str): The type of response.
     """
 
-    response_type: str
+    object_type: str

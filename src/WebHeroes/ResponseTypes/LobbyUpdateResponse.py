@@ -20,6 +20,6 @@ class LobbyUpdateResponse(BaseResponseClass):
         change (NewUserUpdateResponse | NewLobbyUpdateResponse | UserUpdatedUpdateResponse): Details of the change.
     """
 
-    response_type: str = field(default="lobby-update", kw_only=True)
+    object_type: str = field(default="lobby-update", kw_only=True)
     change_type: LobbyUpdate
     change: NewUserUpdateResponse | NewLobbyUpdateResponse | UserUpdatedUpdateResponse

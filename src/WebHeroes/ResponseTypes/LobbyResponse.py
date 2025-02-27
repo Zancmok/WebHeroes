@@ -19,7 +19,7 @@ class LobbyResponse(BaseResponseClass):
         members (list[User]): List of users in the lobby.
     """
 
-    response_type: str = field(default="lobby", kw_only=True)
+    object_type: str = field(default="lobby", kw_only=True)
 
     room_id: int
     name: str

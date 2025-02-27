@@ -19,7 +19,7 @@ class UserResponse(BaseResponseClass):
         presence_status (PresenceStatus): The user's online presence status.
     """
 
-    response_type: str = field(default="user", kw_only=True)
+    object_type: str = field(default="user", kw_only=True)
 
     user_id: int
     username: str

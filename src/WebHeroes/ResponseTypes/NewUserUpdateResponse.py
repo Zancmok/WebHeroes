@@ -12,4 +12,4 @@ class NewUserUpdateResponse(BaseResponseClass):
     Notification about a new user joining the system.
     """
 
-    response_type: str = field(default="new-user-update", kw_only=True)
+    object_type: str = field(default="new-user-update", kw_only=True)

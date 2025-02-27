@@ -19,7 +19,7 @@ from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
 from WebHeroes.LobbyUpdate import LobbyUpdate
-from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse
+from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse
 
 
 class LobbyManager(StaticClass):
@@ -73,28 +73,22 @@ class LobbyManager(StaticClass):
     @route_manager.event("get-lobby-data")
     def get_lobby_data() -> None:
         """
-        Fetches and emits the current lobby data, including the details of the user requesting it,
-        the list of users in the current lobby, and other available lobbies with their members.
+        Fetches and emits the current lobby data, providing information about the requesting user,
+        the users in the same lobby, and other available lobbies.
 
-        The function first checks if the session contains a valid access token. If not, it emits an
-        empty lobby data object. Otherwise, it retrieves the user details for the current user (based
-        on their user ID stored in the session) and collects the necessary data for the lobby and users.
+        Behavior:
+        - If the session lacks a valid access token, an `EmptyResponse` is emitted.
+        - Retrieves the requesting user's details based on their session user ID.
+        - Gathers information about the current lobby's users.
+        - Collects details of other available lobbies and their members.
 
-        The emitted data includes:
-        - The current user's details (name, avatar, user ID, and presence status).
-        - The details of other users in the same lobby (name, avatar, user ID, and presence status).
-        - A list of other available lobbies and their members, with each member's name, avatar, user ID,
-        and presence status.
-
-        Emits:
-            - Event "get-lobby-data" with a JSON object containing:
-                - `self`: The current user's details.
-                - `users`: A list of users in the current lobby.
-                - `lobbies`: A list of other lobbies with their members' details.
+        Response Types:
+        - `EmptyResponse`: If the user is not authenticated.
+        - `GetLobbyDataResponse`: If the user is authenticated.
         """
 
         if not session.get("access_token"):
-            emit("get-lobby-data", {}, to=session["user_session_id"])
+            emit("get-lobby-data", dictify(EmptyResponse()), to=session["user_session_id"])
 
         own_user: User = UserManager.get(session['user_id'])
 
@@ -130,66 +124,6 @@ class LobbyManager(StaticClass):
                  ) for lobby in LobbyManager.other_lobbies]
              )),
              to=session["user_session_id"])
-
-    @staticmethod
-    @route_manager.event('create-lobby')
-    def create_lobby(name: Any) -> None:
-        """
-        # TODO: Make Docstring
-        """
-
-        if not session.get("access_token"):
-            emit("create-lobby", {}, to=session["user_session_id"])
-            return
-
-        # TODO: Make check so only 1 lobby per cyka
-
-        if not name or not type(name) is str:  # TODO: Do better naming limits
-            emit("create-lobby", {}, to=session["user_session_id"])
-            return
-
-        new_lobby: Room = Room(name=name)
-
-        new_lobby.owner = UserManager.get(session['user_id'])
-        new_lobby.add(new_lobby.owner)
-
-        LobbyManager.other_lobbies.append(new_lobby)
-
-        LobbyManager.fire_lobby_update(LobbyUpdate.new_lobby, {
-            "name": new_lobby.name,
-            "room_id": new_lobby.room_id,
-            "owner": {
-                "name": new_lobby.owner.name,
-                "avatar_url": new_lobby.owner.avatar_url,
-                "user_id": new_lobby.owner.user_id,
-                "presence_status": str(new_lobby.owner.presence_status)
-            },
-            "members": [
-                {
-                    "name": member.name,
-                    "avatar_url": member.avatar_url,
-                    "user_id": member.user_id,
-                    "presence_status": str(member.presence_status)
-                } for member in new_lobby.children
-            ]
-        })
-        # TODO: Redirect to GET '/lobby/<lobby_id:int>'
-        # redirect("")
-
-    @staticmethod
-    def fire_lobby_update(reason: LobbyUpdate, change: dict[str, Any]) -> None:
-        """
-        # TODO: Make Docstring
-        """
-
-        emit(
-            'lobby-update',
-            {
-                'reason': str(reason),
-                'change': change
-            },
-            namespace=LobbyManager.lobby_room
-        )
 
     @staticmethod
     @route_manager.event('connect')

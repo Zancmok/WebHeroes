@@ -19,7 +19,7 @@ class GetLobbyDataResponse(BaseResponseClass):
         lobbies (list[LobbyResponse]): List of available lobbies.
     """
 
-    response_type: str = field(default="get-lobby-data-response", kw_only=True)
+    object_type: str = field(default="get-lobby-data-response", kw_only=True)
 
     self: UserResponse
     users: list[UserResponse]

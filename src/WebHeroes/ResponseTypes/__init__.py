@@ -35,7 +35,7 @@ def dictify(data: BaseResponseClass) -> dict[str, Any]:
         attribute_value: Any = getattr(data, attribute)
 
         if isinstance(attribute_value, Enum):
-            attribute_value = str(attribute_value)
+            attribute_value = str(attribute_value.value)
         elif isinstance(attribute_value, BaseResponseClass):
             attribute_value = dictify(attribute_value)
         elif isinstance(attribute_value, list):
