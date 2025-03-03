@@ -20,6 +20,7 @@ from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
 from WebHeroes.LobbyUpdate import LobbyUpdate
 from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse
+from WebHeroes.SocketEvent import SocketEvent
 
 
 class LobbyManager(StaticClass):
@@ -70,7 +71,7 @@ class LobbyManager(StaticClass):
         room.remove(user)
 
     @staticmethod
-    @route_manager.event("get-lobby-data")
+    @route_manager.event(SocketEvent.GET_LOBBY_DATA)
     def get_lobby_data() -> None:
         """
         Fetches and emits the current lobby data, providing information about the requesting user,
@@ -88,11 +89,11 @@ class LobbyManager(StaticClass):
         """
 
         if not session.get("access_token"):
-            emit("get-lobby-data", dictify(EmptyResponse()), to=session["user_session_id"])
+            emit(SocketEvent.GET_LOBBY_DATA, dictify(EmptyResponse()), to=session["user_session_id"])
 
         own_user: User = UserManager.get(session['user_id'])
 
-        emit("get-lobby-data",
+        emit(SocketEvent.GET_LOBBY_DATA,
              dictify(GetLobbyDataResponse(
                  self=UserResponse(
                      user_id=own_user.user_id,
