@@ -18,7 +18,6 @@ from ZancmokLib.StaticClass import StaticClass
 from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
-from WebHeroes.LobbyUpdate import LobbyUpdate
 from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse
 from WebHeroes.SocketEvent import SocketEvent
 
