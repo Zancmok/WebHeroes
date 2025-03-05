@@ -3,7 +3,7 @@
 """
 
 from dataclasses import dataclass, field
-from WebHeroes.LobbyUpdate import LobbyUpdate
+from Enums.Server.LobbyUpdate import LobbyUpdate
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
 from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
 from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse

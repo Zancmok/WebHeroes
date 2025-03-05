@@ -15,7 +15,7 @@ Usage:
     print(new_user)
 """
 
-from WebHeroes.PresenceStatus import PresenceStatus
+from Enums.Common.PresenceStatus import PresenceStatus
 
 
 class User:

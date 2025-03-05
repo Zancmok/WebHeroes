@@ -4,7 +4,7 @@
 
 from dataclasses import dataclass, field
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.PresenceStatus import PresenceStatus
+from Enums.Common.PresenceStatus import PresenceStatus
 
 
 @dataclass

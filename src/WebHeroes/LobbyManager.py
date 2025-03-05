@@ -15,12 +15,12 @@ from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
 from WebHeroes.UserManager import UserManager
 from ZancmokLib.StaticClass import StaticClass
-from typing import Optional, Any
-from WebHeroes.PresenceStatus import PresenceStatus
+from typing import Optional
+from Enums.Common.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
-from WebHeroes.LobbyUpdate import LobbyUpdate
+from Enums.Server.LobbyUpdate import LobbyUpdate
 from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse
-from WebHeroes.SocketEvent import SocketEvent
+from Enums.Server.SocketEvent import SocketEvent
 
 
 class LobbyManager(StaticClass):
