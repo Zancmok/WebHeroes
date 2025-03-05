@@ -4,10 +4,11 @@ UserManager.py
 Manages user instances, providing methods to retrieve and create users.
 """
 
-from ZancmokLib.StaticClass import StaticClass
-from WebHeroes.User import User
-from Enums.Common.PresenceStatus import PresenceStatus
 from typing import Optional
+
+from Enums.Common.PresenceStatus import PresenceStatus
+from WebHeroes.User import User
+from ZancmokLib.StaticClass import StaticClass
 
 
 class UserManager(StaticClass):

@@ -25,8 +25,9 @@ Attributes:
 """
 
 import os
-import dotenv
 import urllib.parse
+
+import dotenv
 
 dotenv.load_dotenv()
 

@@ -9,18 +9,21 @@ Classes:
     LobbyManager: A static class for managing lobby-related routes and user data.
 """
 
+from typing import Optional
+
 from flask import session, request
 from flask_socketio import emit, join_room, leave_room
+
+from Enums.Common.PresenceStatus import PresenceStatus
+from Enums.Server.LobbyUpdate import LobbyUpdate
+from Enums.Server.SocketEvent import SocketEvent
+from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, \
+    LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse
+from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
 from WebHeroes.UserManager import UserManager
 from ZancmokLib.StaticClass import StaticClass
-from typing import Optional
-from Enums.Common.PresenceStatus import PresenceStatus
-from WebHeroes.Room import Room
-from Enums.Server.LobbyUpdate import LobbyUpdate
-from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse
-from Enums.Server.SocketEvent import SocketEvent
 
 
 class LobbyManager(StaticClass):

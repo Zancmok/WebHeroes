@@ -3,6 +3,7 @@
 """
 
 from dataclasses import dataclass, field
+
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
 
 

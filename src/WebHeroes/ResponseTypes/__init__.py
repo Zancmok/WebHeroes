@@ -2,18 +2,19 @@
 # TODO: Write Docstring!
 """
 
-from typing import Any
 from enum import Enum
+from typing import Any
+
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
 from WebHeroes.ResponseTypes.EmptyResponse import EmptyResponse
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
-from WebHeroes.ResponseTypes.LobbyResponse import LobbyResponse
 from WebHeroes.ResponseTypes.GetLobbyDataResponse import GetLobbyDataResponse
-from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
-from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse
-from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
+from WebHeroes.ResponseTypes.LobbyResponse import LobbyResponse
 from WebHeroes.ResponseTypes.LobbyUpdateResponse import LobbyUpdateResponse
+from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse
+from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
 from WebHeroes.ResponseTypes.UserLeftUpdateResponse import UserLeftUpdateResponse
+from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
 
 
 def dictify(data: BaseResponseClass) -> dict[str, Any]:

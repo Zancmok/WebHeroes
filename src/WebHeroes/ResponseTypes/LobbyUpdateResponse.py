@@ -3,12 +3,13 @@
 """
 
 from dataclasses import dataclass, field
+
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
 from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse
-from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
+from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
 from WebHeroes.ResponseTypes.UserLeftUpdateResponse import UserLeftUpdateResponse
+from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
 
 
 @dataclass

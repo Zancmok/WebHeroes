@@ -3,9 +3,10 @@
 """
 
 from dataclasses import dataclass, field
+
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
 from WebHeroes.ResponseTypes.LobbyResponse import LobbyResponse
+from WebHeroes.ResponseTypes.UserResponse import UserResponse
 
 
 @dataclass

@@ -3,8 +3,9 @@
 """
 
 from dataclasses import dataclass, field
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+
 from Enums.Common.PresenceStatus import PresenceStatus
+from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
 
 
 @dataclass

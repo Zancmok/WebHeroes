@@ -6,8 +6,9 @@ Defines the Room class, which represents a chat room where users can join and le
 
 # TODO: Fix Docstring!!!
 
-from WebHeroes.User import User
 from typing import Optional
+
+from WebHeroes.User import User
 
 
 class Room:

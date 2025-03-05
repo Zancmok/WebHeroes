@@ -13,15 +13,15 @@ from flask import Flask, render_template, request, session, redirect
 from flask_socketio import SocketIO
 from werkzeug import Response
 from zenora import APIClient
+from zenora.exceptions import APIError
 from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
-from zenora.exceptions import APIError
-from ZancmokLib.StaticClass import StaticClass
+
 import WebHeroes.config as config
+from WebHeroes.DatabaseBridge import DatabaseBridge
 from WebHeroes.LobbyManager import LobbyManager
 from WebHeroes.RouteManager import RouteManager
-from WebHeroes.DatabaseBridge import DatabaseBridge
-import eventlet
+from ZancmokLib.StaticClass import StaticClass
 
 
 class WebHeroes(StaticClass):

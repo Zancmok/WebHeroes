@@ -9,13 +9,15 @@ Classes:
     DatabaseBridge: A static class for establishing and managing a MySQL database connection.
 """
 
-from ZancmokLib.StaticClass import StaticClass
+import time
+from typing import Optional
+
 import mysql.connector
 from mysql.connector import MySQLConnection
 from mysql.connector.errors import DatabaseError
+
 import WebHeroes.config as config
-from typing import Optional
-import time
+from ZancmokLib.StaticClass import StaticClass
 
 
 class DatabaseBridge(StaticClass):
