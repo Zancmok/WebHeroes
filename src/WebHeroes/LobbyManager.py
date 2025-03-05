@@ -9,7 +9,7 @@ Classes:
     LobbyManager: A static class for managing lobby-related routes and user data.
 """
 
-from flask import session, redirect, request
+from flask import session, request
 from flask_socketio import emit, join_room, leave_room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
@@ -18,7 +18,8 @@ from ZancmokLib.StaticClass import StaticClass
 from typing import Optional, Any
 from WebHeroes.PresenceStatus import PresenceStatus
 from WebHeroes.Room import Room
-from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse
+from WebHeroes.LobbyUpdate import LobbyUpdate
+from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse
 from WebHeroes.SocketEvent import SocketEvent
 
 
@@ -145,6 +146,7 @@ class LobbyManager(StaticClass):
 
         session["user_session_id"] = request.sid
 
+        user: User
         if not UserManager.get(session.get('user_id')):
             UserManager.create_user(
                 user_id=session['user_id'],
@@ -152,10 +154,25 @@ class LobbyManager(StaticClass):
                 avatar_url=session['avatar_url'],
                 presence_status=PresenceStatus.online
             )
+
+            user = UserManager.get(session['user_id'])
         else:
-            user: User = UserManager.get(session['user_id'])
+            user = UserManager.get(session['user_id'])
 
             user.presence_status = PresenceStatus.online
+
+        emit(SocketEvent.LOBBY_UPDATE,
+             dictify(LobbyUpdateResponse(
+                 change_type=LobbyUpdate.new_user,
+                 change=NewUserUpdateResponse(
+                     user=UserResponse(
+                         user_id=user.user_id,
+                         username=user.name,
+                         avatar_url=user.avatar_url,
+                         presence_status=user.presence_status
+                     )
+                 )
+             )), to=LobbyManager.lobby_room.name)
 
         LobbyManager.join_room(
             room=LobbyManager.lobby_room,
@@ -175,11 +192,23 @@ class LobbyManager(StaticClass):
             reason (str): A string indicating the reason for the disconnection.
         """
 
-        user: Optional[User] = UserManager.get(session['user_id'])
+        user: User = UserManager.get(session['user_id'])
 
-        if user:
-            user.presence_status = PresenceStatus.offline
-            LobbyManager.leave_room(
-                room=LobbyManager.lobby_room,
-                user=user
-            )
+        user.presence_status = PresenceStatus.offline
+        LobbyManager.leave_room(
+            room=LobbyManager.lobby_room,
+            user=user
+        )
+
+        emit(SocketEvent.LOBBY_UPDATE,
+             dictify(LobbyUpdateResponse(
+                 change_type=LobbyUpdate.user_left,
+                 change=UserLeftUpdateResponse(
+                     user=UserResponse(
+                         user_id=user.user_id,
+                         username=user.name,
+                         avatar_url=user.avatar_url,
+                         presence_status=user.presence_status
+                     )
+                 )
+             )), to=LobbyManager.lobby_room.name)

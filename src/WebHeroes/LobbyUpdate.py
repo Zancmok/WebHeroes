@@ -13,3 +13,4 @@ class LobbyUpdate(Enum):
     new_lobby: str = "new_lobby"
     new_user: str = "new_user"
     user_updated: str = "user_updated"
+    user_left: str = "user_left"

@@ -8,11 +8,11 @@ from WebHeroes.ResponseTypes.UserResponse import UserResponse
 
 
 @dataclass
-class NewUserUpdateResponse(BaseResponseClass):
+class UserLeftUpdateResponse(BaseResponseClass):
     """
     # TODO: Write Docstring!
     """
 
-    object_type: str = field(default="new-user-update", kw_only=True)
+    object_type: str = field(default="user-left-update", kw_only=True)
 
     user: UserResponse
