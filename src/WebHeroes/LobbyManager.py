@@ -18,7 +18,7 @@ from Enums.Common.PresenceStatus import PresenceStatus
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from Enums.Server.SocketEvent import SocketEvent
 from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, \
-    LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse
+    LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse, NewLobbyUpdateResponse, SuccessResponse
 from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
@@ -128,6 +128,63 @@ class LobbyManager(StaticClass):
                  ) for lobby in LobbyManager.other_lobbies]
              )),
              to=session["user_session_id"])
+
+    @staticmethod
+    @route_manager.event(SocketEvent.CREATE_LOBBY)
+    def create_lobby(lobby_name: str) -> None:
+        if type(lobby_name) is not str:
+            emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
+            return
+        
+        # TODO: Check if user already made a lobby or is in a lobby already!!!
+
+        new_lobby: Room = Room(lobby_name)
+        
+        own_user: User = UserManager.get(session['user_id'])
+
+        new_lobby.owner = own_user
+        new_lobby.children.append(own_user)
+
+        LobbyManager.leave_room(
+            room=LobbyManager.lobby_room,
+            user=own_user
+        )
+
+        LobbyManager.join_room(
+            room=new_lobby,
+            user=own_user
+        )
+
+        LobbyManager.other_lobbies.append(new_lobby)
+
+        emit(SocketEvent.LOBBY_UPDATE,
+             dictify(LobbyUpdateResponse(
+                 change_type=LobbyUpdate.new_lobby,
+                 change=NewLobbyUpdateResponse(
+                     lobby_name=lobby_name,
+                     owner=UserResponse(
+                         user_id=own_user.user_id,
+                         username=own_user.name,
+                         avatar_url=own_user.avatar_url,
+                         presence_status=own_user.presence_status
+                     )
+                 )
+             )), to=LobbyManager.lobby_room.name)
+
+        emit(SocketEvent.LOBBY_UPDATE,
+             dictify(LobbyUpdateResponse(
+                 change_type=LobbyUpdate.user_left,
+                 change=UserLeftUpdateResponse(
+                     user=UserResponse(
+                         user_id=own_user.user_id,
+                         username=own_user.name,
+                         avatar_url=own_user.avatar_url,
+                         presence_status=own_user.presence_status
+                     )
+                 )
+             )), to=LobbyManager.lobby_room.name)
+        
+        emit(SocketEvent.CREATE_LOBBY, dictify(SuccessResponse()), to=session['user_session_id'])
 
     @staticmethod
     @route_manager.event('connect')

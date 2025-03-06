@@ -10,6 +10,7 @@ Classes:
 from dataclasses import dataclass, field
 
 from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+from WebHeroes.ResponseTypes.UserResponse import UserResponse
 
 
 @dataclass
@@ -26,3 +27,8 @@ class NewLobbyUpdateResponse(BaseResponseClass):
     """
 
     object_type: str = field(default="new-lobby-update", kw_only=True)
+
+    # TODO: Update Docstring!
+
+    lobby_name: str
+    owner: UserResponse

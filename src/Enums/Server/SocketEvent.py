@@ -18,3 +18,4 @@ class SocketEvent(str, Enum):
 
     GET_LOBBY_DATA: str = "get-lobby-data"
     LOBBY_UPDATE: str = "lobby-update"
+    CREATE_LOBBY: str = "create-lobby"

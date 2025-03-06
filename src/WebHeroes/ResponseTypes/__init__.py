@@ -36,6 +36,7 @@ from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
 from WebHeroes.ResponseTypes.UserLeftUpdateResponse import UserLeftUpdateResponse
 from WebHeroes.ResponseTypes.UserResponse import UserResponse
 from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
+from WebHeroes.ResponseTypes.SuccessResponse import SuccessResponse
 
 
 def dictify(data: BaseResponseClass) -> dict[str, Any]:
@@ -87,5 +88,6 @@ __all__ = [
     "NewLobbyUpdateResponse",
     "UserUpdatedUpdateResponse",
     "LobbyUpdateResponse",
-    "UserLeftUpdateResponse"
+    "UserLeftUpdateResponse",
+    "SuccessResponse"
 ]
