@@ -34,7 +34,7 @@ class UserManager(StaticClass):
 
     @staticmethod
     def create_user(user_id: int, name: str, avatar_url: str,
-                    presence_status: PresenceStatus = PresenceStatus.offline) -> User:
+                    presence_status: PresenceStatus = PresenceStatus.OFFLINE) -> User:
         """
         Creates a new user and adds them to the user dictionary.
 

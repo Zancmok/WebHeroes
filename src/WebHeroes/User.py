@@ -33,7 +33,7 @@ class User:
         __str__(): Returns a concise string representation of the user (ID and name).
         __repr__(): Returns a detailed string representation of the user (ID, name, and avatar URL).
     """
-    def __init__(self, user_id: int, name: str, avatar_url: str, presence_status: PresenceStatus = PresenceStatus.offline) -> None:
+    def __init__(self, user_id: int, name: str, avatar_url: str, presence_status: PresenceStatus = PresenceStatus.OFFLINE) -> None:
         self.user_id: int = user_id
         self.name: str = name
         self.avatar_url: str = avatar_url

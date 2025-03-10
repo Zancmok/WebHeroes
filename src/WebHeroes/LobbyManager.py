@@ -159,7 +159,7 @@ class LobbyManager(StaticClass):
 
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
-                 change_type=LobbyUpdate.new_lobby,
+                 change_type=LobbyUpdate.NEW_LOBBY,
                  change=NewLobbyUpdateResponse(
                      lobby_name=lobby_name,
                      owner=UserResponse(
@@ -173,7 +173,7 @@ class LobbyManager(StaticClass):
 
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
-                 change_type=LobbyUpdate.user_left,
+                 change_type=LobbyUpdate.USER_LEFT,
                  change=UserLeftUpdateResponse(
                      user=UserResponse(
                          user_id=own_user.user_id,
@@ -212,18 +212,18 @@ class LobbyManager(StaticClass):
                 user_id=session['user_id'],
                 name=session['username'],
                 avatar_url=session['avatar_url'],
-                presence_status=PresenceStatus.online
+                presence_status=PresenceStatus.ONLINE
             )
 
             user = UserManager.get(session['user_id'])
         else:
             user = UserManager.get(session['user_id'])
 
-            user.presence_status = PresenceStatus.online
+            user.presence_status = PresenceStatus.ONLINE
 
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
-                 change_type=LobbyUpdate.new_user,
+                 change_type=LobbyUpdate.NEW_USER,
                  change=NewUserUpdateResponse(
                      user=UserResponse(
                          user_id=user.user_id,
@@ -254,7 +254,7 @@ class LobbyManager(StaticClass):
 
         user: User = UserManager.get(session['user_id'])
 
-        user.presence_status = PresenceStatus.offline
+        user.presence_status = PresenceStatus.OFFLINE
         LobbyManager.leave_room(
             room=LobbyManager.lobby_room,
             user=user
@@ -262,7 +262,7 @@ class LobbyManager(StaticClass):
 
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
-                 change_type=LobbyUpdate.user_left,
+                 change_type=LobbyUpdate.USER_LEFT,
                  change=UserLeftUpdateResponse(
                      user=UserResponse(
                          user_id=user.user_id,
