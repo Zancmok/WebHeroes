@@ -132,6 +132,10 @@ class LobbyManager(StaticClass):
     @staticmethod
     @route_manager.event(SocketEvent.CREATE_LOBBY)
     def create_lobby(lobby_name: str) -> None:
+        """
+        # TODO: Write Docstring!
+        """
+
         if type(lobby_name) is not str:
             emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
             return
