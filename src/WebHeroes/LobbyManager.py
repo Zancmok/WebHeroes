@@ -157,11 +157,14 @@ class LobbyManager(StaticClass):
             emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
             return
         
-        # TODO: Check if user already made a lobby or is in a lobby already!!!
+        own_user: User = UserManager.get(session['user_id'])
+
+        for lobby in LobbyManager.other_lobbies:
+            if own_user in lobby.children:
+                emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse), to=session['user_session_id'])
+                return
 
         new_lobby: Room = Room(lobby_name)
-        
-        own_user: User = UserManager.get(session['user_id'])
 
         new_lobby.owner = own_user
         new_lobby.children.append(own_user)
@@ -242,6 +245,11 @@ class LobbyManager(StaticClass):
 
             user.presence_status = PresenceStatus.ONLINE
 
+        LobbyManager.join_room(
+            room=LobbyManager.lobby_room,
+            user=UserManager.get(session['user_id'])
+        )
+
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.NEW_USER,
@@ -255,10 +263,7 @@ class LobbyManager(StaticClass):
                  )
              )), to=LobbyManager.lobby_room.name)
 
-        LobbyManager.join_room(
-            room=LobbyManager.lobby_room,
-            user=UserManager.get(session['user_id'])
-        )
+
 
     @staticmethod
     @route_manager.event('disconnect')
