@@ -139,18 +139,3 @@ class WebHeroes(StaticClass):
         session['user_id'] = current_user.id
 
         return redirect("/online-lobbies/")
-
-    @staticmethod
-    @app.route("/online-lobbies/", methods=["GET"])
-    def online_lobbies() -> str | Response:
-        """
-        Manages the online lobbies route. If the user is not authenticated, they are redirected
-        to the Discord OAuth2 authorization page. Otherwise, the online lobbies page is rendered.
-
-        :return: The rendered online lobbies template or a redirect response to the OAuth2 URL.
-        """
-
-        if not session.get('access_token', ''):
-            return redirect(config.DISCORD_OAUTH_URL)
-
-        return render_template("online-lobbies.html")

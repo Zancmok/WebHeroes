@@ -11,14 +11,16 @@ Classes:
 
 from typing import Optional
 
-from flask import session, request
+from flask import session, request, redirect, render_template
 from flask_socketio import emit, join_room, leave_room
+from werkzeug import Response
 
 from Enums.Common.PresenceStatus import PresenceStatus
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from Enums.Server.SocketEvent import SocketEvent
 from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, \
     LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse, NewLobbyUpdateResponse, SuccessResponse
+import WebHeroes.config as config
 from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
 from WebHeroes.User import User
@@ -72,6 +74,21 @@ class LobbyManager(StaticClass):
 
         leave_room(room.name)
         room.remove(user)
+
+    @staticmethod
+    @route_manager.route("/online-lobbies/", methods=["GET"])
+    def online_lobbies() -> str | Response:
+        """
+        Manages the online lobbies route. If the user is not authenticated, they are redirected
+        to the Discord OAuth2 authorization page. Otherwise, the online lobbies page is rendered.
+
+        :return: The rendered online lobbies template or a redirect response to the OAuth2 URL.
+        """
+
+        if not session.get('access_token', ''):
+            return redirect(config.DISCORD_OAUTH_URL)
+
+        return render_template("online-lobbies.html")
 
     @staticmethod
     @route_manager.event(SocketEvent.GET_LOBBY_DATA)
