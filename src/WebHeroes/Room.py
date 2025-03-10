@@ -62,3 +62,6 @@ class Room:
         """
 
         self.children.remove(child)
+
+        if child is self.owner:
+            self.owner = None

@@ -38,6 +38,7 @@ class User:
         self.name: str = name
         self.avatar_url: str = avatar_url
         self.presence_status: PresenceStatus = presence_status
+        self.rooms: list = []  # List of rooms but type annotations here cause circular import = blyat
 
     def __str__(self) -> str:
         return f"User(id:{self.user_id};name:{self.name})"

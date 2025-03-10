@@ -88,6 +88,11 @@ class LobbyManager(StaticClass):
         if not session.get('access_token', ''):
             return redirect(config.DISCORD_OAUTH_URL)
 
+        own_user: Optional[User] = UserManager.get(session['user_id'])
+
+        if own_user and LobbyManager.lobby_room not in own_user.rooms:
+            return redirect('/')
+
         return render_template("online-lobbies.html")
 
     @staticmethod
@@ -110,8 +115,13 @@ class LobbyManager(StaticClass):
 
         if not session.get("access_token"):
             emit(SocketEvent.GET_LOBBY_DATA, dictify(EmptyResponse()), to=session["user_session_id"])
+            return
 
         own_user: User = UserManager.get(session['user_id'])
+
+        if LobbyManager.lobby_room not in own_user.rooms:
+            emit(SocketEvent.GET_LOBBY_DATA, dictify(EmptyResponse()), to=session["user_session_id"])
+            return
 
         emit(SocketEvent.GET_LOBBY_DATA,
              dictify(GetLobbyDataResponse(
@@ -156,12 +166,12 @@ class LobbyManager(StaticClass):
         if type(lobby_name) is not str:
             emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
             return
-        
+
         own_user: User = UserManager.get(session['user_id'])
 
         for lobby in LobbyManager.other_lobbies:
             if own_user in lobby.children:
-                emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse), to=session['user_session_id'])
+                emit(SocketEvent.CREATE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
                 return
 
         new_lobby: Room = Room(lobby_name)
@@ -207,7 +217,7 @@ class LobbyManager(StaticClass):
                      )
                  )
              )), to=LobbyManager.lobby_room.name)
-        
+
         emit(SocketEvent.CREATE_LOBBY, dictify(SuccessResponse()), to=session['user_session_id'])
 
     @staticmethod
@@ -245,11 +255,6 @@ class LobbyManager(StaticClass):
 
             user.presence_status = PresenceStatus.ONLINE
 
-        LobbyManager.join_room(
-            room=LobbyManager.lobby_room,
-            user=UserManager.get(session['user_id'])
-        )
-
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.NEW_USER,
@@ -263,7 +268,10 @@ class LobbyManager(StaticClass):
                  )
              )), to=LobbyManager.lobby_room.name)
 
-
+        LobbyManager.join_room(
+            room=LobbyManager.lobby_room,
+            user=UserManager.get(session['user_id'])
+        )
 
     @staticmethod
     @route_manager.event('disconnect')
@@ -281,10 +289,12 @@ class LobbyManager(StaticClass):
         user: User = UserManager.get(session['user_id'])
 
         user.presence_status = PresenceStatus.OFFLINE
-        LobbyManager.leave_room(
-            room=LobbyManager.lobby_room,
-            user=user
-        )
+
+        for room in user.rooms:
+            LobbyManager.leave_room(
+                room=room,
+                user=user
+            )
 
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
