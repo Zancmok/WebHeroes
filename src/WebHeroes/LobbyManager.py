@@ -90,7 +90,7 @@ class LobbyManager(StaticClass):
 
         own_user: Optional[User] = UserManager.get(session['user_id'])
 
-        if own_user and LobbyManager.lobby_room not in own_user.rooms:
+        if own_user and own_user not in LobbyManager.lobby_room.children:
             return redirect('/')
 
         return render_template("online-lobbies.html")
@@ -119,7 +119,7 @@ class LobbyManager(StaticClass):
 
         own_user: User = UserManager.get(session['user_id'])
 
-        if LobbyManager.lobby_room not in own_user.rooms:
+        if own_user not in LobbyManager.lobby_room.children:
             emit(SocketEvent.GET_LOBBY_DATA, dictify(EmptyResponse()), to=session["user_session_id"])
             return
 
@@ -290,7 +290,10 @@ class LobbyManager(StaticClass):
 
         user.presence_status = PresenceStatus.OFFLINE
 
-        for room in user.rooms:
+        for room in LobbyManager.other_lobbies:
+            if not user in room.children:
+                continue
+            
             LobbyManager.leave_room(
                 room=room,
                 user=user
