@@ -11,7 +11,7 @@ Classes:
 
 from typing import Optional
 
-from flask import session, request, redirect, render_template
+from flask import session, request, redirect, render_template, url_for
 from flask_socketio import emit, join_room, leave_room
 from werkzeug import Response
 
@@ -91,9 +91,44 @@ class LobbyManager(StaticClass):
         own_user: Optional[User] = UserManager.get(session['user_id'])
 
         if own_user and own_user not in LobbyManager.lobby_room.children:
+            for lobby in LobbyManager.other_lobbies:
+                if own_user in lobby.children:
+                    return redirect(f'/lobby/{lobby.room_id}')
+            
             return redirect('/')
 
         return render_template("online-lobbies.html")
+
+    @staticmethod
+    @route_manager.route("/lobby/<int:lobby_id>", methods=["GET"])
+    def lobby(lobby_id: int) -> str | Response:
+        """
+        # TODO: Write Docstring!
+        """
+
+        if not session.get('access_token', ''):
+            return redirect('/')
+        
+        own_user: Optional[User] = UserManager.get(session['user_id'])
+
+        if not own_user:
+            return redirect('/')
+        
+        own_user: User
+
+        own_lobby: Optional[Room] = None
+        for lobby in LobbyManager.other_lobbies:
+            if lobby.room_id == lobby_id:
+                own_lobby = lobby
+                break
+
+        if not own_lobby:
+            return redirect('/')
+        
+        if own_user not in own_lobby.children:
+            return redirect('/')
+        
+        return render_template("lobby.html")
 
     @staticmethod
     @route_manager.event(SocketEvent.GET_LOBBY_DATA)
