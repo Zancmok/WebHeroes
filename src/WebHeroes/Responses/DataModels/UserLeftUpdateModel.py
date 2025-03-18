@@ -9,12 +9,12 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
 
 
 @dataclass
-class UserLeftUpdateResponse(BaseResponseClass):
+class UserLeftUpdateModel(BaseDataModel):
     """
     Notification about a user leaving.
 
@@ -24,9 +24,9 @@ class UserLeftUpdateResponse(BaseResponseClass):
     Attributes:
         object_type (str): The type of response, set to "user-left-update" to indicate that
         the response represents a user leaving.
-        user (UserResponse): The details of the user who has left, represented by a `UserResponse` object.
+        user (UserModel): The details of the user who has left, represented by a `UserResponse` object.
     """
 
     object_type: str = field(default="user-left-update", kw_only=True)
 
-    user: UserResponse
+    user: UserModel

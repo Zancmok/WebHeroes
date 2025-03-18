@@ -18,8 +18,8 @@ from werkzeug import Response
 from Enums.Common.PresenceStatus import PresenceStatus
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from Enums.Server.SocketEvent import SocketEvent
-from WebHeroes.ResponseTypes import dictify, GetLobbyDataResponse, UserResponse, LobbyResponse, EmptyResponse, \
-    LobbyUpdateResponse, NewUserUpdateResponse, UserLeftUpdateResponse, NewLobbyUpdateResponse, SuccessResponse
+from WebHeroes.Responses import dictify, GetLobbyDataResponse, UserModel, LobbyModel, EmptyResponse, \
+    LobbyUpdateResponse, NewUserUpdateModel, UserLeftUpdateModel, NewLobbyUpdateModel, SuccessResponse
 import WebHeroes.config as config
 from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
@@ -160,28 +160,28 @@ class LobbyManager(StaticClass):
 
         emit(SocketEvent.GET_LOBBY_DATA,
              dictify(GetLobbyDataResponse(
-                 self=UserResponse(
+                 self=UserModel(
                      user_id=own_user.user_id,
                      username=own_user.name,
                      avatar_url=own_user.avatar_url,
                      presence_status=own_user.presence_status
                  ),
-                 users=[UserResponse(
+                 users=[UserModel(
                      user_id=user.user_id,
                      username=user.name,
                      avatar_url=user.avatar_url,
                      presence_status=user.presence_status
                  ) for user in LobbyManager.lobby_room.children],
-                 lobbies=[LobbyResponse(
+                 lobbies=[LobbyModel(
                      room_id=lobby.room_id,
                      name=lobby.name,
-                     owner=UserResponse(
+                     owner=UserModel(
                          user_id=lobby.owner.user_id,
                          username=lobby.owner.name,
                          avatar_url=lobby.owner.avatar_url,
                          presence_status=lobby.owner.presence_status
                      ),
-                     members=[UserResponse(
+                     members=[UserModel(
                          user_id=member.user_id,
                          username=member.name,
                          avatar_url=member.avatar_url,
@@ -229,9 +229,9 @@ class LobbyManager(StaticClass):
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.NEW_LOBBY,
-                 change=NewLobbyUpdateResponse(
+                 change=NewLobbyUpdateModel(
                      lobby_name=lobby_name,
-                     owner=UserResponse(
+                     owner=UserModel(
                          user_id=own_user.user_id,
                          username=own_user.name,
                          avatar_url=own_user.avatar_url,
@@ -243,8 +243,8 @@ class LobbyManager(StaticClass):
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.USER_LEFT,
-                 change=UserLeftUpdateResponse(
-                     user=UserResponse(
+                 change=UserLeftUpdateModel(
+                     user=UserModel(
                          user_id=own_user.user_id,
                          username=own_user.name,
                          avatar_url=own_user.avatar_url,
@@ -257,7 +257,7 @@ class LobbyManager(StaticClass):
 
     @staticmethod
     @route_manager.event('connect')
-    def on_connect() -> Optional[bool]:
+    def on_connect(*args, **kwargs) -> Optional[bool]:
         """
         Handles the 'connect' event for a socket connection.
 
@@ -293,8 +293,8 @@ class LobbyManager(StaticClass):
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.NEW_USER,
-                 change=NewUserUpdateResponse(
-                     user=UserResponse(
+                 change=NewUserUpdateModel(
+                     user=UserModel(
                          user_id=user.user_id,
                          username=user.name,
                          avatar_url=user.avatar_url,
@@ -310,7 +310,7 @@ class LobbyManager(StaticClass):
 
     @staticmethod
     @route_manager.event('disconnect')
-    def on_disconnect(reason: str) -> None:
+    def on_disconnect(*args, **kwargs) -> None:
         """
         Handles the 'disconnect' event for a socket connection.
 
@@ -337,8 +337,8 @@ class LobbyManager(StaticClass):
         emit(SocketEvent.LOBBY_UPDATE,
              dictify(LobbyUpdateResponse(
                  change_type=LobbyUpdate.USER_LEFT,
-                 change=UserLeftUpdateResponse(
-                     user=UserResponse(
+                 change=UserLeftUpdateModel(
+                     user=UserModel(
                          user_id=user.user_id,
                          username=user.name,
                          avatar_url=user.avatar_url,

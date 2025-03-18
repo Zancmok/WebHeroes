@@ -10,12 +10,12 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
 
 
 @dataclass
-class LobbyResponse(BaseResponseClass):
+class LobbyModel(BaseDataModel):
     """
     Represents a game lobby.
 
@@ -27,7 +27,7 @@ class LobbyResponse(BaseResponseClass):
         response type.
         room_id (int): The unique identifier for the lobby.
         name (str): The name of the lobby.
-        owner (UserResponse): The user who owns the lobby, represented by a `UserResponse` object.
+        owner (UserModel): The user who owns the lobby, represented by a `UserResponse` object.
         members (list[UserResponse]): A list of users in the lobby, each represented by a
         `UserResponse` object.
     """
@@ -36,5 +36,5 @@ class LobbyResponse(BaseResponseClass):
 
     room_id: int
     name: str
-    owner: UserResponse
-    members: list[UserResponse]
+    owner: UserModel
+    members: list[UserModel]

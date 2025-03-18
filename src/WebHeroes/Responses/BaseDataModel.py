@@ -11,11 +11,10 @@ Classes:
 """
 
 from dataclasses import dataclass
-from abc import ABC
 
 
 @dataclass
-class BaseResponseClass(ABC):
+class BaseDataModel:
     """
     Base class for all API response data structures.
 

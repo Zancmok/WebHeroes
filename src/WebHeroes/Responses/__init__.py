@@ -23,23 +23,25 @@ Imports:
     UserLeftUpdateResponse: Represents a response for a user leaving.
 """
 
+# TODO: Rewrite all the docs inside this package!
+
 from enum import Enum
 from typing import Any
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.EmptyResponse import EmptyResponse
-from WebHeroes.ResponseTypes.GetLobbyDataResponse import GetLobbyDataResponse
-from WebHeroes.ResponseTypes.LobbyResponse import LobbyResponse
-from WebHeroes.ResponseTypes.LobbyUpdateResponse import LobbyUpdateResponse
-from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse
-from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
-from WebHeroes.ResponseTypes.UserLeftUpdateResponse import UserLeftUpdateResponse
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
-from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
-from WebHeroes.ResponseTypes.SuccessResponse import SuccessResponse
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.ResponseTypes.EmptyResponse import EmptyResponse
+from WebHeroes.Responses.ResponseTypes.GetLobbyDataResponse import GetLobbyDataResponse
+from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
+from WebHeroes.Responses.ResponseTypes.LobbyUpdateResponse import LobbyUpdateResponse
+from WebHeroes.Responses.DataModels.NewLobbyUpdateModel import NewLobbyUpdateModel
+from WebHeroes.Responses.DataModels.NewUserUpdateModel import NewUserUpdateModel
+from WebHeroes.Responses.DataModels.UserLeftUpdateModel import UserLeftUpdateModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
+from WebHeroes.Responses.DataModels.UserUpdatedUpdateModel import UserUpdatedUpdateModel
+from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
 
 
-def dictify(data: BaseResponseClass) -> dict[str, Any]:
+def dictify(data: BaseDataModel) -> dict[str, Any]:
     """
     Converts a response object into a dictionary, handling nested objects and enums.
 
@@ -49,7 +51,7 @@ def dictify(data: BaseResponseClass) -> dict[str, Any]:
     dictionaries.
 
     Args:
-        data (BaseResponseClass): The response object to convert.
+        data (BaseDataModel): The response object to convert.
 
     Returns:
         dict[str, Any]: The dictionary representation of the response object, where each
@@ -66,7 +68,7 @@ def dictify(data: BaseResponseClass) -> dict[str, Any]:
 
         if isinstance(attribute_value, Enum):
             attribute_value = str(attribute_value.value)
-        elif isinstance(attribute_value, BaseResponseClass):
+        elif isinstance(attribute_value, BaseDataModel):
             attribute_value = dictify(attribute_value)
         elif isinstance(attribute_value, list):
             for i, v in enumerate(attribute_value):
@@ -79,15 +81,15 @@ def dictify(data: BaseResponseClass) -> dict[str, Any]:
 
 __all__ = [
     "dictify",
-    "BaseResponseClass",
+    "BaseDataModel",
     "EmptyResponse",
-    "UserResponse",
-    "LobbyResponse",
+    "UserModel",
+    "LobbyModel",
     "GetLobbyDataResponse",
-    "NewUserUpdateResponse",
-    "NewLobbyUpdateResponse",
-    "UserUpdatedUpdateResponse",
+    "NewUserUpdateModel",
+    "NewLobbyUpdateModel",
+    "UserUpdatedUpdateModel",
     "LobbyUpdateResponse",
-    "UserLeftUpdateResponse",
+    "UserLeftUpdateModel",
     "SuccessResponse"
 ]

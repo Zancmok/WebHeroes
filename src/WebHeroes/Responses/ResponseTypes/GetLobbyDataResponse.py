@@ -10,13 +10,13 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.LobbyResponse import LobbyResponse
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
+from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
 
 
 @dataclass
-class GetLobbyDataResponse(BaseResponseClass):
+class GetLobbyDataResponse(BaseResponseModel):
     """
     Response containing data about available lobbies and users.
 
@@ -27,15 +27,15 @@ class GetLobbyDataResponse(BaseResponseClass):
     Attributes:
         object_type (str): The type of response, set to "get-lobby-data-response" to
         represent this specific response type.
-        self (UserResponse): The requesting user, represented by a `UserResponse` object.
+        self (UserModel): The requesting user, represented by a `UserResponse` object.
         users (list[UserResponse]): A list of active users in the system, each represented
         by a `UserResponse` object.
-        lobbies (list[LobbyResponse]): A list of available lobbies, each represented by
+        lobbies (list[LobbyModel]): A list of available lobbies, each represented by
         a `LobbyResponse` object.
     """
 
     object_type: str = field(default="get-lobby-data-response", kw_only=True)
 
-    self: UserResponse
-    users: list[UserResponse]
-    lobbies: list[LobbyResponse]
+    self: UserModel
+    users: list[UserModel]
+    lobbies: list[LobbyModel]

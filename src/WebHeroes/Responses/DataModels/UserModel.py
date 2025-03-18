@@ -10,11 +10,11 @@ Classes:
 from dataclasses import dataclass, field
 
 from Enums.Common.PresenceStatus import PresenceStatus
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
 
 
 @dataclass
-class UserResponse(BaseResponseClass):
+class UserModel(BaseDataModel):
     """
     Represents a user in the system.
 

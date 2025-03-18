@@ -9,12 +9,12 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
 
 
 @dataclass
-class NewUserUpdateResponse(BaseResponseClass):
+class NewUserUpdateModel(BaseDataModel):
     """
     Notification about a new user being added.
 
@@ -24,9 +24,9 @@ class NewUserUpdateResponse(BaseResponseClass):
     Attributes:
         object_type (str): The type of response, set to "new-user-update" to indicate that
         the response represents a new user addition.
-        user (UserResponse): The details of the new user, represented by a `UserResponse` object.
+        user (UserModel): The details of the new user, represented by a `UserResponse` object.
     """
 
     object_type: str = field(default="new-user-update", kw_only=True)
 
-    user: UserResponse
+    user: UserModel

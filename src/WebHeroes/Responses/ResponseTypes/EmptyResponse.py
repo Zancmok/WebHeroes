@@ -9,11 +9,11 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
 
 
 @dataclass
-class EmptyResponse(BaseResponseClass):
+class EmptyResponse(BaseResponseModel):
     """
     Represents an empty response with no additional data.
 

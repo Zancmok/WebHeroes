@@ -4,11 +4,11 @@
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
 
 
 @dataclass
-class SuccessResponse(BaseResponseClass):
+class SuccessResponse(BaseResponseModel):
     """
     # TODO: Write Docstring!
     """

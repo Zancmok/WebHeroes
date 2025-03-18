@@ -10,11 +10,11 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
 
 
 @dataclass
-class UserUpdatedUpdateResponse(BaseResponseClass):
+class UserUpdatedUpdateModel(BaseDataModel):
     """
     Notification about a user's information being updated.
 

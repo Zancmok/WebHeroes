@@ -9,12 +9,12 @@ Classes:
 
 from dataclasses import dataclass, field
 
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.UserResponse import UserResponse
+from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.DataModels.UserModel import UserModel
 
 
 @dataclass
-class NewLobbyUpdateResponse(BaseResponseClass):
+class NewLobbyUpdateModel(BaseDataModel):
     """
     Notification about a new lobby being created.
 
@@ -31,4 +31,4 @@ class NewLobbyUpdateResponse(BaseResponseClass):
     # TODO: Update Docstring!
 
     lobby_name: str
-    owner: UserResponse
+    owner: UserModel

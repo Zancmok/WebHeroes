@@ -11,15 +11,15 @@ Classes:
 from dataclasses import dataclass, field
 
 from Enums.Server.LobbyUpdate import LobbyUpdate
-from WebHeroes.ResponseTypes.BaseResponseClass import BaseResponseClass
-from WebHeroes.ResponseTypes.NewLobbyUpdateResponse import NewLobbyUpdateResponse
-from WebHeroes.ResponseTypes.NewUserUpdateResponse import NewUserUpdateResponse
-from WebHeroes.ResponseTypes.UserLeftUpdateResponse import UserLeftUpdateResponse
-from WebHeroes.ResponseTypes.UserUpdatedUpdateResponse import UserUpdatedUpdateResponse
+from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
+from WebHeroes.Responses.DataModels.NewLobbyUpdateModel import NewLobbyUpdateModel
+from WebHeroes.Responses.DataModels.NewUserUpdateModel import NewUserUpdateModel
+from WebHeroes.Responses.DataModels.UserLeftUpdateModel import UserLeftUpdateModel
+from WebHeroes.Responses.DataModels.UserUpdatedUpdateModel import UserUpdatedUpdateModel
 
 
 @dataclass
-class LobbyUpdateResponse(BaseResponseClass):
+class LobbyUpdateResponse(BaseResponseModel):
     """
     Response containing an update about a lobby.
 
@@ -40,4 +40,4 @@ class LobbyUpdateResponse(BaseResponseClass):
 
     object_type: str = field(default="lobby-update", kw_only=True)
     change_type: LobbyUpdate
-    change: (NewUserUpdateResponse | NewLobbyUpdateResponse | UserUpdatedUpdateResponse | UserLeftUpdateResponse)
+    change: (NewUserUpdateModel | NewLobbyUpdateModel | UserUpdatedUpdateModel | UserLeftUpdateModel)
