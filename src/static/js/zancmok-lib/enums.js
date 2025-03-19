@@ -4,6 +4,20 @@ export const SocketEvent = {
     CREATE_LOBBY: "create-lobby"
 };
 
+export const ObjectType = {
+    LobbyModel: "lobby",
+    NewLobbyUpdateModel: "new-lobby-update",
+    NewUserUpdateModel: "new-user-update",
+    UserLeftUpdateModel: "user-left-update",
+    UserModel: "user",
+    UserUpdatedUpdateModel: "user-updated-update",
+    CreateLobbyResponse: "create-lobby-response",
+    EmptyResponse: "empty",
+    GetLobbyDataResponse: "get-lobby-data-response",
+    LobbyUpdateResponse: "lobby-update",
+    SuccessResponse: "success"
+}
+
 export const PresenceStatus = {
     OFFLINE: "offline",
     ONLINE: "online"

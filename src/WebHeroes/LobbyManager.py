@@ -19,7 +19,7 @@ from Enums.Common.PresenceStatus import PresenceStatus
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from Enums.Server.SocketEvent import SocketEvent
 from WebHeroes.Responses import dictify, GetLobbyDataResponse, UserModel, LobbyModel, EmptyResponse, \
-    LobbyUpdateResponse, NewUserUpdateModel, UserLeftUpdateModel, NewLobbyUpdateModel, SuccessResponse
+    LobbyUpdateResponse, NewUserUpdateModel, UserLeftUpdateModel, NewLobbyUpdateModel, SuccessResponse, CreateLobbyResponse
 import WebHeroes.config as config
 from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
@@ -253,7 +253,24 @@ class LobbyManager(StaticClass):
                  )
              )), to=LobbyManager.lobby_room.name)
 
-        emit(SocketEvent.CREATE_LOBBY, dictify(SuccessResponse()), to=session['user_session_id'])
+        emit(SocketEvent.CREATE_LOBBY, dictify(CreateLobbyResponse(
+            lobby=LobbyModel(
+                room_id=new_lobby.room_id,
+                name=new_lobby.name,
+                owner=UserModel(
+                    user_id=own_user.user_id,
+                    username=own_user.name,
+                    avatar_url=own_user.avatar_url,
+                    presence_status=own_user.presence_status
+                ),
+                members=[UserModel(
+                    user_id=member.user_id,
+                    username=member.name,
+                    avatar_url=member.avatar_url,
+                    presence_status=member.presence_status
+                ) for member in new_lobby.children]
+            )
+        )), to=session['user_session_id'])
 
     @staticmethod
     @route_manager.event('connect')

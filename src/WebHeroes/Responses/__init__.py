@@ -39,6 +39,7 @@ from WebHeroes.Responses.DataModels.UserLeftUpdateModel import UserLeftUpdateMod
 from WebHeroes.Responses.DataModels.UserModel import UserModel
 from WebHeroes.Responses.DataModels.UserUpdatedUpdateModel import UserUpdatedUpdateModel
 from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
+from WebHeroes.Responses.ResponseTypes.CreateLobbyResponse import CreateLobbyResponse
 
 
 def dictify(data: BaseDataModel) -> dict[str, Any]:
@@ -91,5 +92,6 @@ __all__ = [
     "UserUpdatedUpdateModel",
     "LobbyUpdateResponse",
     "UserLeftUpdateModel",
-    "SuccessResponse"
+    "SuccessResponse",
+    "CreateLobbyResponse"
 ]

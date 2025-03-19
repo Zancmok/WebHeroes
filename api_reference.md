@@ -3,7 +3,10 @@
 ## Index
 - [WebSocket Events](#websocket-events)  
   - [`connect`](#1-websocket-event-connect)  
-  - [`disconnect`](#2-websocket-event-disconnect)
+  - [`disconnect`](#2-websocket-event-disconnect)  
+  - [`get_lobby_data`](#3-websocket-event-get_lobby_data)  
+  - [`create_lobby`](#4-websocket-event-create_lobby)  
+  - [`lobby_update`](#5-websocket-event-lobby_update)  
 - [GET Methods](#get-methods)  
   - [`GET /`](#1-get-)  
   - [`GET /modding-documentation/`](#2-get-modding-documentation)  
@@ -15,6 +18,7 @@
   - [`Success Response`](#2-success-response)  
   - [`Get Lobby Data Response`](#3-get-lobby-data-response)  
   - [`Lobby Update Response`](#4-lobby-update-response)  
+  - [`Create Lobby Response`](#5-create-lobby-response)  
 - [Response Data Models](#response-data-models)  
   - [`Lobby Model`](#1-lobby-model)  
   - [`User Model`](#2-user-model)  
@@ -30,7 +34,7 @@
 
 ## WebSocket Events
 
-### 1. `WebSocket Event: connect`
+### 1. [`WebSocket Event: connect`](#index)
 Handles the WebSocket connection event.
 
 #### **Behavior**
@@ -45,7 +49,7 @@ Handles the WebSocket connection event.
 
 ---
 
-### 2. `WebSocket Event: disconnect`
+### 2. [`WebSocket Event: disconnect`](#index)
 Handles the WebSocket disconnection event.
 
 #### **Behavior**
@@ -54,9 +58,71 @@ Handles the WebSocket disconnection event.
 
 ---
 
+### 3. [`WebSocket Event: get_lobby_data`](#index)
+Fetches and emits the current lobby data, providing information about the requesting user, the users in the same lobby, and other available lobbies.
+
+#### **Behavior**
+- If the session lacks a valid access token, an [`EmptyResponse`](#1-empty-response) is emitted.
+- Retrieves the requesting user's details based on their session user ID.
+- Gathers information about the current lobby's users.
+- Collects details of other available lobbies and their members.
+
+#### **Response**
+- [**`EmptyResponse`**](#1-empty-response): If the user is not authenticated.
+- [**`GetLobbyDataResponse`**](#3-get-lobby-data-response): If the user is authenticated, containing:
+  - `self`: The requesting user.
+  - `users`: A list of users in the same lobby.
+  - `lobbies`: A list of available lobbies and their members.
+
+---
+
+### 4. [`WebSocket Event: create_lobby`](#index)
+Allows a user to create a new lobby and automatically join it.
+
+#### **Request**
+- **Payload**:
+  - `lobby_name` (`string`, required): The name of the new lobby.
+
+#### **Behavior**
+- The server validates the `lobby_name`.
+- If the user is already in another lobby, the request is rejected.
+- The user is removed from the default lobby and added to the new one.
+- The new lobby is added to the list of available lobbies.
+- The server sends two updates to all users in the default lobby:
+  - A [`LOBBY_UPDATE`](#4-lobby-update-response) event indicating a new lobby was created.
+  - A [`LOBBY_UPDATE`](#4-lobby-update-response) event indicating the user left the default lobby.
+
+#### **Response**
+- [**`EmptyResponse`**](#1-empty-response): If `lobby_name` is invalid or the user is already in another lobby.
+- [**`CreateLobbyResponse`**](#5-create-lobby-response): If the lobby is successfully created, containing:
+  - `lobby`: The newly created lobby details.
+
+---
+
+### 5. [`WebSocket Event: lobby_update`](#index)
+Notifies all users when a change occurs in the lobby system.
+
+#### **Sent by**: Server  
+#### **Payload**:
+  - `change_type` (`LobbyUpdate`): The type of change that occurred.
+  - `change`:
+    - If `change_type = NEW_LOBBY`: `NewLobbyUpdateModel`
+    - If `change_type = USER_LEFT`: `UserLeftUpdateModel`
+
+#### **Behavior**
+- Sent when:
+  - A new lobby is created (`NEW_LOBBY`).
+  - A user leaves the default lobby to create their own (`USER_LEFT`).
+
+#### **Response**
+- No direct response; clients update their UI accordingly.
+
+
+---
+
 ## GET Methods
 
-### 1. `GET /`
+### 1. [`GET /`](#index)
 Serves the home page.
 
 #### **Request**
@@ -68,7 +134,7 @@ Serves the home page.
 
 ---
 
-### 2. `GET /modding-documentation/`
+### 2. [`GET /modding-documentation/`](#index)
 Serves the modding documentation page.
 
 #### **Request**
@@ -80,7 +146,7 @@ Serves the modding documentation page.
 
 ---
 
-### 3. `GET /oauth/`
+### 3. [`GET /oauth/`](#index)
 Handles Discord OAuth2 authentication.
 
 #### **Request**
@@ -91,8 +157,8 @@ Handles Discord OAuth2 authentication.
 
 #### **Response**
 - **302 Found**: Redirects to:
-  - `/online-lobbies/` if authentication is successful.
-  - `/` if authentication fails.
+  - [`/online-lobbies/`](#4-get-online-lobbies) if authentication is successful.
+  - [`/`](#1-get-) if authentication fails.
 
 #### **Behavior**
 - Exchanges the authorization code for an access token.
@@ -101,7 +167,7 @@ Handles Discord OAuth2 authentication.
 
 ---
 
-### 4. `GET /online-lobbies/`
+### 4. [`GET /online-lobbies/`](#index)
 Serves the online lobbies page.
 
 #### **Request**
@@ -122,9 +188,7 @@ _None yet_
 
 ## Response Objects
 
----
-
-### 1. `Empty Response`
+### 1. [`Empty Response`](#index)
 Represents an empty response with no additional data.
 
 #### Object Type: `empty`
@@ -138,7 +202,7 @@ _None_
 
 ---
 
-### 2. `Success Response`
+### 2. [`Success Response`](#index)
 Indicates a successful operation.
 
 #### Object Type: `success`
@@ -151,15 +215,15 @@ _None_
 
 ---
 
-### 3. `Get Lobby Data Response`
+### 3. [`Get Lobby Data Response`](#index)
 Provides data about available lobbies and active users.
 
 #### Object Type: `get-lobby-data-response`
 
 #### **Fields**
-- `self`: `UserModel`  
-- `users`: `list[UserModel]`  
-- `lobbies`: `list[LobbyModel]`  
+- `self`: [`UserModel`](#2-user-model)  
+- `users`: [`list[UserModel]`](#2-user-model)  
+- `lobbies`: [`list[LobbyModel]`](#1-lobby-model)  
 
 #### **Field Explanation**
 - `self`: The requesting user.  
@@ -168,13 +232,13 @@ Provides data about available lobbies and active users.
 
 ---
 
-### 4. `Lobby Update Response`
+### 4. [`Lobby Update Response`](#index)
 Represents an update to a lobby, detailing the type of change and its specifics.
 
 #### Object Type: `lobby-update`
 
 #### **Fields**
-- `change_type`: `LobbyUpdate`  
+- `change_type`: [`LobbyUpdate`](#1-lobbyupdate)  
 - `change`: `NewUserUpdateModel | NewLobbyUpdateModel | UserUpdatedUpdateModel | UserLeftUpdateModel`  
 
 #### **Field Explanation**
@@ -187,9 +251,23 @@ Represents an update to a lobby, detailing the type of change and its specifics.
 
 ---
 
+### 5. [`Create Lobby Response`](#index)
+
+Gives you the data about the newly created lobby. Sent only to the user creating the said lobby.
+
+#### Object Type: `create-lobby-response`
+
+#### **Fields**
+- `lobby`: [`LobbyModel`](#1-lobby-model)
+
+#### **Field Explanation**
+- `lobby`: The newly created lobby.
+
+---
+
 ## Response Data Models
 
-### 1. `Lobby Model`
+### 1. [`Lobby Model`](#index)
 
 Represents a game lobby.
 
@@ -198,8 +276,8 @@ Represents a game lobby.
 #### **Fields**  
 - `room_id`: `int`  
 - `name`: `str`  
-- `owner`: `UserModel`  
-- `members`: `list[UserModel]`  
+- `owner`: [`UserModel`](#2-user-model)  
+- `members`: [`list[UserModel]`](#2-user-model)  
 
 #### **Field Explanation**  
 - `room_id`: The unique identifier for the lobby.  
@@ -209,7 +287,7 @@ Represents a game lobby.
 
 ---
 
-### 2. `User Model`
+### 2. [`User Model`](#index)
 
 Represents a user in the system.
 
@@ -219,7 +297,7 @@ Represents a user in the system.
 - `user_id`: `int`  
 - `username`: `str`  
 - `avatar_url`: `str`  
-- `presence_status`: `PresenceStatus`  
+- `presence_status`: [`PresenceStatus`](#2-presencestatus) 
 
 #### **Field Explanation**  
 - `user_id`: The unique identifier for the user.  
@@ -229,7 +307,7 @@ Represents a user in the system.
 
 ---
 
-### 3. `New Lobby Update Model`
+### 3. [`New Lobby Update Model`](#index)
 
 Notification about a new lobby being created.
 
@@ -237,7 +315,7 @@ Notification about a new lobby being created.
 
 #### **Fields**  
 - `lobby_name`: `str`  
-- `owner`: `UserModel`  
+- `owner`: [`UserModel`](#2-user-model)  
 
 #### **Field Explanation**  
 - `lobby_name`: The name of the newly created lobby.  
@@ -245,42 +323,42 @@ Notification about a new lobby being created.
 
 ---
 
-### 4. `New User Update Model`
+### 4. [`New User Update Model`](#index)
 
 Notification about a new user being added.
 
 #### **Object Type**: `new-user-update`
 
 #### **Fields**  
-- `user`: `UserModel`  
+- `user`: [`UserModel`](#2-user-model)  
 
 #### **Field Explanation**  
 - `user`: The details of the newly added user, represented by a `UserModel`.  
 
 ---
 
-### 5. `User Left Update Model`
+### 5. [`User Left Update Model`](#index)
 
 Notification about a user leaving the system or a lobby.
 
 #### **Object Type**: `user-left-update`
 
 #### **Fields**  
-- `user`: `UserModel`  
+- `user`: [`UserModel`](#2-user-model)  
 
 #### **Field Explanation**  
 - `user`: The details of the user who has left, represented by a `UserModel`.  
 
 ---
 
-### 6. `User Updated Update Model`
+### 6. [`User Updated Update Model`](#index)
 
 Notification about a user's information being updated.
 
 #### **Object Type**: `user-updated-update`
 
 #### **Fields**  
-_None_  
+_None_
 
 #### **Field Explanation**  
 - This response type indicates that a user's information has been updated in the system.  
@@ -289,7 +367,7 @@ _None_
 
 ## Enums
 
-### 1. `LobbyUpdate`
+### 1. [`LobbyUpdate`](#index)
 
 #### **Values**
 - `NEW_LOBBY`: `new-lobby`
@@ -299,7 +377,7 @@ _None_
 
 ---
 
-### 2. `PresenceStatus`
+### 2. [`PresenceStatus`](#index)
 
 #### **Values**
 - `OFFLINE`: `offline`
