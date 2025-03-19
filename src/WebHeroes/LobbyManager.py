@@ -212,7 +212,6 @@ class LobbyManager(StaticClass):
         new_lobby: Room = Room(lobby_name)
 
         new_lobby.owner = own_user
-        new_lobby.children.append(own_user)
 
         LobbyManager.leave_room(
             room=LobbyManager.lobby_room,

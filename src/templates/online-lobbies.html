@@ -122,6 +122,10 @@
 					console.log(payload)
 				})
 
+				socket.on("create-lobby", function(payload) {
+					console.log(payload)
+				})
+
 				socket.emit("get-lobby-data");
 
 				socket.emit("create-lobby", "test-lobby");
