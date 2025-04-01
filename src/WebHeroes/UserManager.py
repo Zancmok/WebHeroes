@@ -20,6 +20,7 @@ class UserManager(StaticClass):
     """
 
     _users: dict[int, User] = {}
+    _user_session_map: dict[int, str] = {}
 
     @staticmethod
     def get(user_id: int) -> Optional[User]:
@@ -31,6 +32,25 @@ class UserManager(StaticClass):
         """
 
         return UserManager._users.get(user_id)
+
+    @staticmethod
+    def get_session_id(user_id: int) -> Optional[str]:
+        """
+        # TODO: Write Docstring!
+        """
+
+        if user_id in UserManager._user_session_map:
+            return UserManager._user_session_map[user_id]
+
+        return None
+
+    @staticmethod
+    def assign_session_id(user_id: int, session_id: str) -> None:
+        """
+        # TODO: Write Docstring!
+        """
+
+        UserManager._user_session_map[user_id] = session_id
 
     @staticmethod
     def create_user(user_id: int, name: str, avatar_url: str,

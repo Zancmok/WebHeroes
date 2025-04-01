@@ -272,6 +272,64 @@ class LobbyManager(StaticClass):
         )), to=session['user_session_id'])
 
     @staticmethod
+    @route_manager.event(SocketEvent.LEAVE_LOBBY)
+    def leave_lobby(lobby_id: int) -> None:
+        """
+        # TODO: Write Docstring!
+        """
+
+        if type(lobby_id) is not int:
+            emit(SocketEvent.LEAVE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
+            return
+
+        own_lobby: Optional[Room] = None
+        for lobby in LobbyManager.other_lobbies:
+            if lobby.room_id == lobby_id:
+                own_lobby = lobby
+                break
+
+        if own_lobby is None:
+            emit(SocketEvent.LEAVE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
+            return
+
+        own_lobby: Room
+        own_user: Optional[User] = UserManager.get(session['user_id'])
+
+        if not own_user:
+            emit(SocketEvent.LEAVE_LOBBY, dictify(EmptyResponse()), to=session['user_session_id'])
+            return
+
+        own_user: User
+
+        if own_lobby.owner is own_user:
+            for member in own_lobby.children:
+                LobbyManager.leave_room(own_lobby, member)
+
+                member_session_id: Optional[str] = UserManager.get_session_id(member.user_id)
+
+                if not member_session_id:
+                    print(f"Warning: Member {member} doesn't have a designated session ID yet still in lobby {own_lobby} somehow?", flush=True)
+                    continue
+
+                member_session_id: str
+
+                emit(SocketEvent.LEAVE_LOBBY, dictify(LobbyUpdateResponse(
+                    change_type=LobbyUpdate.USER_LEFT,
+                    change=UserLeftUpdateModel(
+                        user=UserModel(
+                            user_id=member.user_id,
+                            username=member.name,
+                            avatar_url=member.avatar_url,
+                            presence_status=member.presence_status
+                        )
+                    )
+                )), to=member_session_id)
+
+            LobbyManager.other_lobbies.remove(own_lobby)
+
+            # TODO: Nigga this aint finished yet ):
+
+    @staticmethod
     @route_manager.event('connect')
     def on_connect(*args, **kwargs) -> Optional[bool]:
         """
