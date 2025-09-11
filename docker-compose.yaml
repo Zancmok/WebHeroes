@@ -1,15 +1,15 @@
 services:
   web_heroes_server:
     build:
-      context: .
-      dockerfile: Dockerfile
+      context: ./src/WebHeroes
+      dockerfile: ./Dockerfile
       args:
         no_run: "true"
     ports:
       - "5000:5000"
     depends_on:
       - web_heroes_database
-    command: bash -c "python /app/src/main.py"
+    command: bash -c "python ./main.py"
   web_heroes_database:
     image: mysql
     ports:

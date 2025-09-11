@@ -11,7 +11,7 @@ Classes:
 
 from typing import Optional
 
-from flask import session, request, redirect, render_template, url_for
+from flask import session, request, redirect, render_template
 from flask_socketio import emit, join_room, leave_room
 from werkzeug import Response
 
@@ -19,7 +19,7 @@ from Enums.Common.PresenceStatus import PresenceStatus
 from Enums.Server.LobbyUpdate import LobbyUpdate
 from Enums.Server.SocketEvent import SocketEvent
 from WebHeroes.Responses import dictify, GetLobbyDataResponse, UserModel, LobbyModel, EmptyResponse, \
-    LobbyUpdateResponse, NewUserUpdateModel, UserLeftUpdateModel, NewLobbyUpdateModel, SuccessResponse, CreateLobbyResponse
+    LobbyUpdateResponse, NewUserUpdateModel, UserLeftUpdateModel, NewLobbyUpdateModel, CreateLobbyResponse
 import WebHeroes.config as config
 from WebHeroes.Room import Room
 from WebHeroes.RouteManager import RouteManager
