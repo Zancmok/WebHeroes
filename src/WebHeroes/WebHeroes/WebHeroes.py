@@ -9,7 +9,7 @@ Classes:
     with the Discord API.
 """
 
-from flask import Flask, render_template, request, session, redirect
+from flask import Flask, render_template, request, session, redirect, Blueprint
 from flask_socketio import SocketIO
 from werkzeug import Response
 from zenora import APIClient
@@ -22,6 +22,8 @@ from WebHeroes.DatabaseBridge import DatabaseBridge
 from WebHeroes.LobbyManager import LobbyManager
 from WebHeroes.RouteManager import RouteManager
 from ZancmokLib.StaticClass import StaticClass
+from WebAPI.Common import Common
+from WebAPI.HTMLRoutes import HTMLRoutes
 
 
 class WebHeroes(StaticClass):
@@ -74,6 +76,9 @@ class WebHeroes(StaticClass):
         for manager in managers:
             manager.register_routes(WebHeroes.app, WebHeroes.socket_io)
 
+        WebHeroes.app.register_blueprint(Common.route_blueprint)
+        WebHeroes.app.register_blueprint(HTMLRoutes.route_blueprint)
+
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
         WebHeroes.socket_io.run(
@@ -84,28 +89,6 @@ class WebHeroes(StaticClass):
             use_reloader=False,
             log_output=True
         )
-
-    @staticmethod
-    @app.route("/", methods=["GET"])
-    def home() -> str:
-        """
-        Handles requests to the home page ("/").
-
-        :return: The rendered template for the index page.
-        """
-
-        return render_template("index.html")
-
-    @staticmethod
-    @app.route("/modding-documentation/")
-    def modding_documentation() -> str:
-        """
-        Serves the modding documentation page.
-
-        :return: The rendered template for the modding documentation page.
-        """
-
-        return render_template("modding-documentation.html")
 
     @staticmethod
     @app.route("/oauth/", methods=["GET"])

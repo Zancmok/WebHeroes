@@ -1,0 +1,34 @@
+import WebHeroes.config as config
+from ZancmokLib.StaticClass import StaticClass
+from flask import Blueprint, render_template
+
+
+class HTMLRoutes(StaticClass):
+    route_blueprint: Blueprint = Blueprint(
+        name="WebAPI:HTMLRoutes",
+        import_name=__name__,
+        template_folder=config.TEMPLATES_PATH,
+        static_folder=config.STATIC_PATH
+    )
+
+    @staticmethod
+    @route_blueprint.route("/", methods=["GET"])
+    def index() -> str:
+        """
+        Handles requests to the home page ("/").
+
+        :return: The rendered template for the index page.
+        """
+
+        return render_template("index.html")
+
+    @staticmethod
+    @route_blueprint.route("/modding-documentation/")
+    def modding_documentation() -> str:
+        """
+        Serves the modding documentation page.
+
+        :return: The rendered template for the modding documentation page.
+        """
+
+        return render_template("modding-documentation.html")
