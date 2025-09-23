@@ -11,7 +11,7 @@ Classes:
 from enum import Enum
 
 
-class PresenceStatus(Enum):
+class EUserPresenceStatus(Enum):
     """
     An enumeration representing the possible presence statuses of a user.
 
@@ -19,5 +19,5 @@ class PresenceStatus(Enum):
         OFFLINE (str): Indicates the user is offline and not currently active.
         ONLINE (str): Indicates the user is online and currently active.
     """
-    OFFLINE: str = 'offline'
-    ONLINE: str = 'online'
+    OFFLINE = 'offline'
+    ONLINE = 'online'

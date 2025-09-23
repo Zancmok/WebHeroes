@@ -7,11 +7,11 @@ Manages user instances, providing methods to retrieve and create users.
 from typing import Optional
 
 from Enums.Common.PresenceStatus import PresenceStatus
-from WebHeroes.User import User
+from WebHeroes.UserManagement.User import User
 from ZancmokLib.StaticClass import StaticClass
 
 
-class UserManager(StaticClass):
+class UserFactory(StaticClass):
     """
     A static class that manages users.
 
@@ -31,7 +31,7 @@ class UserManager(StaticClass):
         :return: The User instance if found, otherwise None.
         """
 
-        return UserManager._users.get(user_id)
+        return UserFactory._users.get(user_id)
 
     @staticmethod
     def get_session_id(user_id: int) -> Optional[str]:
@@ -39,8 +39,8 @@ class UserManager(StaticClass):
         # TODO: Write Docstring!
         """
 
-        if user_id in UserManager._user_session_map:
-            return UserManager._user_session_map[user_id]
+        if user_id in UserFactory._user_session_map:
+            return UserFactory._user_session_map[user_id]
 
         return None
 
@@ -50,7 +50,7 @@ class UserManager(StaticClass):
         # TODO: Write Docstring!
         """
 
-        UserManager._user_session_map[user_id] = session_id
+        UserFactory._user_session_map[user_id] = session_id
 
     @staticmethod
     def create_user(user_id: int, name: str, avatar_url: str,
@@ -72,6 +72,6 @@ class UserManager(StaticClass):
             presence_status=presence_status
         )
 
-        UserManager._users[user_id] = new_user
+        UserFactory._users[user_id] = new_user
 
         return new_user

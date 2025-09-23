@@ -18,7 +18,6 @@ from zenora.models.oauth import OauthResponse
 from zenora.models.user import OwnUser
 
 import WebHeroes.config as config
-from WebHeroes.DatabaseBridge import DatabaseBridge
 from WebHeroes.LobbyManager import LobbyManager
 from WebHeroes.RouteManager import RouteManager
 from ZancmokLib.StaticClass import StaticClass
@@ -66,8 +65,6 @@ class WebHeroes(StaticClass):
 
         :return: None
         """
-
-        DatabaseBridge.init()
 
         managers: list[RouteManager] = [
             LobbyManager.route_manager
