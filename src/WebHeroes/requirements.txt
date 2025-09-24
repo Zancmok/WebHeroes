@@ -1,7 +1,6 @@
 flask
 flask-socketio
-zenora
 python-dotenv
 werkzeug
-mysql-connector-python
+SQLAlchemy
 eventlet

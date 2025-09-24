@@ -9,17 +9,10 @@ Classes:
     with the Discord API.
 """
 
-from flask import Flask, render_template, request, session, redirect, Blueprint
+from flask import Flask
 from flask_socketio import SocketIO
-from werkzeug import Response
-from zenora import APIClient
-from zenora.exceptions import APIError
-from zenora.models.oauth import OauthResponse
-from zenora.models.user import OwnUser
 
 import WebHeroes.config as config
-from WebHeroes.LobbyManager import LobbyManager
-from WebHeroes.RouteManager import RouteManager
 from ZancmokLib.StaticClass import StaticClass
 from WebAPI.Common import Common
 from WebAPI.HTMLRoutes import HTMLRoutes
@@ -37,7 +30,6 @@ class WebHeroes(StaticClass):
 
     Attributes:
         app: A Flask instance that handles the web server and routing.
-        discord_client: An instance of the Discord API client used to interact with the Discord OAuth service.
 
     Methods:
         run: Initializes and starts the Flask web server.
@@ -51,11 +43,6 @@ class WebHeroes(StaticClass):
 
     socket_io: SocketIO = SocketIO(app)
 
-    discord_client: APIClient = APIClient(
-        token=config.DISCORD_BOT_TOKEN,
-        client_secret=config.DISCORD_CLIENT_SECRET
-    )
-
     @staticmethod
     def run() -> None:
         """
@@ -65,13 +52,6 @@ class WebHeroes(StaticClass):
 
         :return: None
         """
-
-        managers: list[RouteManager] = [
-            LobbyManager.route_manager
-        ]
-
-        for manager in managers:
-            manager.register_routes(WebHeroes.app, WebHeroes.socket_io)
 
         WebHeroes.app.register_blueprint(Common.route_blueprint)
         WebHeroes.app.register_blueprint(HTMLRoutes.route_blueprint)
@@ -86,36 +66,3 @@ class WebHeroes(StaticClass):
             use_reloader=False,
             log_output=True
         )
-
-    @staticmethod
-    @app.route("/oauth/", methods=["GET"])
-    def oauth() -> Response:
-        """
-        Handles Discord OAuth2 authentication. This route exchanges the authorization code for
-        an access token and retrieves user details, which are then stored in the session.
-
-        :return: A redirect response to the online lobbies page or the home page in case of failure.
-        """
-
-        oauth_code: str = request.args.get('code', '')
-
-        try:
-            oauth_response: OauthResponse = WebHeroes.discord_client.oauth.get_access_token(
-                code=oauth_code,
-                redirect_uri=config.REDIRECT_URI
-            )
-        except APIError:
-            return redirect("/")
-
-        access_token: str = oauth_response.access_token
-
-        bearer_client: APIClient = APIClient(access_token, bearer=True)
-
-        current_user: OwnUser = bearer_client.users.get_current_user()
-
-        session['access_token'] = access_token
-        session['username'] = current_user.username
-        session['avatar_url'] = current_user.avatar_url
-        session['user_id'] = current_user.id
-
-        return redirect("/online-lobbies/")
