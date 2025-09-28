@@ -1,5 +1,6 @@
 import WebHeroes.config as config
 from ZancmokLib.StaticClass import StaticClass
+from ZancmokLib.EHTTPMethod import EHTTPMethod
 from flask import Blueprint, render_template
 
 
@@ -12,7 +13,7 @@ class HTMLRoutes(StaticClass):
     )
 
     @staticmethod
-    @route_blueprint.route("/", methods=["GET"])
+    @route_blueprint.route("/", methods=[EHTTPMethod.GET])
     def index() -> str:
         """
         Handles requests to the home page ("/").
@@ -23,7 +24,7 @@ class HTMLRoutes(StaticClass):
         return render_template("index.html")
 
     @staticmethod
-    @route_blueprint.route("/modding-documentation/")
+    @route_blueprint.route("/modding-documentation/", methods=[EHTTPMethod.GET])
     def modding_documentation() -> str:
         """
         Serves the modding documentation page.
