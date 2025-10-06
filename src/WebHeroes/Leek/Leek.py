@@ -3,6 +3,7 @@ from sqlalchemy import Engine, text
 from sqlalchemy.exc import OperationalError
 from ZancmokLib.StaticClass import StaticClass
 from time import sleep
+# Models necessary for the metadata creation of them.
 from Leek.Models.BaseModel import BaseModel
 from Leek.Models.UserModel import UserModel
 

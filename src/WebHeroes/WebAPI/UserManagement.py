@@ -2,7 +2,8 @@ from typing import Optional
 
 import WebHeroes.config as config
 from WebHeroes.UserManagement.UserAccountManager import UserAccountManager
-from WebHeroes.UserManagement.User import User
+from WebHeroes.UserManagement.UserAlreadyExistsError import UserAlreadyExistsError
+from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from flask import Blueprint
@@ -20,9 +21,12 @@ class UserManagement(StaticClass):
     @staticmethod
     @route_blueprint.route("/signup/", methods=[EHTTPMethod.POST])
     def signup(username: str, password: str) -> None:
-        user: User = UserAccountManager.create_account(username, password)
+        try:
+            user: UserModel = UserAccountManager.create_account(username, password)
+        except UserAlreadyExistsError:
+            return # TODO: Do the thingy yk yk
 
     @staticmethod
     @route_blueprint.route("/login/", methods=[EHTTPMethod.POST])
     def login(username: str, password: str) -> None:
-        user: User = UserAccountManager.try_login(username, password)
+        user: UserModel = UserAccountManager.try_login(username, password)
