@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import StrEnum, auto
 
 
-class EHTTPMethod(Enum):
-    GET = "GET"
-    POST = "POST"
-    PATCH = "PATCH"
-    PUT = "PUT"
-    DELETE = "DELETE"
+class EHTTPMethod(StrEnum):
+    GET = auto()
+    POST = auto()
+    PATCH = auto()
+    PUT = auto()
+    DELETE = auto()

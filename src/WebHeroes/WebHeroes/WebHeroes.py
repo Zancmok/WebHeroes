@@ -11,11 +11,12 @@ Classes:
 
 from flask import Flask
 from flask_socketio import SocketIO
-
+from Leek.Leek import Leek
 import WebHeroes.config as config
 from ZancmokLib.StaticClass import StaticClass
 from WebAPI.Common import Common
 from WebAPI.HTMLRoutes import HTMLRoutes
+from WebAPI.UserManagement import UserManagement
 
 
 class WebHeroes(StaticClass):
@@ -55,6 +56,9 @@ class WebHeroes(StaticClass):
 
         WebHeroes.app.register_blueprint(Common.route_blueprint)
         WebHeroes.app.register_blueprint(HTMLRoutes.route_blueprint)
+        WebHeroes.app.register_blueprint(UserManagement.route_blueprint)
+
+        Leek.initialize()
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 

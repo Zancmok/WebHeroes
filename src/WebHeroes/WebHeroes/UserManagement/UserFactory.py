@@ -5,8 +5,7 @@ Manages user instances, providing methods to retrieve and create users.
 """
 
 from typing import Optional
-
-from WebHeroes.UserManagement.User import User
+from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 
 
@@ -18,10 +17,8 @@ class UserFactory(StaticClass):
     It provides methods to retrieve and create users.
     """
 
-    _users: dict[int, User] = {}
-
     @staticmethod
-    def get(user_id: int) -> Optional[User]:
+    def get(user_id: int) -> Optional[UserModel]:
         """
         Retrieves a user by their ID.
 
@@ -29,8 +26,4 @@ class UserFactory(StaticClass):
         :return: The User instance if found, otherwise None.
         """
 
-        user: User = UserFactory._users.get(user_id)
-        if user:
-            return user
-
-        return None
+        raise NotImplementedError

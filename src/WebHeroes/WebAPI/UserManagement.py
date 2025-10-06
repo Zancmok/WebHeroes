@@ -20,9 +20,9 @@ class UserManagement(StaticClass):
     @staticmethod
     @route_blueprint.route("/signup/", methods=[EHTTPMethod.POST])
     def signup(username: str, password: str) -> None:
-        user: Optional[User] = UserAccountManager.create_account(username, password)
+        user: User = UserAccountManager.create_account(username, password)
 
     @staticmethod
     @route_blueprint.route("/login/", methods=[EHTTPMethod.POST])
     def login(username: str, password: str) -> None:
-        user: Optional[User] = UserAccountManager.try_login(username, password)
+        user: User = UserAccountManager.try_login(username, password)

@@ -1,6 +1,3 @@
 .env
 .venv
 .idea
-src/__pycache__
-src/WebHeroes/__pycache__
-src/WebHeroes/ZancmokLib/__pycache__
