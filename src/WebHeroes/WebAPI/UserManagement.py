@@ -6,7 +6,10 @@ from WebHeroes.UserManagement.UserAlreadyExistsError import UserAlreadyExistsErr
 from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
+from ZancmokLib.EHTTPCode import EHTTPCode
 from flask import Blueprint
+from WebHeroes.Responses.ResponseTypes.SignupResponse import SignupResponse
+from WebHeroes.Responses import dictify
 
 
 class UserManagement(StaticClass):
@@ -20,11 +23,19 @@ class UserManagement(StaticClass):
 
     @staticmethod
     @route_blueprint.route("/signup/", methods=[EHTTPMethod.POST])
-    def signup(username: str, password: str) -> None:
+    def signup(username: str, password: str) -> dict:
         try:
             user: UserModel = UserAccountManager.create_account(username, password)
         except UserAlreadyExistsError:
-            return # TODO: Do the thingy yk yk
+            return dictify(SignupResponse(
+                success=False,
+                reason="User already exists"
+            )), EHTTPCode.CONFLICT
+        
+        return dictify(SignupResponse(
+            success=True,
+            reason=""
+        )), EHTTPCode.CREATED
 
     @staticmethod
     @route_blueprint.route("/login/", methods=[EHTTPMethod.POST])
