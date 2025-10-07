@@ -1,7 +1,9 @@
-[gd_scene load_steps=10 format=3 uid="uid://cmmf4br4amuep"]
+[gd_scene load_steps=20 format=3 uid="uid://cmmf4br4amuep"]
 
-[ext_resource type="Script" uid="uid://c77w7ukfsc446" path="res://AnimatedSprite2d.cs" id="1_06t4h"]
 [ext_resource type="Texture2D" uid="uid://bd73bylc8hcgl" path="res://Webheroes_spritesheets/button_menu_press.png" id="1_7vrkn"]
+[ext_resource type="Script" uid="uid://b13xs24hl1170" path="res://ButtonTemplate.cs" id="1_jix8l"]
+[ext_resource type="Texture2D" uid="uid://1cy5x26p1l71" path="res://Webheroes_spritesheets/button_menu_hover.png" id="3_jix8l"]
+[ext_resource type="Texture2D" uid="uid://bywh52mvkql1v" path="res://Webheroes_spritesheets/button_menu.png" id="5_glbon"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_7vrkn"]
 atlas = ExtResource("1_7vrkn")
@@ -53,10 +55,84 @@ animations = [{
 "speed": 60.0
 }]
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_8qtwp"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(0, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_dy7ct"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(114, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0o4t1"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(228, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_0k4wn"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(342, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_j5v2v"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(456, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_iotk1"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(570, 0, 114, 64)
+
+[sub_resource type="AtlasTexture" id="AtlasTexture_w44g7"]
+atlas = ExtResource("3_jix8l")
+region = Rect2(684, 0, 114, 64)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_cm266"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_8qtwp")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_dy7ct")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0o4t1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_0k4wn")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_j5v2v")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_iotk1")
+}, {
+"duration": 1.0,
+"texture": SubResource("AtlasTexture_w44g7")
+}],
+"loop": false,
+"name": &"default",
+"speed": 60.0
+}]
+
 [node name="Node2D" type="Node2D"]
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-position = Vector2(514.90106, 326.875)
+[node name="Button" type="Button" parent="."]
+offset_left = 424.0
+offset_top = 333.0
+offset_right = 432.0
+offset_bottom = 341.0
+script = ExtResource("1_jix8l")
+
+[node name="TextureRect" type="TextureRect" parent="Button"]
+layout_mode = 0
+offset_right = 114.0
+offset_bottom = 64.0
+texture = ExtResource("5_glbon")
+
+[node name="ButtonAnimationPressed2D" type="AnimatedSprite2D" parent="Button"]
+position = Vector2(207.00006, -55)
 scale = Vector2(0.9405984, 1.0351563)
 sprite_frames = SubResource("SpriteFrames_dy7ct")
-script = ExtResource("1_06t4h")
+
+[node name="ButtonAnimationHover2D" type="AnimatedSprite2D" parent="Button"]
+position = Vector2(35, -56)
+scale = Vector2(0.99999994, 0.99999994)
+sprite_frames = SubResource("SpriteFrames_cm266")
