@@ -1,5 +1,6 @@
 from enum import IntEnum
 
+
 class EHTTPCode(IntEnum):
     # 1xx Informational Response
     CONTINUE = 100
@@ -16,7 +17,7 @@ class EHTTPCode(IntEnum):
     PARTIAL_CONTENT = 206
     MULTI_STATUS = 207
     ALREADY_REPORTED = 208
-    IM_USED = 226    
+    IM_USED = 226
     # 3xx Redirection
     MULTIPLE_CHOICES = 300
     MOVED_PERMANENTLY = 301

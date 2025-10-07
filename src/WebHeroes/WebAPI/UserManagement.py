@@ -22,10 +22,13 @@ class UserManagement(StaticClass):
     )
 
     @staticmethod
-    @route_blueprint.route("/signup/", methods=[EHTTPMethod.POST])
+    @route_blueprint.route("/signup/<username>/<password>", methods=[EHTTPMethod.POST])
     def signup(username: str, password: str) -> tuple[dict[str, Any], int]:
         try:
-            user: UserModel = UserAccountManager.create_account(username, password)
+            user: UserModel = UserAccountManager.create_account(
+                username=username,
+                password=password
+            )
         except UserAlreadyExistsError:
             return dictify(SignupResponse(
                 success=False,
