@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 
 import WebHeroes.config as config
 from WebHeroes.UserManagement.UserAccountManager import UserAccountManager
@@ -23,7 +23,7 @@ class UserManagement(StaticClass):
 
     @staticmethod
     @route_blueprint.route("/signup/", methods=[EHTTPMethod.POST])
-    def signup(username: str, password: str) -> dict:
+    def signup(username: str, password: str) -> tuple[dict[str, Any], int]:
         try:
             user: UserModel = UserAccountManager.create_account(username, password)
         except UserAlreadyExistsError:
