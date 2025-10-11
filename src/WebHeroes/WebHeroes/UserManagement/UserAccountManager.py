@@ -1,6 +1,12 @@
+from typing import Optional
+
+from flask import session
 from ZancmokLib.StaticClass import StaticClass
 from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
 from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
+from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
+from WebHeroes.UserManagement.Errors.AuthFailedError import AuthFailedError
+from WebHeroes.UserManagement.Errors.AlreadyLoggedInError import AlreadyLoggedInError
 from Leek.Repositories.UserRepository import UserRepository
 from Leek.Models.UserModel import UserModel
 import bcrypt
@@ -30,4 +36,22 @@ class UserAccountManager(StaticClass):
 
     @staticmethod
     def try_login(username: str, password: str) -> UserModel:
-        ...
+        user: Optional[UserModel] = UserRepository.get_by_username(username)
+
+        if not user:
+            raise UserDoesntExistError(f"User '{username}' doesn't exist.")
+
+        if old_user_id := session.get('user_id'):
+            old_user_id: int
+
+            if old_user_id == user.id:
+                return user
+            else:
+                raise AlreadyLoggedInError(f"You are already logged in as another user.")
+
+        if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
+            raise AuthFailedError(f"Password incorrect.")
+
+        session['user_id'] = user.id
+
+        return user

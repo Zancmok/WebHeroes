@@ -1,7 +1,10 @@
 import WebHeroes.config as config
+from WebHeroes.UserManagement.Errors.AlreadyLoggedInError import AlreadyLoggedInError
+from WebHeroes.UserManagement.Errors.AuthFailedError import AuthFailedError
 from WebHeroes.UserManagement.UserAccountManager import UserAccountManager
 from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
 from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
+from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
 from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
@@ -43,6 +46,22 @@ class UserManagement(StaticClass):
         return dictify(SuccessResponse()), EHTTPCode.CREATED
 
     @staticmethod
-    @route_blueprint.route("/login/", methods=[EHTTPMethod.POST])
-    def login(username: str, password: str) -> None:
-        user: UserModel = UserAccountManager.try_login(username, password)
+    @route_blueprint.route("/login", methods=[EHTTPMethod.POST])
+    @FlaskUtil.reroute_arguments(username=str, password=str)
+    def login(username: str, password: str) -> tuple[Response, HTTPCode]:
+        try:
+            UserAccountManager.try_login(username, password)
+        except UserDoesntExistError as e:
+            return dictify(FailedResponse(
+                reason=str(e)
+            )), EHTTPCode.BAD_REQUEST
+        except AuthFailedError as e:
+            return dictify(FailedResponse(
+                reason=str(e)
+            )), EHTTPCode.FORBIDDEN
+        except AlreadyLoggedInError as e:
+            return dictify(FailedResponse(
+                reason=str(e)
+            )), EHTTPCode.BAD_REQUEST
+
+        return dictify(SuccessResponse()), EHTTPCode.OK

@@ -1,5 +1,6 @@
 from typing import Callable, Any
 
+import functools
 from flask import request
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
@@ -11,6 +12,7 @@ class FlaskUtil(StaticClass):
     @staticmethod
     def reroute_arguments(**kwargs: type) -> Callable[..., Any]:
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
+            @functools.wraps(function)
             def wrapper() -> Any:
                 if not isinstance(json_data := request.get_json(silent=True), dict):
                     json_data = {}
