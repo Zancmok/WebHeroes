@@ -6,9 +6,11 @@ from WebHeroes.UserManagement.UserAlreadyExistsError import UserAlreadyExistsErr
 from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
-from ZancmokLib.EHTTPCode import EHTTPCode
-from flask import Blueprint
-from WebHeroes.Responses.ResponseTypes.SignupResponse import SignupResponse
+from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode
+from ZancmokLib.FlaskUtil import FlaskUtil
+from flask import Blueprint, Response
+from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
+from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
 from WebHeroes.Responses import dictify
 
 
@@ -22,23 +24,20 @@ class UserManagement(StaticClass):
     )
 
     @staticmethod
-    @route_blueprint.route("/signup/<username>/<password>", methods=[EHTTPMethod.POST])
-    def signup(username: str, password: str) -> tuple[dict[str, Any], int]:
+    @route_blueprint.route("/signup", methods=[EHTTPMethod.POST])
+    @FlaskUtil.reroute_arguments(username=str, password=str)
+    def signup(username: str, password: str) -> tuple[Response, HTTPCode]:
         try:
-            user: UserModel = UserAccountManager.create_account(
+            UserAccountManager.create_account(
                 username=username,
                 password=password
             )
         except UserAlreadyExistsError:
-            return dictify(SignupResponse(
-                success=False,
+            return dictify(FailedResponse(
                 reason="User already exists"
             )), EHTTPCode.CONFLICT
         
-        return dictify(SignupResponse(
-            success=True,
-            reason=""
-        )), EHTTPCode.CREATED
+        return dictify(SuccessResponse()), EHTTPCode.CREATED
 
     @staticmethod
     @route_blueprint.route("/login/", methods=[EHTTPMethod.POST])

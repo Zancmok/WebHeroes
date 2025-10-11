@@ -1,5 +1,7 @@
 from enum import IntEnum
 
+type HTTPCode = int
+
 
 class EHTTPCode(IntEnum):
     # 1xx Informational Response
