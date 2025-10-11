@@ -1,8 +1,7 @@
-from typing import Optional, Any
-
 import WebHeroes.config as config
 from WebHeroes.UserManagement.UserAccountManager import UserAccountManager
-from WebHeroes.UserManagement.UserAlreadyExistsError import UserAlreadyExistsError
+from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
+from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
 from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
@@ -32,9 +31,13 @@ class UserManagement(StaticClass):
                 username=username,
                 password=password
             )
-        except UserAlreadyExistsError:
+        except InvalidUsernameError as e:
             return dictify(FailedResponse(
-                reason="User already exists"
+                reason=str(e)
+            )), EHTTPCode.BAD_REQUEST
+        except UserAlreadyExistsError as e:
+            return dictify(FailedResponse(
+                reason=str(e)
             )), EHTTPCode.CONFLICT
         
         return dictify(SuccessResponse()), EHTTPCode.CREATED

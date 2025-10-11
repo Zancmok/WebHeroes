@@ -6,7 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from Leek.Models.UserModel import UserModel
 from Leek.Leek import Leek
 from ZancmokLib.StaticClass import StaticClass
-from WebHeroes.UserManagement.UserAlreadyExistsError import UserAlreadyExistsError
+from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
 
 
 class UserRepository(StaticClass):

@@ -6,3 +6,4 @@ cryptography
 pymysql
 sqlalchemy
 eventlet
+bcrypt
