@@ -17,6 +17,9 @@ class UserAccountManager(StaticClass):
     def create_account(username: str, password: str) -> UserModel:
         allowed_letters: str = "abcdefghijklmnoprstuvzxywqABCDEFGHIJKLMNOPRSTUVZQXYW0123456789_-"
 
+        if username == "":
+            raise InvalidUsernameError("Username cannot be empty.")
+
         for letter in username:
             if letter not in allowed_letters:
                 raise InvalidUsernameError(f"Letter '{letter}' is not allowed inside of a username.")

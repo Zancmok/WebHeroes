@@ -1,7 +1,3 @@
-"""
-# TODO: Write Docstring!
-"""
-
 from dataclasses import dataclass
 
 from WebHeroes.Responses.BaseDataModel import BaseDataModel
