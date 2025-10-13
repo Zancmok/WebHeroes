@@ -5,6 +5,7 @@ from WebHeroes.UserManagement.UserAccountManager import UserAccountManager
 from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
 from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
 from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
+from WebHeroes.Errors.NotLoggedInError import NotLoggedInError
 from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
@@ -62,6 +63,18 @@ class UserManagement(StaticClass):
         except AlreadyLoggedInError as e:
             return dictify(FailedResponse(
                 reason=str(e)
+            )), EHTTPCode.FORBIDDEN
+
+        return dictify(SuccessResponse()), EHTTPCode.OK
+
+    @staticmethod
+    @route_blueprint.route("/logout", methods=[EHTTPMethod.POST])
+    def logout() -> tuple[Response, HTTPCode]:
+        try:
+            UserAccountManager.try_logout()
+        except NotLoggedInError:
+            return dictify(FailedResponse(
+                reason="Cannot log out if not logged in."
             )), EHTTPCode.FORBIDDEN
 
         return dictify(SuccessResponse()), EHTTPCode.OK

@@ -7,6 +7,7 @@ from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsername
 from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
 from WebHeroes.UserManagement.Errors.AuthFailedError import AuthFailedError
 from WebHeroes.UserManagement.Errors.AlreadyLoggedInError import AlreadyLoggedInError
+from WebHeroes.Errors.NotLoggedInError import NotLoggedInError
 from Leek.Repositories.UserRepository import UserRepository
 from Leek.Models.UserModel import UserModel
 import bcrypt
@@ -58,3 +59,10 @@ class UserAccountManager(StaticClass):
         session['user_id'] = user.id
 
         return user
+
+    @staticmethod
+    def try_logout() -> None:
+        if not session.get('user_id'):
+            raise NotLoggedInError
+        
+        del session['user_id']
