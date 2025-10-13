@@ -33,3 +33,8 @@ class HTMLRoutes(StaticClass):
         """
 
         return render_template("modding-documentation.html")
+
+    @staticmethod
+    @route_blueprint.route("/signup/", methods=[EHTTPMethod.GET])
+    def signup() -> str:
+        return render_template("signup.html")
