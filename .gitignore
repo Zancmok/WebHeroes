@@ -3,3 +3,4 @@
 .idea
 .vscode
 src/WebHeroesApp/.godot
+src/WebHeroes/.env
