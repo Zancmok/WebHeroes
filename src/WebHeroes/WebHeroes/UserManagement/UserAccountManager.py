@@ -18,8 +18,8 @@ class UserAccountManager(StaticClass):
     def create_account(username: str, password: str) -> UserModel:
         allowed_letters: str = "abcdefghijklmnoprstuvzxywqABCDEFGHIJKLMNOPRSTUVZQXYW0123456789_-"
 
-        if username == "":
-            raise InvalidUsernameError("Username cannot be empty.")
+        if len(username) not in range(3, 17):
+            raise InvalidUsernameError("Username must be between '3' and '16' characters long!")
 
         for letter in username:
             if letter not in allowed_letters:
