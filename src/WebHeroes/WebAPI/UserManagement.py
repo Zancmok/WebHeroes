@@ -58,10 +58,10 @@ class UserManagement(StaticClass):
         except AuthFailedError as e:
             return dictify(FailedResponse(
                 reason=str(e)
-            )), EHTTPCode.FORBIDDEN
+            )), EHTTPCode.BAD_REQUEST
         except AlreadyLoggedInError as e:
             return dictify(FailedResponse(
                 reason=str(e)
-            )), EHTTPCode.BAD_REQUEST
+            )), EHTTPCode.FORBIDDEN
 
         return dictify(SuccessResponse()), EHTTPCode.OK
