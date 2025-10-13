@@ -1,0 +1,131 @@
+/* Force Dark Mode */
+body, .container, .card {
+background-color: #121212;
+color: white;
+}
+
+/* Enhanced Card Styling */
+.card {
+border-radius: 15px;
+box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+border: 2px solid #333; /* Border to make the card more defined */
+background-color: #1e1e1e; /* Slightly lighter than the background to make it pop */
+}
+
+.card h3 {
+color: #fafafa; /* Make header stand out */
+}
+
+.nav-tabs .nav-link {
+color: #b0b0b0;
+font-weight: bold;
+transition: all 0.3s ease;
+position: relative;
+}
+
+.nav-tabs .nav-link.active {
+background-color: #333;
+color: white;
+}
+
+.nav-tabs .nav-link.active::after {
+width: 100%;
+left: 0;
+}
+
+.nav-tabs .nav-link:hover::after {
+width: 50%;
+left: 25%;
+}
+
+.form-control {
+background-color: #2a2a2a;
+color: white; /* Default text color */
+border: 1px solid #444;
+border-radius: 8px;
+transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-control:focus {
+background-color: #333;
+box-shadow: 0 0 0 0.2rem rgba(29, 185, 84, 0.25); /* Spotify green glow */
+border-color: #1DB954;
+color: white; /* Add this line to keep text white when focused */
+}
+
+.form-control::placeholder {
+color: #aaa;
+}
+
+.btn-primary {
+color: white;
+border-radius: 8px;
+padding: 12px;
+transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+background-color: #00308F;
+transform: translateY(-2px);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.btn-success {
+background-color: #1DB954; /* Spotify green */
+color: white;
+border-radius: 8px;
+padding: 12px;
+border: none;
+transition: all 0.3s ease;
+}
+
+.btn-success:hover {
+background-color: #1ed760; /* Lighter Spotify green */
+transform: translateY(-2px);
+box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Tab content fade animations */
+.tab-pane {
+opacity: 0;
+transform: translateY(10px);
+transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.tab-pane.show {
+opacity: 1;
+transform: translateY(0);
+}
+
+/* Fade in for form elements */
+.form-label, .form-control, .btn {
+animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+from {
+    opacity: 0;
+    transform: translateY(10px);
+}
+to {
+    opacity: 1;
+    transform: translateY(0);
+}
+}
+
+/* Staggered animation for form elements */
+form .mb-3:nth-child(1) {
+animation-delay: 0.1s;
+}
+
+form .mb-3:nth-child(2) {
+animation-delay: 0.2s;
+}
+
+form .mb-3:nth-child(3) {
+animation-delay: 0.3s;
+}
+
+form .d-grid {
+animation-delay: 0.4s;
+}
