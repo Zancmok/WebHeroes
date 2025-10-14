@@ -21,17 +21,53 @@ signupPassword.addEventListener("input", comparePasswords);
 confirmPassword.addEventListener("input", comparePasswords);
 
 
-function signupPress(event){
-    event.preventDefualt();
+async function signupPress(event) {
+    event.preventDefault();
 
-    if (signupPassword.value === "" && confirmPassword.value === ""){
+    if (signupPassword.value === "" && confirmPassword.value === "") {
         return;
-    } else if(signupPassword.value !== confirmPassword.value){
+    } else if (signupPassword.value !== confirmPassword.value) {
         return;
     }
 
-    let signup_data = {
+    const signup_data = {
         username: document.getElementById("signup-name").value,
         password: signupPassword.value
     };
+
+    try {
+        const response = await fetch("/signup", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(signup_data)
+        });
+
+        const data = await response.json();
+
+        if (response.status === 201) {
+            // Success - account created
+            console.log("Account created successfully!");
+            // Redirect or clear form as needed
+            form.reset();
+            matchPass.textContent = "";
+        } else if (response.status === 400) {
+            // Bad request - invalid username
+            console.error("Error:", data.reason);
+            matchPass.textContent = `❌ ${data.reason}`;
+            matchPass.style.color = "red";
+        } else if (response.status === 409) {
+            // Conflict - user already exists
+            console.error("Error:", data.reason);
+            matchPass.textContent = `❌ ${data.reason}`;
+            matchPass.style.color = "red";
+        }
+    } catch (error) {
+        console.error("Request failed:", error);
+        matchPass.textContent = "❌ An error occurred. Please try again.";
+        matchPass.style.color = "red";
+    }
 }
+
+form.addEventListener("submit", signupPress);
