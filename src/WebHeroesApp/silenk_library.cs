@@ -1,11 +1,11 @@
 using Godot;
 using System;
 
-namespace silenk_library
+namespace SilenkLibrary
 {
-    public partial class Utility_class : Node2D
+    public partial class UtilityClass : Node2D
     {
-        public Button createButton(string buttonText, Vector2 position)
+        public Button CreateButton(string buttonText, Vector2 position)
         {
             Button newButton = new Button();
             newButton.Text = buttonText;
@@ -13,6 +13,11 @@ namespace silenk_library
             AddChild(newButton);
             GD.Print("ass");
             return newButton;
+        }
+
+        internal void CreateButton(string v, (int, int) value)
+        {
+            throw new NotImplementedException();
         }
     }
 }
