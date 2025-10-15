@@ -36,7 +36,7 @@ async function signupPress(event) {
     };
 
     try {
-        const response = await fetch("/signup", {
+        const response = await fetch("/user-management/signup", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
