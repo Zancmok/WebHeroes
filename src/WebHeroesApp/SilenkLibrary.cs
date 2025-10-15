@@ -5,13 +5,13 @@ namespace SilenkLibrary
 {
     public partial class UtilityClass : Node2D
     {
-        public Button CreateButton(string buttonText, Vector2 position)
+        public Button CreateButton(Node parent, string buttonText, Vector2 position, Vector2 size)
         {
             Button newButton = new Button();
             newButton.Text = buttonText;
             newButton.Position = position;
-            AddChild(newButton);
-            GD.Print("ass");
+            newButton.CustomMinimumSize = size;
+            parent.AddChild(newButton);
             return newButton;
         }
 

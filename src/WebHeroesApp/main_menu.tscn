@@ -1,12 +1,36 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmmf4br4amuep"]
+[gd_scene load_steps=3 format=3 uid="uid://dd2riyt3jqg1e"]
 
-[ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://MainMenu.cs" id="1_jix8l"]
+[ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://LoginRegisterMenu.cs" id="1_jix8l"]
+[ext_resource type="Script" uid="uid://htmny6ht3eqh" path="res://LoginRegisterPageContainer.cs" id="2_7vrkn"]
 
-[node name="Node2D" type="Node2D"]
+[node name="LoginRegisterMenu" type="Node2D"]
 script = ExtResource("1_jix8l")
 
-[node name="Button1" type="Button" parent="."]
-offset_left = 424.0
-offset_top = 333.0
-offset_right = 432.0
-offset_bottom = 341.0
+[node name="LoginRegisterPageContainer" type="Container" parent="."]
+custom_minimum_size = Vector2(100, 100)
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("2_7vrkn")
+
+[node name="LoginRegisterButtonContainer" type="HBoxContainer" parent="."]
+offset_left = -50.0
+offset_top = -50.0
+offset_right = -30.0
+offset_bottom = -42.0
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="LoginButton" type="Button" parent="LoginRegisterButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
+
+[node name="RegisterButton" type="Button" parent="LoginRegisterButtonContainer"]
+layout_mode = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
