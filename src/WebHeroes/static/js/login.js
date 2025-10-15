@@ -71,3 +71,49 @@ async function signupPress(event) {
 }
 
 form.addEventListener("submit", signupPress);
+
+async function loginPress(event) {
+    event.preventDefault();
+
+    const login_data = {
+        username: document.getElementById("login-name").value,  // Changed from "login-username" to "login-name"
+        password: document.getElementById("login-password").value
+    };
+
+    try {
+        const response = await fetch("/user-management/login", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(login_data)
+        });
+
+        const data = await response.json();
+
+        if (response.status === 200) {
+            // Success - logged in
+            console.log("Login successful!");
+            loginShit.textContent = "✅ Login successful!";
+            loginShit.style.color = "green";
+            // Redirect to dashboard or home page
+            // window.location.href = "/dashboard";
+        } else if (response.status === 400) {
+            // Bad request - user doesn't exist or auth failed
+            console.error("Error:", data.reason);
+            loginShit.textContent = `❌ ${data.reason}`;
+            loginShit.style.color = "red";
+        } else if (response.status === 403) {
+            // Forbidden - already logged in
+            console.error("Error:", data.reason);
+            loginShit.textContent = `❌ ${data.reason}`;
+            loginShit.style.color = "red";
+        }
+    } catch (error) {
+        console.error("Request failed:", error);
+        loginShit.textContent = "❌ An error occurred. Please try again.";
+        loginShit.style.color = "red";
+    }
+}
+
+login.addEventListener("submit", loginPress);
