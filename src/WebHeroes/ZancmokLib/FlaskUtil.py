@@ -47,3 +47,12 @@ class FlaskUtil(StaticClass):
                 return function(**output)
             return wrapper
         return decorator
+
+    def requiere_auth(admin=False) -> Callable[..., Any]:
+        def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
+            @functools.wraps(function)
+            def wrapper() -> Any:
+                raise NotImplementedError("ojoj, das is nicht Kebab")
+                return function()
+            return wrapper
+        return decorator

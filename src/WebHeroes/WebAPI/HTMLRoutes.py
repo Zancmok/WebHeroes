@@ -38,3 +38,8 @@ class HTMLRoutes(StaticClass):
     @route_blueprint.route("/signup/", methods=[EHTTPMethod.GET])
     def signup() -> str:
         return render_template("signup.html")
+
+    @staticmethod
+    @route_blueprint.route("/online-lobbies/", methods=[EHTTPMethod.GET])
+    def online_lobbies() -> str:
+        return render_template("online-lobbies.html")
