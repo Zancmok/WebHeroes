@@ -48,6 +48,7 @@ class FlaskUtil(StaticClass):
             return wrapper
         return decorator
 
+    @staticmethod
     def requiere_auth(admin=False) -> Callable[..., Any]:
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
             @functools.wraps(function)
