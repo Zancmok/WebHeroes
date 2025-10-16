@@ -15,10 +15,9 @@ namespace SilenkLibrary
 			return newButton;
 		}
 
-		public Container CreateContainer(Node parent, Vector2 position)
+		public Container CreateContainer(Node parent)
 		{
 			Container newContainer = new Container();
-			newContainer.Position = position;
 			parent.AddChild(newContainer);
 			return newContainer;
 		}

@@ -16,8 +16,6 @@ public partial class LoginRegisterPageContainer : Container
 	{
 		utilityClass = new UtilityClass();
 
-		Container idiotContainer = utilityClass.CreateContainer(this, new Vector2(100, 100));
-
 		Container loginRegisterPageContainer = GetNode<Container>("LoginRegisterPageContainer");
 		loginRegisterPageContainer.Position = new Vector2(1000, 1000);
 		
