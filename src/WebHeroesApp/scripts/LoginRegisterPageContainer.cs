@@ -14,8 +14,15 @@ public partial class LoginRegisterPageContainer : Container
 	
 	public override void _Ready()
 	{
+		utilityClass = new UtilityClass();
+
+		Container idiotContainer = utilityClass.CreateContainer(this, new Vector2(100, 100));
+
 		Container loginRegisterPageContainer = GetNode<Container>("LoginRegisterPageContainer");
-		// loginRegisterPageContainer.Position =
+		loginRegisterPageContainer.Position = new Vector2(1000, 1000);
+		
+		HBoxContainer loginRegisterButtonContainer = GetNode<HBoxContainer>("LoginRegisterPageContainer/LoginRegisterButtonContainer");
+		loginRegisterButtonContainer.Position = new Vector2(1000,1000);
 		
 		Button loginButton = GetNode<Button>("LoginRegisterButtonContainer/LoginButton");
 		loginButton.Text = "Login";

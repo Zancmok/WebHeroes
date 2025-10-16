@@ -1,15 +1,18 @@
 [gd_scene load_steps=3 format=3 uid="uid://cmmf4br4amuep"]
 
-[ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://MainMenu.cs" id="1_jix8l"]
-[ext_resource type="Script" uid="uid://htmny6ht3eqh" path="res://LoginRegisterPageContainer.cs" id="2_7vrkn"]
+[ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://scripts/LoginRegisterMenu.cs" id="1_jix8l"]
+[ext_resource type="Script" uid="uid://htmny6ht3eqh" path="res://scripts/LoginRegisterPageContainer.cs" id="2_7vrkn"]
 
 [node name="LoginRegisterMenu" type="Node2D"]
 script = ExtResource("1_jix8l")
 
 [node name="LoginRegisterPageContainer" type="Container" parent="."]
-offset_right = 40.0
-offset_bottom = 40.0
+offset_left = 960.0
+offset_top = 362.0
+offset_right = 1000.0
+offset_bottom = 402.0
 script = ExtResource("2_7vrkn")
+metadata/_edit_use_anchors_ = true
 
 [node name="LoginRegisterButtonContainer" type="HBoxContainer" parent="LoginRegisterPageContainer"]
 layout_mode = 2
