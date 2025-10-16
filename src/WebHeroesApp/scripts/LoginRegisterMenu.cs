@@ -5,7 +5,6 @@ using System.Xml.Serialization;
 
 public partial class LoginRegisterMenu : Node2D
 {
-	
 	private UtilityClass utilityClass;
 	public override void _Ready()
 	{
