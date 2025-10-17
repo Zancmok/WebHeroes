@@ -5,7 +5,15 @@ namespace SilenkLibrary
 {
 	public partial class UtilityClass : Node2D
 	{
-		public Button CreateButton(Node parent, string buttonText, Vector2 position, Vector2 size)
+		public Button CreateButton(Node parent, string buttonText)
+		{
+			Button newButton = new Button();
+			newButton.Text = buttonText;
+			parent.AddChild(newButton);
+			return newButton;	
+		}
+		
+		public Button CreateButtonExact(Node parent, string buttonText, Vector2 position, Vector2 size)
 		{
 			Button newButton = new Button();
 			newButton.Text = buttonText;
@@ -23,7 +31,7 @@ namespace SilenkLibrary
 			return newContainer;
 		}
 
-		public CenterContainer CreateCenterContainer(Node parent, bool useTopLeft, Control.LayoutPreset preset)
+		public CenterContainer CreateCenterContainer(Node parent, bool useTopLeft = false, Control.LayoutPreset preset = Control.LayoutPreset.FullRect)
 		{
 
 			CenterContainer newCenterContainer = new CenterContainer();
@@ -31,6 +39,6 @@ namespace SilenkLibrary
 			newCenterContainer.SetAnchorsPreset(preset);
 			parent.AddChild(newCenterContainer);
 			return newCenterContainer;
-        }
+		}
 	}
 }
