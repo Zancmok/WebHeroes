@@ -1,11 +1,14 @@
 from typing import Callable, Any
 
 import functools
-from flask import request
+from flask import request, session
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
 from WebHeroes.Responses import dictify
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
+from WebHeroes.UserManagement.EUserPermissionLevel import EUserPermissionLevel
+from Leek.Repositories.UserRepository import UserRepository
+from Leek.Models.UserModel import UserModel
 
 
 class FlaskUtil(StaticClass):
@@ -49,11 +52,27 @@ class FlaskUtil(StaticClass):
         return decorator
 
     @staticmethod
-    def requiere_auth(admin=False) -> Callable[..., Any]:
+    def require_auth(permission_level: EUserPermissionLevel = EUserPermissionLevel.DEFAULT) -> Callable[..., Any]:
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
             @functools.wraps(function)
-            def wrapper() -> Any:
-                raise NotImplementedError("ojoj, das is nicht Kebab")
-                return function()
+            def wrapper(*args, **kwargs) -> Any:
+                if not (user_id := session.get('user_id')):
+                    return dictify(FailedResponse(
+                        reason="User is not authenticated."
+                    )), EHTTPCode.FORBIDDEN
+                user_id: int
+
+                if not (user := UserRepository.get_by_id(user_id)):
+                    return dictify(FailedResponse(
+                        reason="User not found."
+                    )), EHTTPCode.FORBIDDEN
+                user: UserModel
+
+                if user.permission_level.value < permission_level.value:
+                    return dictify(FailedResponse(
+                        reason="Insufficient permissions."
+                    )), EHTTPCode.FORBIDDEN
+
+                return function(*args, **kwargs)
             return wrapper
         return decorator

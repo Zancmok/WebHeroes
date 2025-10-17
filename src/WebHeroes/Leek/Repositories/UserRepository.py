@@ -34,3 +34,8 @@ class UserRepository(StaticClass):
     def get_by_username(username: str) -> Optional[UserModel]:
         with Session(Leek.engine) as session:
             return session.execute(select(UserModel).where(UserModel.username == username)).scalars().first()
+
+    @staticmethod
+    def get_by_id(id: int) -> Optional[UserModel]:
+        with Session(Leek.engine) as session:
+            return session.execute(select(UserModel).where(UserModel.id == id)).scalars().first()
