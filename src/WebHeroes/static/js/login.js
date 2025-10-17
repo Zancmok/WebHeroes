@@ -96,8 +96,9 @@ async function loginPress(event) {
             console.log("Login successful!");
             loginShit.textContent = "✅ Login successful!";
             loginShit.style.color = "green";
+
             // Redirect to dashboard or home page
-            // window.location.href = "/dashboard";
+            window.location.assign("/online-lobbies/");
         } else if (response.status === 400) {
             // Bad request - user doesn't exist or auth failed
             console.error("Error:", data.reason);
