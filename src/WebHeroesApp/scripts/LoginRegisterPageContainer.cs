@@ -17,10 +17,10 @@ public partial class LoginRegisterPageContainer : Container
 		utilityClass = new UtilityClass();
 
 		Container loginRegisterPageContainer = GetNode<Container>("LoginRegisterPageContainer");
-		loginRegisterPageContainer.Position = new Vector2(1000, 1000);
+		loginRegisterPageContainer.SetAnchorsPreset(Control.LayoutPreset.Center);
 		
 		HBoxContainer loginRegisterButtonContainer = GetNode<HBoxContainer>("LoginRegisterPageContainer/LoginRegisterButtonContainer");
-		loginRegisterButtonContainer.Position = new Vector2(1000,1000);
+		loginRegisterButtonContainer.SetAnchorsPreset(Control.LayoutPreset.TopWide);
 		
 		Button loginButton = GetNode<Button>("LoginRegisterButtonContainer/LoginButton");
 		loginButton.Text = "Login";

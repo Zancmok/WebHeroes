@@ -16,6 +16,9 @@ public partial class LoginRegisterMenu : Node2D
 
 		Button buttonRegisterPage = utilityClass.CreateButton(this, "MainMenuButtonSettings", new Vector2(100, 100), new Vector2(10, 10));
 		buttonRegisterPage.Pressed += ButtonPressed;
+
+		Container testContainer = utilityClass.CreateContainer(this, Control.LayoutPreset.Center);
+		CenterContainer testCenterContainer = utilityClass.CreateCenterContainer(testContainer, false, Control.LayoutPreset.Center);
 	}
 
 	private void ButtonPressed()

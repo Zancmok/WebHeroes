@@ -15,11 +15,22 @@ namespace SilenkLibrary
 			return newButton;
 		}
 
-		public Container CreateContainer(Node parent)
+		public Container CreateContainer(Node parent, Control.LayoutPreset preset)
 		{
 			Container newContainer = new Container();
+			newContainer.SetAnchorsPreset(preset);
 			parent.AddChild(newContainer);
 			return newContainer;
 		}
+
+		public CenterContainer CreateCenterContainer(Node parent, bool useTopLeft, Control.LayoutPreset preset)
+		{
+
+			CenterContainer newCenterContainer = new CenterContainer();
+			newCenterContainer.UseTopLeft = useTopLeft;
+			newCenterContainer.SetAnchorsPreset(preset);
+			parent.AddChild(newCenterContainer);
+			return newCenterContainer;
+        }
 	}
 }
