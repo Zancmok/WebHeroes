@@ -1,7 +1,7 @@
 from typing import Callable, Any
 
 import functools
-from flask import request, session
+from flask import request, session, redirect
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
 from WebHeroes.Responses import dictify
@@ -57,9 +57,9 @@ class FlaskUtil(StaticClass):
             @functools.wraps(function)
             def wrapper(*args, **kwargs) -> Any:
                 if not (user_id := session.get('user_id')):
-                    return dictify(FailedResponse(
-                        reason="User is not authenticated."
-                    )), EHTTPCode.FORBIDDEN
+                    return redirect(
+                        "/signup/",
+                        code=EHTTPCode.FOUND)
                 user_id: int
 
                 if not (user := UserRepository.get_by_id(user_id)):
