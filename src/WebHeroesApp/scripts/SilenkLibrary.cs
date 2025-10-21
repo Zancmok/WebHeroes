@@ -3,12 +3,13 @@ using System;
 
 namespace SilenkLibrary
 {
-	public partial class UtilityClass : Node2D
+	public partial class UtilityClass
 	{
-		public Button CreateButton(Node parent, string buttonText)
+		public Button CreateButton(Node parent, string buttonText, Vector2 size)
 		{
 			Button newButton = new Button();
 			newButton.Text = buttonText;
+			newButton.CustomMinimumSize = size;
 			parent.AddChild(newButton);
 			return newButton;	
 		}
@@ -36,8 +37,8 @@ namespace SilenkLibrary
 
 			CenterContainer newCenterContainer = new CenterContainer();
 			newCenterContainer.UseTopLeft = useTopLeft;
-			newCenterContainer.SetAnchorsPreset(preset);
 			parent.AddChild(newCenterContainer);
+			newCenterContainer.SetAnchorsPreset(preset);
 			return newCenterContainer;
 		}
 	}
