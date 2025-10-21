@@ -1,4 +1,7 @@
 #include <Python.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 static PyMethodDef lua_bridge_module_methods[] = {
     {NULL, NULL, 0, NULL}
