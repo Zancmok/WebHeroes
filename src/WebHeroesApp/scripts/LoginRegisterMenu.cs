@@ -12,6 +12,10 @@ public partial class LoginRegisterMenu : Node2D
 		GD.Print("MainMenu _ready() called!");
 		utilityClass = new UtilityClass();
 
+		HttpRequest httpRequest = GetNode<HttpRequest>("HTTPRequest"); // add node in editor
+		httpRequest.RequestCompleted += OnRequestCompleted;
+		httpRequest.Request("https://jsonplaceholder.typicode.com/posts/1");
+
 		CenterContainer testCenterContainer1 = utilityClass.CreateCenterContainer(this);
 		
 		Button buttonLoginPage = utilityClass.CreateButton(testCenterContainer1, "MainMenuButtonPlay");
@@ -24,5 +28,10 @@ public partial class LoginRegisterMenu : Node2D
 	private void ButtonPressed()
 	{
 		GD.Print("ASS");
+	}
+
+	private void OnRequestCompleted()
+	{
+		throw new NotImplementedException();
 	}
 }
