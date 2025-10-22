@@ -39,7 +39,7 @@ class UserAccountManager(StaticClass):
         return user
 
     @staticmethod
-    def try_login(username: str, password: str) -> UserModel:
+    def try_login(username: str, password: str) -> str:
         user: Optional[UserModel] = UserRepository.get_by_username(username)
 
         if not user:
@@ -49,20 +49,22 @@ class UserAccountManager(StaticClass):
             old_user_id: int
 
             if old_user_id == user.id:
-                return user
+                return SessionManager.get_session(user.id)
             else:
                 raise AlreadyLoggedInError(f"You are already logged in as another user.")
 
         if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
             raise AuthFailedError(f"Password incorrect.")
 
-        SessionManager.new_session(user.id)
+        existing_session: Optional[str] = SessionManager.get_session(user.id)
+        if existing_session:
+            return existing_session
 
-        return user
+        return SessionManager.new_session(user.id)
 
     @staticmethod
-    def try_logout() -> None:
-        if not SessionManager.get_user_id():
+    def try_logout(token: Optional[str] = None) -> None:
+        if not SessionManager.get_user_id(token=token):
             raise NotLoggedInError
         
-        SessionManager.kill_session()
+        SessionManager.kill_session(token=token)

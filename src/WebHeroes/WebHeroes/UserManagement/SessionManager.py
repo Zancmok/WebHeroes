@@ -35,3 +35,11 @@ class SessionManager(StaticClass):
             session.pop("token")
 
         SessionManager._tokens.pop(token, None)
+
+    @staticmethod
+    def get_session(user_id: int) -> Optional[str]:
+        for token in SessionManager._tokens:
+            if SessionManager._tokens[token] == user_id:
+                return token
+
+        return None
