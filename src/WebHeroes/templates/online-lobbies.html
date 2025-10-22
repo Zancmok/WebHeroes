@@ -18,7 +18,7 @@
 		<table border="1" style="width:15%;float:left">
 			<thead>
 				<tr>
-					<td id="nameDisplay">bos</td>
+					<td id="nameDisplay"></td>
 					<td rowspan="2"><img id="pfp-display" src="https://cdn.discordapp.com/embed/avatars/1.png" width="100em" height="100em"></td>
 				</tr>
 				<tr>
@@ -38,7 +38,7 @@
 		<table style="width:15%;float:left">
 			<thead>
 				<tr>
-					<td><button>BACK</button></td>
+					<td><button id="back">BACK</button></td>
 				</tr>
 				<tr>
 					<td><button>PROFIl</button></td>
@@ -131,6 +131,7 @@
 				socket.emit("create-lobby", "test-lobby");
 			})()
 		</script>
+		<script src="../static/js/logout.js"></script>
 
 	</body>
 
