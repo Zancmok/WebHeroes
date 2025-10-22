@@ -1,5 +1,5 @@
 from typing import Callable, Any
-
+from types import NoneType
 import functools
 from flask import request, redirect
 from ZancmokLib.StaticClass import StaticClass
@@ -48,6 +48,9 @@ class FlaskUtil(StaticClass):
 
                     if argument in query_data and isinstance(output_data := query_data[argument], allowed_types):
                         output[argument] = output_data
+                        continue
+
+                    if NoneType in allowed_types:
                         continue
 
                     return dictify(FailedResponse(

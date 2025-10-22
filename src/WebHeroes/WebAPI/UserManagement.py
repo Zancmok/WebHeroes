@@ -6,7 +6,6 @@ from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyEx
 from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
 from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
 from WebHeroes.Errors.NotLoggedInError import NotLoggedInError
-from Leek.Models.UserModel import UserModel
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode

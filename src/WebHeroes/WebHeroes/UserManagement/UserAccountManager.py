@@ -61,8 +61,8 @@ class UserAccountManager(StaticClass):
         return user
 
     @staticmethod
-    def try_logout(token: Optional[str] = None) -> None:
+    def try_logout() -> None:
         if not SessionManager.get_user_id():
             raise NotLoggedInError
         
-        SessionManager.kill_session(token)
+        SessionManager.kill_session()
