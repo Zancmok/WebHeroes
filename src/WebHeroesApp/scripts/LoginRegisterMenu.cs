@@ -2,6 +2,7 @@ using Godot;
 using System;
 using SilenkLibrary;
 using System.Xml.Serialization;
+using System.Numerics;
 
 public partial class LoginRegisterMenu : Control
 {
@@ -15,39 +16,61 @@ public partial class LoginRegisterMenu : Control
 		//HttpRequest httpRequest = GetNode<HttpRequest>("HTTPRequest"); // add node in editor
 		//httpRequest.RequestCompleted += OnRequestCompleted;
 		//httpRequest.Request("https://jsonplaceholder.typicode.com/posts/1");
+		
+		this.Size = GetViewportRect().Size;
+		this.Position = Godot.Vector2.Zero;
+		this.SetAnchorsPreset(Control.LayoutPreset.FullRect);
 
-		Control loginRegisterControl = GetNode<Control>("LoginRegisterControl");
-
-		CallDeferred(MethodName.DebugSizes, loginRegisterControl);
 		// dynamic elements
-		CenterContainer testCenterContainer1 = utilityClass.CreateCenterContainer(loginRegisterControl);
-
-		VBoxContainer vbox = new VBoxContainer();
-		vbox.AddThemeConstantOverride("separation", 20);
-		testCenterContainer1.AddChild(vbox);
-
-		Button buttonLoginPage = utilityClass.CreateButton(vbox, "MainMenuButtonPlay", new Vector2(200, 50));
+		CenterContainer lRPageAtlas = utilityClass.CreateCenterContainer(this);
+		
+		VBoxContainer lRPage = utilityClass.CreateVBoxContainer(lRPageAtlas, "separation", 10);
+		HBoxContainer loginRegisterButtonStand = utilityClass.CreateHBoxContainer(lRPage, "separation", 10);
+		VBoxContainer loginFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
+		
+		// loginRegisterButtonStand buttons
+		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "MainMenuButtonPlay", new Godot.Vector2(200, 50));
 		buttonLoginPage.Pressed += () => ButtonPressed("success");
 
-		Button buttonRegisterPage = utilityClass.CreateButton(vbox, "MainMenuButtonSettings", new Vector2(200, 50));
+		Button buttonRegisterPage = utilityClass.CreateButton(loginRegisterButtonStand, "MainMenuButtonSettings", new Godot.Vector2(200, 50));
 		buttonRegisterPage.Pressed += () => ButtonPressed("success");
 
+		// loginFormStand form
+		//text that says Username
+		Label userNameInputLabel = new Label();
+		userNameInputLabel.Text = "Username";
+		loginFormStand.AddChild(userNameInputLabel);
+		
+		//input bar for Username
+		LineEdit userNameInput = new LineEdit();
+		userNameInput.CustomMinimumSize = new Godot.Vector2(0,50);
+		loginFormStand.AddChild(userNameInput);
 
-		// static elements
-		//CenterContainer loginRegisterPageCenterContainer = GetNode<CenterContainer>("LoginRegisterPageCenterContainer");
-		//loginRegisterPageCenterContainer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-
-		//HBoxContainer loginRegisterButtonContainer = GetNode<HBoxContainer>("LoginRegisterPageContainer/LoginRegisterButtonContainer");
-		//loginRegisterButtonContainer.SetAnchorsPreset(Control.LayoutPreset.TopWide);
-
-		//Button loginButton = GetNode<Button>("LoginRegisterButtonContainer/LoginButton");
-		//loginButton.Text = "Login";
-		//loginButton.Pressed += () => ButtonPressed("Login");
-
-		//Button registerButton = GetNode<Button>("LoginRegisterButtonContainer/RegisterButton");
-		//registerButton.Text = "Register";
-		//registerButton.Pressed += () => ButtonPressed("Register");
+		//text that says Password
+		Label passWordInputLabel = new Label();
+		passWordInputLabel.Text = "Password";
+		loginFormStand.AddChild(passWordInputLabel);
+		
+		// password bit container
+		HBoxContainer passWordRow = utilityClass.CreateHBoxContainer(loginFormStand, "separation", 10);
+		//input bar for Password
+		LineEdit passWordInput = new LineEdit();
+		passWordInput.CustomMinimumSize = new Godot.Vector2(0, 50);
+		passWordInput.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+		passWordInput.Secret = true;
+		passWordInput.SecretCharacter = "*";
+		passWordRow.AddChild(passWordInput);
+		//hide Password button
+		Button showPassWord = utilityClass.CreateButton(passWordRow, "Show", new Godot.Vector2(50, 50));
+		showPassWord.Pressed += () => {
+			passWordInput.Secret = !passWordInput.Secret;
+		};
+		
+		
+		
+		CallDeferred(MethodName.DebugSizes, this);
 	}
+	
 	private void ButtonPressed(string response)
 	{
 		GD.Print($"{response}");

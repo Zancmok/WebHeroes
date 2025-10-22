@@ -37,9 +37,25 @@ namespace SilenkLibrary
 
 			CenterContainer newCenterContainer = new CenterContainer();
 			newCenterContainer.UseTopLeft = useTopLeft;
-			parent.AddChild(newCenterContainer);
 			newCenterContainer.SetAnchorsPreset(preset);
+			parent.AddChild(newCenterContainer);
 			return newCenterContainer;
+		}
+		
+		public VBoxContainer CreateVBoxContainer(Node parent, string atribute, int atributeSize)
+		{
+			VBoxContainer newVBoxContainer = new VBoxContainer();
+			newVBoxContainer.AddThemeConstantOverride(atribute, atributeSize);
+			parent.AddChild(newVBoxContainer);
+			return newVBoxContainer;
+		}
+		
+		public HBoxContainer CreateHBoxContainer(Node parent, string atribute, int atributeSize)
+		{
+			HBoxContainer newHBoxContainer = new HBoxContainer();
+			newHBoxContainer.AddThemeConstantOverride(atribute, atributeSize);
+			parent.AddChild(newHBoxContainer);
+			return newHBoxContainer;
 		}
 	}
 }

@@ -5,18 +5,6 @@
 [node name="LoginRegisterMenu" type="Node2D"]
 
 [node name="LoginRegisterControl" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
 script = ExtResource("1_jix8l")
-
-[node name="LoginRegisterPageCenterContainer" type="CenterContainer" parent="."]
-visible = false
-offset_right = 40.0
-offset_bottom = 40.0
-
-[node name="LoginRegisterButtonContainer" type="HBoxContainer" parent="LoginRegisterPageCenterContainer"]
-layout_mode = 2
-
-[node name="LoginButton" type="Button" parent="LoginRegisterPageCenterContainer/LoginRegisterButtonContainer"]
-layout_mode = 2
-
-[node name="RegisterButton" type="Button" parent="LoginRegisterPageCenterContainer/LoginRegisterButtonContainer"]
-layout_mode = 2
