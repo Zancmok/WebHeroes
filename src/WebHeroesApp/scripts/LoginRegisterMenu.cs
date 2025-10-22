@@ -3,7 +3,7 @@ using System;
 using SilenkLibrary;
 using System.Xml.Serialization;
 
-public partial class LoginRegisterMenu : Node2D
+public partial class LoginRegisterMenu : Control
 {
 	private UtilityClass utilityClass;
 
@@ -16,17 +16,11 @@ public partial class LoginRegisterMenu : Node2D
 		//httpRequest.RequestCompleted += OnRequestCompleted;
 		//httpRequest.Request("https://jsonplaceholder.typicode.com/posts/1");
 
+		Control loginRegisterControl = GetNode<Control>("LoginRegisterControl");
 
-
-		Control testControl1 = new Control();
-		AddChild(testControl1);
-		testControl1.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-		testControl1.Size = GetViewportRect().Size;
-		testControl1.Position = Vector2.Zero;
-
-		CallDeferred(MethodName.DebugSizes, testControl1);
+		CallDeferred(MethodName.DebugSizes, loginRegisterControl);
 		// dynamic elements
-		CenterContainer testCenterContainer1 = utilityClass.CreateCenterContainer(testControl1);
+		CenterContainer testCenterContainer1 = utilityClass.CreateCenterContainer(loginRegisterControl);
 
 		VBoxContainer vbox = new VBoxContainer();
 		vbox.AddThemeConstantOverride("separation", 20);

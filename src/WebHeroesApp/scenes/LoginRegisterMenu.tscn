@@ -3,6 +3,8 @@
 [ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://scripts/LoginRegisterMenu.cs" id="1_jix8l"]
 
 [node name="LoginRegisterMenu" type="Node2D"]
+
+[node name="LoginRegisterControl" type="Control" parent="."]
 script = ExtResource("1_jix8l")
 
 [node name="LoginRegisterPageCenterContainer" type="CenterContainer" parent="."]
