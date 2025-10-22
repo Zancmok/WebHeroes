@@ -1,56 +1,259 @@
-
-#newGame{
-	position: fixed;
-	bottom: 1em;
-	left: 3em;
-	width:20em;
+/* Reset and base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#loadGame{
-	position: fixed;
-	bottom: 1em;
-	left: 27em;
-	width: 20em;
+body {
+  font-family: 'Georgia', serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-attachment: fixed;
+  color: #d4af37;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
 }
 
-#join{
-	position: fixed;
-	bottom: 1em;
-	left: 50em;
-	width:20em;
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(25, 118, 210, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-#message{
-	position: fixed;
-	bottom: 1em;
-	right:1em;
-	width:50%;
+/* Table base styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  background: linear-gradient(135deg, #2a2416 0%, #3d3027 50%, #2a2416 100%);
+  border: 3px solid #8b7355;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(0, 0, 0, 0.7);
+  position: relative;
+  z-index: 1;
+  margin-bottom: 10px;
 }
 
-#send{
-	position: fixed;
-	bottom: 1em;
-	right: 1em;
+table::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+    repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
+  pointer-events: none;
 }
 
-#bot{
-	width:45%;
-	float:left;
-	position: fixed;
-	top: 8em;
-}
-#bot2{
-	width:40%;
-	float:left;
-	position: fixed;
-	right:17em;
-	top: 8em;
+/* Table cells */
+td {
+  padding: 10px 15px;
+  border: 1px solid #5a4a3a;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+  font-weight: bold;
 }
 
-#bot3{
-	width:17em;
-	float:right;
-	position: fixed;
-	right:0em;
-	top:8em;
+thead td {
+  background: linear-gradient(135deg, #1a1410 0%, #2a2416 100%);
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid #8b7355;
+}
+
+tbody td {
+  background: rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover td {
+  background: rgba(212, 175, 55, 0.1);
+  cursor: pointer;
+}
+
+/* Profile picture */
+#pfp-display {
+  border: 2px solid #d4af37;
+  box-shadow: 0 0 10px rgba(212, 175, 55, 0.4);
+  border-radius: 0;
+}
+
+/* Main lobby table */
+#bot {
+  width: 60%;
+  float: left;
+  margin-right: 1%;
+  clear: both;
+  margin-top: 20px;
+}
+
+/* Chat room table */
+#bot2 {
+  width: 19%;
+  float: left;
+  margin-right: 1%;
+  margin-top: 20px;
+}
+
+/* Players online table */
+#bot3 {
+  width: 19%;
+  float: left;
+  margin-top: 20px;
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  padding: 12px 24px;
+  font-size: 0.95em;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #cd853f 50%, #a0522d 100%);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5), 0 6px 15px rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* Button container */
+#buttons {
+  clear: both;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+/* Input field */
+input[type="text"] {
+  background-color: rgba(0, 0, 0, 0.5);
+  color: #d4af37;
+  border: 2px solid #8b7355;
+  padding: 12px 15px;
+  font-family: 'Georgia', serif;
+  font-size: 0.95em;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  width: 300px;
+  margin-right: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+input[type="text"]::placeholder {
+  color: #8b7355;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+input[type="text"]:focus {
+  outline: none;
+  background-color: rgba(0, 0, 0, 0.7);
+  box-shadow: inset 0 0 10px rgba(212, 175, 55, 0.2), 0 0 15px rgba(212, 175, 55, 0.4);
+  border-color: #d4af37;
+}
+
+/* Send button specific */
+#send {
+  vertical-align: top;
+}
+
+/* Special styling for specific text elements */
+#nameDisplay,
+#ratingDisplay {
+  font-size: 1em;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6), 1px 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1200px) {
+  #bot {
+    width: 100%;
+    float: none;
+    margin-right: 0;
+  }
+  
+  #bot2, #bot3 {
+    width: 49%;
+    float: left;
+  }
+  
+  #bot2 {
+    margin-right: 2%;
+  }
+  
+  #bot3 {
+    margin-right: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  table[style*="float:left"] {
+    width: 100% !important;
+    float: none !important;
+  }
+  
+  #bot, #bot2, #bot3 {
+    width: 100%;
+    float: none;
+    margin-right: 0;
+  }
+  
+  #buttons {
+    flex-direction: column;
+  }
+  
+  button {
+    width: 100%;
+  }
+  
+  input[type="text"] {
+    width: calc(100% - 10px);
+    margin-bottom: 10px;
+  }
 }

@@ -4,6 +4,7 @@ from typing import Any
 from WebHeroes.Responses.BaseDataModel import BaseDataModel
 from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
+from WebHeroes.Responses.ResponseTypes.LoginResponse import LoginResponse
 from flask import jsonify, Response
 
 
@@ -49,5 +50,6 @@ __all__ = [
     "dictify",
     "BaseDataModel",
     "SuccessResponse",
-    "FailedResponse"
+    "FailedResponse",
+    "LoginResponse"
 ]
