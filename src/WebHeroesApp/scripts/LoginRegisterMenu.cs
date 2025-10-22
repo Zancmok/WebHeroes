@@ -29,10 +29,10 @@ public partial class LoginRegisterMenu : Control
 		VBoxContainer loginFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
 		
 		// loginRegisterButtonStand buttons
-		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "MainMenuButtonPlay", new Godot.Vector2(200, 50));
+		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "Login", new Godot.Vector2(200, 50));
 		buttonLoginPage.Pressed += () => ButtonPressed("success");
 
-		Button buttonRegisterPage = utilityClass.CreateButton(loginRegisterButtonStand, "MainMenuButtonSettings", new Godot.Vector2(200, 50));
+		Button buttonRegisterPage = utilityClass.CreateButton(loginRegisterButtonStand, "Register", new Godot.Vector2(200, 50));
 		buttonRegisterPage.Pressed += () => ButtonPressed("success");
 
 		// loginFormStand form
