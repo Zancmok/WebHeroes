@@ -1,7 +1,7 @@
 from typing import Optional
 
-from flask import session
 from ZancmokLib.StaticClass import StaticClass
+from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.Errors.UserAlreadyExistsError import UserAlreadyExistsError
 from WebHeroes.UserManagement.Errors.InvalidUsernameError import InvalidUsernameError
 from WebHeroes.UserManagement.Errors.UserDoesntExistError import UserDoesntExistError
@@ -45,7 +45,7 @@ class UserAccountManager(StaticClass):
         if not user:
             raise UserDoesntExistError(f"User '{username}' doesn't exist.")
 
-        if old_user_id := session.get('user_id'):
+        if old_user_id := SessionManager.get_user_id():
             old_user_id: int
 
             if old_user_id == user.id:
@@ -56,13 +56,13 @@ class UserAccountManager(StaticClass):
         if not bcrypt.checkpw(password.encode(), user.password_hash.encode()):
             raise AuthFailedError(f"Password incorrect.")
 
-        session['user_id'] = user.id
+        SessionManager.new_session(user.id)
 
         return user
 
     @staticmethod
-    def try_logout() -> None:
-        if not session.get('user_id'):
+    def try_logout(token: Optional[str] = None) -> None:
+        if not SessionManager.get_user_id():
             raise NotLoggedInError
         
-        del session['user_id']
+        SessionManager.kill_session(token)

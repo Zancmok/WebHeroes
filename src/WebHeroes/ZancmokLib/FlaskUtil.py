@@ -1,9 +1,10 @@
 from typing import Callable, Any
 
 import functools
-from flask import request, session, redirect
+from flask import request, redirect
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
+from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.Responses import dictify
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
 from WebHeroes.UserManagement.EUserPermissionLevel import EUserPermissionLevel
@@ -13,7 +14,7 @@ from Leek.Models.UserModel import UserModel
 
 class FlaskUtil(StaticClass):
     @staticmethod
-    def reroute_arguments(**kwargs: type) -> Callable[..., Any]:
+    def reroute_arguments(**kwargs: type | list[type]) -> Callable[..., Any]:
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
             @functools.wraps(function)
             def wrapper() -> Any:
@@ -31,15 +32,21 @@ class FlaskUtil(StaticClass):
 
                 output: dict[str, Any] = {}
                 for argument in kwargs:
-                    if argument in json_data and isinstance(output_data := json_data[argument], kwargs[argument]):
+                    allowed_types: tuple[type]
+                    if isinstance(kwargs[argument], type):
+                        allowed_types = (kwargs[argument],)
+                    else:
+                        allowed_types = tuple(kwargs[argument])
+
+                    if argument in json_data and isinstance(output_data := json_data[argument], allowed_types):
                         output[argument] = output_data
                         continue
 
-                    if argument in form_data and isinstance(output_data := form_data[argument], kwargs[argument]):
+                    if argument in form_data and isinstance(output_data := form_data[argument], allowed_types):
                         output[argument] = output_data
                         continue
 
-                    if argument in query_data and isinstance(output_data := query_data[argument], kwargs[argument]):
+                    if argument in query_data and isinstance(output_data := query_data[argument], allowed_types):
                         output[argument] = output_data
                         continue
 
@@ -56,7 +63,7 @@ class FlaskUtil(StaticClass):
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
             @functools.wraps(function)
             def wrapper(*args, **kwargs) -> Any:
-                if not (user_id := session.get('user_id')):
+                if not (user_id := SessionManager.get_user_id(kwargs.get("token"))):
                     return redirect(
                         "/signup/",
                         code=EHTTPCode.FOUND)
