@@ -27,13 +27,16 @@ public partial class LoginRegisterMenu : Control
 		VBoxContainer lRPage = utilityClass.CreateVBoxContainer(lRPageAtlas, "separation", 10);
 		HBoxContainer loginRegisterButtonStand = utilityClass.CreateHBoxContainer(lRPage, "separation", 10);
 		VBoxContainer loginFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
+		VBoxContainer registerFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
 		
 		// loginRegisterButtonStand buttons
 		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "Login", new Godot.Vector2(200, 50));
 		buttonLoginPage.Pressed += () => ButtonPressed("success");
+		buttonLoginPage.Pressed += () => ToggleContainerVisibility(registerFormStand);
 
 		Button buttonRegisterPage = utilityClass.CreateButton(loginRegisterButtonStand, "Register", new Godot.Vector2(200, 50));
 		buttonRegisterPage.Pressed += () => ButtonPressed("success");
+		buttonRegisterPage.Pressed += () => ToggleContainerVisibility(loginFormStand);
 
 		// loginFormStand form
 		//text that says Username
@@ -62,11 +65,16 @@ public partial class LoginRegisterMenu : Control
 		passWordRow.AddChild(passWordInput);
 		//hide Password button
 		Button showPassWord = utilityClass.CreateButton(passWordRow, "Show", new Godot.Vector2(50, 50));
-		showPassWord.Pressed += () => {
+		showPassWord.Pressed += () =>
+		{
 			passWordInput.Secret = !passWordInput.Secret;
 		};
 		
 		
+		
+
+		// registerFormStand form
+		Label userNameInputLabel1 = new Label();
 		
 		CallDeferred(MethodName.DebugSizes, this);
 	}
@@ -79,6 +87,11 @@ public partial class LoginRegisterMenu : Control
 	private void OnRequestCompleted()
 	{
 		throw new NotImplementedException();
+	}
+
+	public void ToggleContainerVisibility(VBoxContainer myContainer)
+	{
+		myContainer.Visible = !myContainer.Visible;
 	}
 
 	private void DebugSizes(Control control)
