@@ -27,5 +27,9 @@
 - Terminal
 
 #### Silenk
+- Visual Studio Code
+- Godot (.Net)
+- Github
+- Pixelorama
 
 #### Immanis70
