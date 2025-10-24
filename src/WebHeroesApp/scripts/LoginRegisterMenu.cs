@@ -4,18 +4,19 @@ using SilenkLibrary;
 using System.Xml.Serialization;
 using System.Numerics;
 
+
 public partial class LoginRegisterMenu : Control
 {
 	private UtilityClass utilityClass;
+	const string testLink = "https://bug-free-space-parakeet-x5rgqx99q679h9pp6-5000.app.github.dev/";
 
 	public override void _Ready()
 	{
 		GD.Print("MainMenu _ready() called!");
 		utilityClass = new UtilityClass();
 
-		//HttpRequest httpRequest = GetNode<HttpRequest>("HTTPRequest"); // add node in editor
-		//httpRequest.RequestCompleted += OnRequestCompleted;
-		//httpRequest.Request("https://jsonplaceholder.typicode.com/posts/1");
+		HttpRequest httpRequest = GetNode<HttpRequest>("HTTPRequest"); // add node in editor
+		httpRequest.Request($"{testLink}/user-management/signup", null, Godot.HttpClient.Method.Post);
 		
 		this.Size = GetViewportRect().Size;
 		this.Position = Godot.Vector2.Zero;
@@ -32,11 +33,11 @@ public partial class LoginRegisterMenu : Control
 		// loginRegisterButtonStand buttons
 		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "Login", new Godot.Vector2(200, 50));
 		buttonLoginPage.Pressed += () => ButtonPressed("success");
-		buttonLoginPage.Pressed += () => ToggleContainerVisibility(registerFormStand);
+		buttonLoginPage.Pressed += () => ToggleContainerVisibility(registerFormStand, loginFormStand);
 
 		Button buttonRegisterPage = utilityClass.CreateButton(loginRegisterButtonStand, "Register", new Godot.Vector2(200, 50));
 		buttonRegisterPage.Pressed += () => ButtonPressed("success");
-		buttonRegisterPage.Pressed += () => ToggleContainerVisibility(loginFormStand);
+		buttonRegisterPage.Pressed += () => ToggleContainerVisibility(loginFormStand, registerFormStand);
 
 		// loginFormStand form
 		//text that says Username
@@ -69,6 +70,12 @@ public partial class LoginRegisterMenu : Control
 		{
 			passWordInput.Secret = !passWordInput.Secret;
 		};
+
+		// login button
+		utilityClass.CreateButton(loginFormStand, "Login", new Godot.Vector2(0, 50));
+
+		// register button
+		utilityClass.CreateButton(registerFormStand, "Register", new Godot.Vector2(0, 50));
 		
 		
 		
@@ -89,9 +96,10 @@ public partial class LoginRegisterMenu : Control
 		throw new NotImplementedException();
 	}
 
-	public void ToggleContainerVisibility(VBoxContainer myContainer)
+	public void ToggleContainerVisibility(VBoxContainer myContainerInvisible, VBoxContainer myContainerVisible)
 	{
-		myContainer.Visible = !myContainer.Visible;
+		myContainerInvisible.Visible = false;
+		myContainerVisible.Visible = true;
 	}
 
 	private void DebugSizes(Control control)
