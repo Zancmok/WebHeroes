@@ -43,3 +43,8 @@ class SessionManager(StaticClass):
                 return token
 
         return None
+
+    @staticmethod
+    def refresh_session(token: str) -> None:
+        if not session.get("token"):
+            session["token"] = token

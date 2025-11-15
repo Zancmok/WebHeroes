@@ -1,4 +1,4 @@
-from typing import Callable, Any
+from typing import Callable, Any, Optional
 from types import NoneType
 import functools
 from flask import request, redirect
@@ -77,6 +77,11 @@ class FlaskUtil(StaticClass):
                         reason="User not found."
                     )), EHTTPCode.FORBIDDEN
                 user: UserModel
+
+                token: Optional[str]
+                if token := kwargs.get("token"):
+                    SessionManager.refresh_session(token)
+                token: str
 
                 if user.permission_level.value < permission_level.value:
                     return dictify(FailedResponse(
