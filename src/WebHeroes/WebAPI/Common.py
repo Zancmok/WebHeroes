@@ -13,5 +13,15 @@ class Common(StaticClass):
     )
 
     socket_blueprint: SocketBlueprint = SocketBlueprint(
-
+        name=""
     )
+
+    @staticmethod
+    @socket_blueprint.on("connect")
+    def on_connect() -> None:
+        print("Client connected (:", flush=True)
+
+    @staticmethod
+    @socket_blueprint.on("disconnect")
+    def on_disconnect() -> None:
+        print("Client disconnected ):", flush=True)

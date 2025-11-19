@@ -55,6 +55,7 @@ class WebHeroes(StaticClass):
         """
 
         WebHeroes.app.register_blueprint(Common.route_blueprint)
+        Common.socket_blueprint.init(WebHeroes.socket_io)
         WebHeroes.app.register_blueprint(HTMLRoutes.route_blueprint)
         WebHeroes.app.register_blueprint(UserManagement.route_blueprint)
 
