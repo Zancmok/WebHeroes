@@ -5,7 +5,9 @@ from ZancmokLib.SocketBlueprint import SocketBlueprint
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
-from flask import Blueprint
+from WebHeroes.UserManagement.Errors.SessionAlreadyBoundError import SessionAlreadyBoundError
+from flask import Blueprint, request, session
+from flask_socketio import ConnectionRefusedError
 
 
 class Common(StaticClass):
@@ -23,23 +25,27 @@ class Common(StaticClass):
     @staticmethod
     @socket_blueprint.on("connect")
     def on_connect(auth: Optional[dict[str, str]]) -> None:
-        user_id: int
-        if not (user_id := SessionManager.get_user_id((auth.get("token") if isinstance(auth, dict) else None))):
+        token: Optional[str] = str(auth.get("token")) if isinstance(auth, dict) else session.get("token")
+
+        if not token:
             raise ConnectionRefusedError("unauthorized")
+        token: str
+
+        user_id: Optional[int]
+        if not (user_id := SessionManager.get_user_id(token=token)):
+            raise ConnectionRefusedError("unauthorized")
+        user_id: int
 
         try:
-            LobbyManager.online_lobby.join_member(user_id)
-        except AlreadyInLobbyError:
-            raise ConnectionRefusedError("User already connected!")
+            SessionManager.bind_socket_connection(socket_id=request.sid, token=token)
+        except SessionAlreadyBoundError:
+            raise ConnectionRefusedError("Session already bound to another connection!")
 
-        print(f"Client connected!", flush=True)
+        print(f"Client connected: {request.sid}", flush=True)
 
     @staticmethod
     @socket_blueprint.on("disconnect")
     def on_disconnect(reason: str) -> None:
-        user_id: Optional[int] = SessionManager.get_user_id()
+        SessionManager.unbind_socket_connection(socket_id=request.sid)
 
-        if user_id:
-            LobbyManager.online_lobby.leave_member(user_id)
-
-        print(f"Client disconnected: {reason}", flush=True)
+        print(f"Client disconnected: {request.sid}", flush=True)
