@@ -1,14 +1,17 @@
 from typing import Optional
 
 from flask import session
+
+from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.UserManagement.Errors.SessionAlreadyBoundError import SessionAlreadyBoundError
+from WebHeroes.UserManagement.UserSession import UserSession
 from ZancmokLib.StaticClass import StaticClass
 import secrets
 
 
 class SessionManager(StaticClass):
     _tokens: dict[str, int] = {}
-    _socket_connections: dict[str, str] = {}
+    _socket_connections: dict[str, UserSession] = {}
 
     @staticmethod
     def new_session(user_id: int) -> str:
@@ -51,12 +54,16 @@ class SessionManager(StaticClass):
             session["token"] = token
 
     @staticmethod
-    def bind_socket_connection(socket_id: str, new_token: str) -> None:
-        for token in SessionManager._socket_connections.values():
-            if new_token == token:
+    def bind_socket_connection(socket_id: str, token: str, lobby: Lobby) -> None:
+        for user_session in SessionManager._socket_connections.values():
+            if user_session.get_token() == token:
                 raise SessionAlreadyBoundError
-        
-        SessionManager._socket_connections[socket_id] = new_token
+
+        SessionManager._socket_connections[socket_id] = UserSession(
+            user_id=SessionManager.get_user_id(token),
+            token=token,
+            lobby=lobby
+        )
 
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
