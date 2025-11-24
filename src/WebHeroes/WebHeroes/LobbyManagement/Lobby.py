@@ -16,4 +16,4 @@ class Lobby:
         self.member_ids.remove(member_id)
 
     def __str__(self) -> str:
-        return f"Lobby<name:{self.name}>"
+        return f"Lobby(name={self.name})"

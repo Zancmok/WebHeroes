@@ -28,4 +28,3 @@ class UserSession:
         self._lobby = lobby
 
         lobby.join_member(self._user_id)
-        

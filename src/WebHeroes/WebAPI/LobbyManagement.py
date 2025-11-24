@@ -4,6 +4,7 @@ from ZancmokLib.FlaskUtil import FlaskUtil
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode
 from ZancmokLib.StaticClass import StaticClass
+from ZancmokLib.SocketBlueprint import SocketBlueprint
 
 
 class LobbyManagement(StaticClass):
@@ -15,8 +16,11 @@ class LobbyManagement(StaticClass):
         url_prefix="/lobby-management"
     )
 
+    socket_blueprint: SocketBlueprint = SocketBlueprint(
+        name="lobby/"
+    )
+
     @staticmethod
-    @route_blueprint.route("/refresh", methods=[EHTTPMethod.POST])
-    @FlaskUtil.require_auth()
-    def refresh() -> tuple[Response, HTTPCode]:
+    @socket_blueprint.on("refresh")
+    def refresh() -> None:
         raise NotImplementedError
