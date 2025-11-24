@@ -37,7 +37,7 @@ class Common(StaticClass):
         user_id: int
 
         try:
-            SessionManager.bind_socket_connection(socket_id=request.sid, token=token)
+            SessionManager.bind_socket_connection(socket_id=request.sid, new_token=token)
         except SessionAlreadyBoundError:
             raise ConnectionRefusedError("Session already bound to another connection!")
 

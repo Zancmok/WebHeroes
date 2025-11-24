@@ -51,11 +51,12 @@ class SessionManager(StaticClass):
             session["token"] = token
 
     @staticmethod
-    def bind_socket_connection(socket_id: str, token: str) -> None:
-        if socket_id in SessionManager._socket_connections:
-            raise SessionAlreadyBoundError
+    def bind_socket_connection(socket_id: str, new_token: str) -> None:
+        for token in SessionManager._socket_connections.values():
+            if new_token == token:
+                raise SessionAlreadyBoundError
         
-        SessionManager._socket_connections[socket_id] = token
+        SessionManager._socket_connections[socket_id] = new_token
 
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
