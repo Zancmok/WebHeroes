@@ -3,6 +3,7 @@ from sqlalchemy import Engine, text
 from sqlalchemy.exc import OperationalError
 from ZancmokLib.StaticClass import StaticClass
 from time import sleep
+import WebHeroes.config as config
 # Models necessary for the metadata creation of them.
 from Leek.Models.BaseModel import BaseModel
 from Leek.Models.UserModel import UserModel
@@ -24,7 +25,7 @@ class Leek(StaticClass):
 
                 break
             except OperationalError:
-                print("Retrying connection in 5s...", flush=True)
-                sleep(5)
+                print(f"Retrying connection in {config.DATABASE_RECONNECTION_TIMEOUT}s...", flush=True)
+                sleep(config.DATABASE_RECONNECTION_TIMEOUT)
 
         BaseModel.metadata.create_all(Leek.engine)

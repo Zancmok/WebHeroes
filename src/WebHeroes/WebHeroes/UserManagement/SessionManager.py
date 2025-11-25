@@ -59,12 +59,18 @@ class SessionManager(StaticClass):
             if user_session.get_token() == token:
                 raise SessionAlreadyBoundError
 
-        SessionManager._socket_connections[socket_id] = UserSession(
+        new_user_session: UserSession = UserSession(
             user_id=SessionManager.get_user_id(token),
             token=token,
             lobby=lobby
         )
 
+        lobby.join_member(new_user_session.get_user_id())
+
+        SessionManager._socket_connections[socket_id] = new_user_session
+
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
-        SessionManager._socket_connections.pop(socket_id)
+        user_session: UserSession = SessionManager._socket_connections.pop(socket_id)
+
+        user_session.get_lobby().leave_member(user_session.get_user_id())

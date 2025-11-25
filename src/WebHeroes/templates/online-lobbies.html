@@ -112,23 +112,13 @@
 
 				socket.on("connect", () => {
     				console.log("Connected to server!");
+
+					socket.emit('refresh');
 				});
 
-				socket.on("get-lobby-data", function(payload) {
-					console.log(payload)
-				})
-
-				socket.on("lobby-update", function(payload) {
-					console.log(payload)
-				})
-
-				socket.on("create-lobby", function(payload) {
-					console.log(payload)
-				})
-
-				socket.emit("get-lobby-data");
-
-				socket.emit("create-lobby", "test-lobby");
+				socket.on('refresh', (data) => {
+					console.log('Received refresh response:', data);
+				});
 			})()
 		</script>
 		<script src="../static/js/logout.js"></script>

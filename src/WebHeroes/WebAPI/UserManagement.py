@@ -17,7 +17,7 @@ from flask import Blueprint, Response
 from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
 from WebHeroes.Responses.ResponseTypes.LoginResponse import LoginResponse
-from WebHeroes.Responses import dictify
+from WebHeroes.Responses import jsonify
 
 
 class UserManagement(StaticClass):
@@ -39,15 +39,15 @@ class UserManagement(StaticClass):
                 password=password
             )
         except InvalidUsernameError as e:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason=str(e)
             )), EHTTPCode.BAD_REQUEST
         except UserAlreadyExistsError as e:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason=str(e)
             )), EHTTPCode.CONFLICT
         
-        return dictify(SuccessResponse()), EHTTPCode.CREATED
+        return jsonify(SuccessResponse()), EHTTPCode.CREATED
 
     @staticmethod
     @route_blueprint.route("/login", methods=[EHTTPMethod.POST])
@@ -56,19 +56,19 @@ class UserManagement(StaticClass):
         try:
             token: str = UserAccountManager.try_login(username, password)
         except UserDoesntExistError as e:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason=str(e)
             )), EHTTPCode.BAD_REQUEST
         except AuthFailedError as e:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason=str(e)
             )), EHTTPCode.BAD_REQUEST
         except AlreadyLoggedInError as e:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason=str(e)
             )), EHTTPCode.FORBIDDEN
 
-        return dictify(LoginResponse(
+        return jsonify(LoginResponse(
             token=token
         )), EHTTPCode.OK
 
@@ -79,8 +79,8 @@ class UserManagement(StaticClass):
         try:
             UserAccountManager.try_logout(token=token)
         except NotLoggedInError:
-            return dictify(FailedResponse(
+            return jsonify(FailedResponse(
                 reason="Cannot log out if not logged in."
             )), EHTTPCode.FORBIDDEN
 
-        return dictify(SuccessResponse()), EHTTPCode.OK
+        return jsonify(SuccessResponse()), EHTTPCode.OK

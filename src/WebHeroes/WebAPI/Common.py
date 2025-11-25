@@ -18,7 +18,7 @@ class Common(StaticClass):
     )
 
     socket_blueprint: SocketBlueprint = SocketBlueprint(
-        name=""
+        name="WebAPI:Common"
     )
 
     @staticmethod
