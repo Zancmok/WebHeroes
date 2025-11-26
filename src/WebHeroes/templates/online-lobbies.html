@@ -14,115 +14,73 @@
 	</head>
 
 	<body>
-		
-		<table border="1" style="width:15%;float:left">
-			<thead>
-				<tr>
-					<td id="nameDisplay"></td>
-					<td rowspan="2"><img id="pfp-display" src="https://cdn.discordapp.com/embed/avatars/1.png" width="100em" height="100em"></td>
-				</tr>
-				<tr>
-					<td id="ratingDisplay">rating:</td>
-				</tr>
-			</thead>
-		</table>
-		
-		<table style="width:70%;float:left">
-			<thead>
-				<tr>
-					<td>reklama spot</td>
-				</tr>
-			</thead>
-		</table>
-		
-		<table style="width:15%;float:left">
-			<thead>
-				<tr>
-					<td><button id="back">BACK</button></td>
-				</tr>
-				<tr>
-					<td><button>PROFIl</button></td>
-				</tr>
-			</thead>
-		</table>
-		
-		<img></img>
-		
-		<table border="1" id="bot">
-			<thead id="lobbies">
-				<tr>
-					<td>*</td><!--save icon probabily-->
-					<td>HOST NAME</td>
-					<td>&nbsp;</td> <!--is comp-->
-					<td>GAME DESCRIPTION</td>
-					<td>#</td> <!--PLAYER COUNT-->
-					<td>&nbsp;</td> <!--is competitive-->
-					<td>&nbsp;</td> <!--has password-->
-				</tr>
-			</thead>
-			
-			<tbody>
-				<!--empty for now-->
-			</tbody>
-			
-		</table>
-		
-		<table border="1" id="bot2">
-			<thead>
-				<tr>
-					<td>CHAT ICON</td>
-					<td>CHAT ROOM</td>
-				</tr>
-			</thead>
-			
-			<tbody>
-				<!--empty for now-->
-			</tbody>
-		</table>
-		
-		<table border="1" id="bot3">
-			<thead>
-				<tr>
-					<td>PLAYERS ONLINE</td>
-				</tr>
-			</thead>
-			
-			<tbody>
-				<!--empty for now-->
-			</tbody>
-		</table>
-		
-		<div id="buttons">
-			<button id="newGame">NEW GAME</button>
-			<button id="loadGame">LOAD GAME</button>
-			<button id="join">JOIN</button>
-		</div>
+    <div class="container">
+        <!-- Header -->
+        <div class="header-section">
+            <div class="header-ad">
+                Advertisement Spot
+            </div>
+            <div class="header-nav">
+                <button id="back">Back</button>
+            </div>
+        </div>
 
-		
+        <!-- Main content wrapper -->
+        <div class="content-wrapper">
+            <!-- Main content area -->
+            <div class="main-content">
+                <!-- Action bar -->
+                <div class="action-bar">
+                    <button id="newGame">Create New Game</button>
+                </div>
 
-		<input type="text" placeholder="-" id="message">
-		<button id="send">SEND</button>
+                <!-- Lobbies table -->
+                <table id="bot">
+                    <thead>
+                        <tr>
+                            <td>Host Name</td>
+                            <td>Join</td>
+                            <td>Game Description</td>
+                            <td>Players</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Lobbies will be populated here -->
+                    </tbody>
+                </table>
+            </div>
 
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <table id="bot3">
+                    <thead>
+                        <tr>
+                            <td>Players Online</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Players will be populated here -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 
-		
+    <script type="text/javascript" charset="utf-8">
+        (function init() {
+            var socket = io()
 
-		<script type="text/javascript" charset="utf-8">
-			(function init() {
-				var socket = io()
+            socket.on("connect", () => {
+                console.log("Connected to server!");
+                socket.emit('refresh');
+            });
 
-				socket.on("connect", () => {
-    				console.log("Connected to server!");
-
-					socket.emit('refresh');
-				});
-
-				socket.on('refresh', (data) => {
-					console.log('Received refresh response:', data);
-				});
-			})()
-		</script>
-		<script src="../static/js/logout.js"></script>
-
-	</body>
+            socket.on('refresh', (data) => {
+                console.log('Received refresh response:', data);
+            });
+        })()
+    </script>
+    <script src="../static/js/logout.js"></script>
+</body>
 
 </html>
