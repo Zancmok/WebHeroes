@@ -29,8 +29,6 @@ class LobbyManagement(StaticClass):
     @staticmethod
     @socket_blueprint.on("refresh")
     def refresh() -> None:
-        print("Refresh happened on backend!", flush=True)
-
         emit("refresh", dictify(LobbyRefreshResponse(
             members=[
                 MemberModel(
