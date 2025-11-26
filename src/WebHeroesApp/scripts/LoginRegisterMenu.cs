@@ -28,7 +28,9 @@ public partial class LoginRegisterMenu : Control
 		VBoxContainer lRPage = utilityClass.CreateVBoxContainer(lRPageAtlas, "separation", 10);
 		HBoxContainer loginRegisterButtonStand = utilityClass.CreateHBoxContainer(lRPage, "separation", 10);
 		VBoxContainer loginFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
+		loginFormStand.Visible = true;
 		VBoxContainer registerFormStand = utilityClass.CreateVBoxContainer(lRPage, "separation", 10);
+		registerFormStand.Visible = false;
 		
 		// loginRegisterButtonStand buttons
 		Button buttonLoginPage = utilityClass.CreateButton(loginRegisterButtonStand, "Login", new Godot.Vector2(200, 50));

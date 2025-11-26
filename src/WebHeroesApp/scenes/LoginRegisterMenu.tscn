@@ -1,10 +1,17 @@
-[gd_scene load_steps=2 format=3 uid="uid://cmmf4br4amuep"]
+[gd_scene format=3 uid="uid://cjeqi5byhfp8h"]
 
-[ext_resource type="Script" uid="uid://c0uyfpd1tariy" path="res://scripts/LoginRegisterMenu.cs" id="1_jix8l"]
-
-[node name="LoginRegisterMenu" type="Node2D"]
-
-[node name="LoginRegisterControl" type="Control" parent="."]
+[node name="Control" type="Control"]
 layout_mode = 3
-anchors_preset = 0
-script = ExtResource("1_jix8l")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="CenterContainer" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
