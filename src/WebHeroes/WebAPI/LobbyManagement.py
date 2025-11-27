@@ -36,4 +36,4 @@ class LobbyManagement(StaticClass):
                     member_name=UserRepository.get_by_id(member_id).username
                 ) for member_id in LobbyManager.online_lobby.member_ids
             ]
-        )))
+        )), to=LobbyManager.online_lobby.name)
