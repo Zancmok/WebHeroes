@@ -1,8 +1,10 @@
+from typing import Any
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
 from WebHeroes.Responses import dictify
 from WebHeroes.Responses.ResponseTypes.LobbyRefreshResponse import LobbyRefreshResponse
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
+from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
 from flask_socketio import emit
@@ -37,3 +39,9 @@ class LobbyManagement(StaticClass):
                 ) for member_id in LobbyManager.online_lobby.member_ids
             ]
         )), to=LobbyManager.online_lobby.name)
+
+    @staticmethod
+    @socket_blueprint.on("create-lobby")
+    def create_lobby(json: dict[str, Any]) -> None:
+        print(SessionManager.get_user_session(), flush=True)
+        print(json, flush=True)
