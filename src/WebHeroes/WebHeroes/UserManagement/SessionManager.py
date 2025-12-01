@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import session
+from flask import session, request
 from flask_socketio import join_room, leave_room
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.UserManagement.Errors.SessionAlreadyBoundError import SessionAlreadyBoundError
@@ -78,3 +78,10 @@ class SessionManager(StaticClass):
 
         lobby.leave_member(user_session.get_user_id())
         leave_room(lobby.name)
+
+    @staticmethod
+    def get_user_session(socket_id: Optional[str] = None) -> Optional[UserSession]:
+        if socket_id:
+            return SessionManager._socket_connections.get(socket_id)
+
+        return SessionManager._socket_connections.get(request.sid)

@@ -70,9 +70,20 @@
         (function init() {
             var socket = io()
 
-            socket.on("connect", () => {
+            function sleep(ms) {
+                return new Promise(resolve => setTimeout(resolve, ms));
+            }
+
+            socket.on("connect", async () => {
                 console.log("Connected to server!");
-                socket.emit('refresh');
+
+                socket.emit('create-lobby', {"lobby-name": "Im a bloody nigger, ho, ho, ho"});
+
+                while (true)
+                {
+                    socket.emit('refresh');
+                    await sleep(10000);
+                }
             });
 
             socket.on('refresh', (data) => {
