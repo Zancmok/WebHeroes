@@ -11,7 +11,7 @@ config_version=5
 [application]
 
 config/name="WebHeroesApp"
-run/main_scene="uid://cmmf4br4amuep"
+run/main_scene="uid://cjeqi5byhfp8h"
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
