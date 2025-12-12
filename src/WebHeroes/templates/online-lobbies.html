@@ -66,31 +66,7 @@
         </div>
     </div>
 
-    <script type="text/javascript" charset="utf-8">
-        (function init() {
-            var socket = io()
-
-            function sleep(ms) {
-                return new Promise(resolve => setTimeout(resolve, ms));
-            }
-
-            socket.on("connect", async () => {
-                console.log("Connected to server!");
-
-                socket.emit('create-lobby', {"lobby-name": "Im a bloody nigger, ho, ho, ho"});
-
-                while (true)
-                {
-                    socket.emit('refresh');
-                    await sleep(10000);
-                }
-            });
-
-            socket.on('refresh', (data) => {
-                console.log('Received refresh response:', data);
-            });
-        })()
-    </script>
+    <script src="../static/js/lobbies.js"></script>
     <script src="../static/js/logout.js"></script>
 </body>
 
