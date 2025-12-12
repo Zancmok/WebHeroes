@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cjeqi5byhfp8h"]
+[gd_scene load_steps=5 format=3 uid="uid://cjeqi5byhfp8h"]
 
 [ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUpPage.cs" id="1_v4cxy"]
 [ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/SignUpVisuals.cs" id="2_4vdtq"]
+[ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/TabsWork.cs" id="2_6b5og"]
+[ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginVisuals.cs" id="2_vo05e"]
 
 [node name="Control_Base" type="Control"]
 layout_mode = 3
@@ -25,6 +27,7 @@ layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer"]
 layout_mode = 2
+script = ExtResource("2_6b5og")
 
 [node name="Tabs" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -48,6 +51,7 @@ layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin"]
 layout_mode = 2
+script = ExtResource("2_vo05e")
 
 [node name="UsernameInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
 layout_mode = 2
@@ -81,10 +85,10 @@ text = "Show"
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Login" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/HBoxContainer2"]
+[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-text = "Login"
+text = "Submit"
 
 [node name="FormSignUp" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
 custom_minimum_size = Vector2(500, 100)
@@ -139,3 +143,8 @@ size_flags_horizontal = 3
 [node name="ShowPassword" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer"]
 layout_mode = 2
 text = "Show"
+
+[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+text = "Submit
+"
