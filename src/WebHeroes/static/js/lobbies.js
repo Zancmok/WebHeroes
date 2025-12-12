@@ -34,6 +34,7 @@
                 onlinePlayers.append(row);
             }
         } else{
+            // ˘ <- Rozle cooked here, yatta
             let row = row = document.createElement("tr");
 
             row.innerHTML = "<td>No players online</td>"
