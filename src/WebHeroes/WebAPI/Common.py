@@ -6,7 +6,9 @@ from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
 from WebHeroes.UserManagement.Errors.SessionAlreadyBoundError import SessionAlreadyBoundError
-from flask import Blueprint, request, session
+from flask import Blueprint, request, session, Response, jsonify
+from ZancmokLib.EHTTPMethod import EHTTPMethod
+from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode
 
 
 class Common(StaticClass):
@@ -20,6 +22,11 @@ class Common(StaticClass):
     socket_blueprint: SocketBlueprint = SocketBlueprint(
         name="WebAPI:Common"
     )
+
+    @staticmethod
+    @route_blueprint.route("/ping", methods=[EHTTPMethod.POST])
+    def ping() -> tuple[Response, HTTPCode]:
+        return jsonify("pong"), EHTTPCode.OK
 
     @staticmethod
     @socket_blueprint.on("connect")
