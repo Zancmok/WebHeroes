@@ -1,4 +1,7 @@
-[gd_scene format=3 uid="uid://cjeqi5byhfp8h"]
+[gd_scene load_steps=3 format=3 uid="uid://cjeqi5byhfp8h"]
+
+[ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUpPage.cs" id="1_v4cxy"]
+[ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/SignUpVisuals.cs" id="2_4vdtq"]
 
 [node name="Control_Base" type="Control"]
 layout_mode = 3
@@ -7,6 +10,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_v4cxy")
 
 [node name="CenterContainer_BasePlate" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -25,49 +29,113 @@ layout_mode = 2
 [node name="Tabs" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="Button" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
+[node name="LoginTab" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Login
 "
 
-[node name="Button2" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
+[node name="SignUpTab" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Sign up
 "
 
 [node name="FormLogin" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
-custom_minimum_size = Vector2(500, 500)
+visible = false
+custom_minimum_size = Vector2(500, 100)
 layout_mode = 2
 
 [node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin"]
 layout_mode = 2
 
-[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
+[node name="UsernameInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/HBoxContainer"]
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
 layout_mode = 2
 text = "Uername"
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/HBoxContainer"]
+[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
+[node name="PasswordInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
 layout_mode = 2
 text = "Password"
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/HBoxContainer2"]
+[node name="PasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
 layout_mode = 2
 size_flags_horizontal = 3
+
+[node name="ShowPassword" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
+layout_mode = 2
+text = "Show"
 
 [node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="Login" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Login"
+
+[node name="FormSignUp" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp"]
+layout_mode = 2
+
+[node name="UsernameInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
+layout_mode = 2
+text = "Uername"
+
+[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_4vdtq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PasswordInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/PasswordInput"]
+layout_mode = 2
+text = "Password"
+
+[node name="PasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/PasswordInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RepeatPassword" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/RepeatPassword"]
+layout_mode = 2
+text = "Repeat Password"
+
+[node name="RepeatPasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/RepeatPassword"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShowPassword" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Show"
