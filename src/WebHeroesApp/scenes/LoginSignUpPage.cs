@@ -4,6 +4,7 @@ using System.Text;
 using SilenkLibrary;
 using System.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json;
 
 public partial class LoginSignUpPage : Control
 {
@@ -35,7 +36,7 @@ public partial class LoginSignUpPage : Control
 	{
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print(json);
-		//currentUserToken = body[];
+		currentUserToken = JsonDocument.Parse(json).RootElement.GetProperty("token").GetString();
 	}
 	
 	private void SignUp()
@@ -48,7 +49,6 @@ public partial class LoginSignUpPage : Control
 		string usernameData = username.Text;
 		string passwordData = password.Text;
 		string repeatPasswordData = repeatPassword.Text;
-		
 		if (passwordData == repeatPasswordData)
 		{
 			var jsonData = new Godot.Collections.Dictionary
