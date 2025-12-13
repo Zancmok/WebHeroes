@@ -57,11 +57,19 @@ namespace SilenkLibrary
 			parent.AddChild(newHBoxContainer);
 			return newHBoxContainer;
 		}
-		/*
-		public Popup createPopup(Node parent, string title, string, message)
+		
+		public AcceptDialog CreateAcceptDialog(Node parent, string title, string message)
 		{
-			throw new NotImplementedException();
+			AcceptDialog dialog = new AcceptDialog()
+			{
+				Title = title,
+				DialogText = message,
+				OkButtonText = "OK"
+			};
+			parent.AddChild(dialog);
+			dialog.PopupCentered();
+			
+			return dialog;
 		}
-		*/
 	}
 }

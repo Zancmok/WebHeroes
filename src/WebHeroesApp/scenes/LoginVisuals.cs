@@ -7,8 +7,8 @@ public partial class LoginVisuals : VBoxContainer
 	
 	public override void _Ready()
 	{
-		Button showPassword = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput/ShowPassword");
-		LineEdit passwordLine = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput/PasswordLine");
+		Button showPassword = GetNode<Button>("PasswordInput/ShowPassword");
+		LineEdit passwordLine = GetNode<LineEdit>("PasswordInput/PasswordLine");
 		passwordLine.Secret = true;
 		
 		showPassword.Pressed += () =>

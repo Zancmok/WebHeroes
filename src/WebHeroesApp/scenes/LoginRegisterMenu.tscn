@@ -61,7 +61,7 @@ size_flags_vertical = 3
 layout_mode = 2
 text = "Uername"
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
+[node name="UsernameLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -81,11 +81,7 @@ size_flags_horizontal = 3
 layout_mode = 2
 text = "Show"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/HBoxContainer2"]
+[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "Submit"
@@ -105,7 +101,7 @@ size_flags_vertical = 3
 layout_mode = 2
 text = "Uername"
 
-[node name="LineEdit" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
+[node name="UsernameLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
 layout_mode = 2
 size_flags_horizontal = 3
 
@@ -149,4 +145,4 @@ layout_mode = 2
 text = "Submit
 "
 
-[node name="CallZancock" type="HTTPRequest" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
+[node name="CallZancock" type="HTTPRequest" parent="."]
