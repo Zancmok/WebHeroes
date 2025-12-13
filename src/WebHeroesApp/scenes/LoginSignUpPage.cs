@@ -35,7 +35,7 @@ public partial class LoginSignUpPage : Control
 	{
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print(json);
-		currentUserToken = body[];
+		//currentUserToken = body[];
 	}
 	
 	private void SignUp()
