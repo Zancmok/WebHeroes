@@ -1,9 +1,9 @@
 [gd_scene load_steps=5 format=3 uid="uid://cjeqi5byhfp8h"]
 
-[ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUpPage.cs" id="1_v4cxy"]
-[ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/SignUpVisuals.cs" id="2_4vdtq"]
-[ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/TabsWork.cs" id="2_6b5og"]
-[ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginVisuals.cs" id="2_vo05e"]
+[ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUp/LoginSignUpPage.cs" id="1_v4cxy"]
+[ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/LoginSignUp/SignUpVisuals.cs" id="2_4vdtq"]
+[ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/LoginSignUp/TabsWork.cs" id="2_6b5og"]
+[ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginSignUp/LoginVisuals.cs" id="2_vo05e"]
 
 [node name="Control_Base" type="Control"]
 layout_mode = 3
