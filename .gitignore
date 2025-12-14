@@ -4,3 +4,5 @@
 .vscode
 src/WebHeroesApp/.godot
 src/WebHeroes/.env
+src/WebHeroes/cert.pem
+src/WebHeroes/key.pem
