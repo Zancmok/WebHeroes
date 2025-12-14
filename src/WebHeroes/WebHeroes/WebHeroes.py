@@ -72,5 +72,7 @@ class WebHeroes(StaticClass):
             port=config.PORT,
             debug=config.DEBUG,
             use_reloader=False,
-            log_output=True
+            log_output=True,
+            keyfile='key.pem',
+            certfile='cert.pem'
         )
