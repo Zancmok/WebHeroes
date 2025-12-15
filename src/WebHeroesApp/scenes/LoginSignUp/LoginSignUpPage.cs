@@ -5,10 +5,12 @@ using SilenkLibrary;
 using System.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using SocketIOClient;
 
 public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
+	private SocketIO _socket;
 	private string testHttp = "http://127.0.0.1:5000/ping";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
