@@ -5,19 +5,19 @@ using SilenkLibrary;
 using System.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
-using SocketIOClient;
 
 public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
-	private SocketIO _socket;
-	private string testHttp = "http://127.0.0.1:5000/ping";
+	private SocketIo socket;
+	private string testHttp = "https://127.0.0.1:5000/ping";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
 		
 	public override void _Ready()
 	{
+		socket = GetNode<SocketIo>("SocketIO");
 		httpRequest = GetNode<HttpRequest>("CallZancock");
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		
@@ -32,6 +32,8 @@ public partial class LoginSignUpPage : Control
 		{
 			Login();
 		};
+		
+		Send();
 	}
 	
 	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
@@ -62,7 +64,7 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
 
-			MakePostRequest("http://127.0.0.1:5000/user-management/signup", jsonString);
+			MakePostRequest("https://127.0.0.1:5000/user-management/signup", jsonString);
 		}
 		else
 		{
@@ -87,7 +89,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
 
-		MakePostRequest("http://127.0.0.1:5000/user-management/login", jsonString);
+		MakePostRequest("https://127.0.0.1:5000/user-management/login", jsonString);
 	}
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
@@ -98,6 +100,11 @@ public partial class LoginSignUpPage : Control
 		}
 		
 		httpRequest.Request(url, headers, HttpClient.Method.Post, body);
+	}
+	
+	private void Send()
+	{
+		socket.SendMessage("Hello World!");
 	}
 	
 	public override void _UnhandledInput(InputEvent @event)

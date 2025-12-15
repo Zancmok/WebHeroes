@@ -3,6 +3,8 @@
 .idea
 .vscode
 src/WebHeroesApp/.godot
+src/WebHeroesApp/addons/godot-socketio
+src/WebHeroesApp/cert.crt
 src/WebHeroes/.env
 src/WebHeroes/cert.pem
 src/WebHeroes/key.pem
