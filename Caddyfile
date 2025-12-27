@@ -1,0 +1,7 @@
+:80 {
+    reverse_proxy web_heroes_server:5000
+}
+localhost {
+    reverse_proxy web_heroes_server:5000
+    tls internal
+}
