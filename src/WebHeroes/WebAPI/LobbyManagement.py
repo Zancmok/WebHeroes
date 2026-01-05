@@ -4,6 +4,7 @@ from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
 from WebHeroes.Responses import dictify
 from WebHeroes.Responses.ResponseTypes.LobbyRefreshResponse import LobbyRefreshResponse
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
+from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
@@ -37,11 +38,22 @@ class LobbyManagement(StaticClass):
                     member_id=member_id,
                     member_name=str(UserRepository.get_by_id(member_id).username)
                 ) for member_id in LobbyManager.online_lobby.member_ids
+            ],
+            lobbies=[
+                LobbyModel(
+                    lobby_name=lobby.name,
+                    owner_id=lobby.owner_id,
+                    members=[
+                        MemberModel(
+                            member_id=member_id,
+                            member_name=str(UserRepository.get_by_id(member_id).username)
+                        ) for member_id in lobby.member_ids
+                    ] 
+                ) for lobby in LobbyManager.get_lobbies()
             ]
         )), to=LobbyManager.online_lobby.name)
 
     @staticmethod
     @socket_blueprint.on("create-lobby")
     def create_lobby(json: dict[str, Any]) -> None:
-        print(SessionManager.get_user_session(), flush=True)
-        print(json, flush=True)
+        LobbyManager.create_lobby(lobby_name=json["lobby-name"])
