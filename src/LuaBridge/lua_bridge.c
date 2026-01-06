@@ -4,11 +4,11 @@
 #include <lualib.h>
 
 int sandboxAmount = 0;
-lua_State *sandboxes = NULL;
+lua_State **sandboxes = NULL;
 
 void openLuaSandbox(PyObject *name)
 {
-    lua_State *L = lua_open();
+    lua_State *L = luaL_newstate();
 
     if (!L)
     {
@@ -16,8 +16,18 @@ void openLuaSandbox(PyObject *name)
         return;
     }
 
+    lua_State** temporary = (lua_State**)realloc(sandboxes, sizeof(lua_State*) * (sandboxAmount + 1));
+
+    if (!temporary)
+    {
+        lua_close(L);
+
+        PyErr_SetString(PyExc_RuntimeError, "Reallocate failed!");
+        return;
+    }
+
     sandboxAmount++;
-    sandboxes = (lua_State*)realloc(sandboxes, sizeof(lua_State*) * sandboxAmount);
+    sandboxes = temporary;
     sandboxes[sandboxAmount - 1] = L;
 }
 
