@@ -13,7 +13,7 @@ class LobbyManager(StaticClass):
     _player_lobbies: list[OwnedLobby] = []
 
     @staticmethod
-    def create_lobby(lobby_name: str, token: Optional[str]) -> None:
+    def create_lobby(lobby_name: str, token: Optional[str] = None) -> None:
         user_id: int = SessionManager.get_user_id(token=token)
 
         for lobby in LobbyManager._player_lobbies:
@@ -27,3 +27,7 @@ class LobbyManager(StaticClass):
             name=lobby_name,
             owner_id=user_id
         ))
+
+    @staticmethod
+    def get_lobbies() -> list[OwnedLobby]:
+        return LobbyManager._player_lobbies
