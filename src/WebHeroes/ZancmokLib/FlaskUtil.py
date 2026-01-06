@@ -2,6 +2,8 @@ from typing import Callable, Any, Optional
 from types import NoneType
 import functools
 from flask import request, redirect
+from sqlalchemy.util.preloaded import orm_util
+
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
 from WebHeroes.UserManagement.SessionManager import SessionManager
@@ -56,6 +58,33 @@ class FlaskUtil(StaticClass):
                     return dictify(FailedResponse(
                         reason=f"Missing or invalid argument: '{argument}'"
                     )), EHTTPCode.BAD_REQUEST
+
+                return function(**output)
+            return wrapper
+        return decorator
+
+    @staticmethod
+    def verify_socket_arguments(**kwargs: type | list[type]) -> Callable[..., Any]:
+        def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
+            @functools.wraps(function)
+            def wrapper(json: Optional[Any] = None) -> Optional[Any]:
+                if not isinstance(json, dict):
+                    return None
+
+                output: dict[str, Any] = {}
+                for argument in kwargs:
+                    allowed_types: tuple[type]
+                    if isinstance(kwargs[argument], type):
+                        allowed_types = (kwargs[argument],)
+                    else:
+                        allowed_types = tuple(kwargs[argument])
+
+                    if argument in json and isinstance(output_data := json[argument], allowed_types):
+                        output[argument] = output_data
+                        continue
+
+                    if NoneType in allowed_types:
+                        continue
 
                 return function(**output)
             return wrapper
