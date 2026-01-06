@@ -1,7 +1,7 @@
-from enum import Enum
+from enum import StrEnum
 
 
-class EHTTPMethod(Enum):
+class EHTTPMethod(StrEnum):
     GET = "GET"
     POST = "POST"
     PATCH = "PATCH"

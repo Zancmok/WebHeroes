@@ -1,16 +1,7 @@
-"""
-# TODO: Write Docstring!
-"""
-
-from dataclasses import dataclass, field
-
 from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
+from dataclasses import field, dataclass
 
 
 @dataclass
 class SuccessResponse(BaseResponseModel):
-    """
-    # TODO: Write Docstring!
-    """
-
-    object_type: str = field(default="success", kw_only=True)
+    object_type: str = field(default="success-response", kw_only=True)

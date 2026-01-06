@@ -1,6 +1,10 @@
 .env
 .venv
 .idea
-src/__pycache__
-src/WebHeroes/__pycache__
-src/WebHeroes/ZancmokLib/__pycache__
+.vscode
+src/WebHeroesApp/.godot
+src/WebHeroesApp/addons/godot-socketio
+src/WebHeroesApp/cert.crt
+src/WebHeroes/.env
+src/WebHeroes/cert.pem
+src/WebHeroes/key.pem

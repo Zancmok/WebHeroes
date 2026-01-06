@@ -11,11 +11,13 @@ Classes:
 
 from flask import Flask
 from flask_socketio import SocketIO
-
+from Leek.Leek import Leek
 import WebHeroes.config as config
 from ZancmokLib.StaticClass import StaticClass
 from WebAPI.Common import Common
 from WebAPI.HTMLRoutes import HTMLRoutes
+from WebAPI.UserManagement import UserManagement
+from WebAPI.LobbyManagement import LobbyManagement
 
 
 class WebHeroes(StaticClass):
@@ -54,7 +56,13 @@ class WebHeroes(StaticClass):
         """
 
         WebHeroes.app.register_blueprint(Common.route_blueprint)
+        Common.socket_blueprint.init(WebHeroes.socket_io)
         WebHeroes.app.register_blueprint(HTMLRoutes.route_blueprint)
+        WebHeroes.app.register_blueprint(UserManagement.route_blueprint)
+        WebHeroes.app.register_blueprint(LobbyManagement.route_blueprint)
+        LobbyManagement.socket_blueprint.init(WebHeroes.socket_io)
+
+        Leek.initialize()
 
         WebHeroes.app.config["SECRET_KEY"] = config.FLASK_SECRET_KEY
 
@@ -64,5 +72,7 @@ class WebHeroes(StaticClass):
             port=config.PORT,
             debug=config.DEBUG,
             use_reloader=False,
-            log_output=True
+            log_output=True,
+            # keyfile='key.pem',
+            # certfile='cert.pem'
         )

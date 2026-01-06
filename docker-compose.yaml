@@ -1,12 +1,24 @@
 services:
+  caddy:
+    image: caddy:2
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - web_heroes_server
+
   web_heroes_server:
     build:
       context: ./src/WebHeroes
       dockerfile: ./Dockerfile
       args:
         no_run: "true"
-    ports:
-      - "5000:5000"
+    expose:
+      - "5000"
     depends_on:
       - web_heroes_database
     command: bash -c "python ./main.py"
@@ -23,3 +35,5 @@ services:
       - web_heroes_db_data:/var/lib/mysql
 volumes:
   web_heroes_db_data:
+  caddy_data:
+  caddy_config:

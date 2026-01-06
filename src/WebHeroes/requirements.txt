@@ -2,5 +2,8 @@ flask
 flask-socketio
 python-dotenv
 werkzeug
-SQLAlchemy
+cryptography
+pymysql
+sqlalchemy
 eventlet
+bcrypt

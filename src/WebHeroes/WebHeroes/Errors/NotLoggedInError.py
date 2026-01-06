@@ -1,0 +1,3 @@
+class NotLoggedInError(Exception):
+    """Raised when user not logged in ):"""
+    ...

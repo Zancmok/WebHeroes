@@ -1,6 +1,7 @@
 import WebHeroes.config as config
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPMethod import EHTTPMethod
+from ZancmokLib.FlaskUtil import FlaskUtil
 from flask import Blueprint, render_template
 
 
@@ -33,3 +34,14 @@ class HTMLRoutes(StaticClass):
         """
 
         return render_template("modding-documentation.html")
+
+    @staticmethod
+    @route_blueprint.route("/signup/", methods=[EHTTPMethod.GET])
+    def signup() -> str:
+        return render_template("signup.html")
+
+    @staticmethod
+    @route_blueprint.route("/online-lobbies/", methods=[EHTTPMethod.GET])
+    @FlaskUtil.require_auth()
+    def online_lobbies() -> str:
+        return render_template("online-lobbies.html")

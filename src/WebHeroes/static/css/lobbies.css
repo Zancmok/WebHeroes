@@ -1,56 +1,304 @@
-
-#newGame{
-	position: fixed;
-	bottom: 1em;
-	left: 3em;
-	width:20em;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-#loadGame{
-	position: fixed;
-	bottom: 1em;
-	left: 27em;
-	width: 20em;
+body {
+  font-family: 'Georgia', serif;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  background-attachment: fixed;
+  color: #d4af37;
+  min-height: 100vh;
+  padding: 20px;
+  position: relative;
+  overflow-x: hidden;
 }
 
-#join{
-	position: fixed;
-	bottom: 1em;
-	left: 50em;
-	width:20em;
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+      radial-gradient(circle at 20% 50%, rgba(212, 175, 55, 0.03) 0%, transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(25, 118, 210, 0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
-#message{
-	position: fixed;
-	bottom: 1em;
-	right:1em;
-	width:50%;
+.container {
+  max-width: 1600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
 }
 
-#send{
-	position: fixed;
-	bottom: 1em;
-	right: 1em;
+/* Header */
+.header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
-#bot{
-	width:45%;
-	float:left;
-	position: fixed;
-	top: 8em;
-}
-#bot2{
-	width:40%;
-	float:left;
-	position: fixed;
-	right:17em;
-	top: 8em;
+.header-ad {
+  flex: 1;
+  background: linear-gradient(135deg, #2a2416 0%, #3d3027 50%, #2a2416 100%);
+  border: 3px solid #8b7355;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(0, 0, 0, 0.7);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.6);
+  text-transform: uppercase;
+  letter-spacing: 2px;
 }
 
-#bot3{
-	width:17em;
-	float:right;
-	position: fixed;
-	right:0em;
-	top:8em;
+.header-nav {
+  flex: 0 0 auto;
+}
+
+/* Main content layout */
+.content-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.main-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar {
+  flex: 0 0 300px;
+  min-width: 0;
+}
+
+/* Action bar */
+.action-bar {
+  margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+/* Tables */
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: linear-gradient(135deg, #2a2416 0%, #3d3027 50%, #2a2416 100%);
+  border: 3px solid #8b7355;
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8), 0 4px 15px rgba(0, 0, 0, 0.7);
+  position: relative;
+  margin-bottom: 20px;
+}
+
+table::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: 
+      repeating-linear-gradient(90deg, transparent, transparent 2px, rgba(0, 0, 0, 0.1) 2px, rgba(0, 0, 0, 0.1) 4px);
+  pointer-events: none;
+}
+
+td {
+  padding: 12px 15px;
+  border: 1px solid #5a4a3a;
+  color: #d4af37;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-size: 0.9em;
+  font-weight: bold;
+  position: relative;
+}
+
+thead td {
+  background: linear-gradient(135deg, #1a1410 0%, #2a2416 100%);
+  color: #ffd700;
+  text-shadow: 0 0 8px rgba(212, 175, 55, 0.5), 1px 1px 2px rgba(0, 0, 0, 0.8);
+  border-bottom: 2px solid #8b7355;
+  font-size: 1em;
+  padding: 15px;
+}
+
+tbody td {
+  background: rgba(0, 0, 0, 0.3);
+  transition: background-color 0.3s ease;
+}
+
+tbody tr:hover td {
+  background: rgba(212, 175, 55, 0.1);
+  cursor: pointer;
+}
+
+/* Lobby table columns */
+#bot thead td:nth-child(1) {
+  width: 25%;
+}
+
+#bot thead td:nth-child(2) {
+  width: 15%;
+  text-align: center;
+}
+
+#bot thead td:nth-child(3) {
+  width: 45%;
+}
+
+#bot thead td:nth-child(4) {
+  width: 15%;
+  text-align: center;
+}
+
+/* Players online table */
+#bot3 {
+  margin-bottom: 0;
+}
+
+#bot3 tbody {
+  display: block;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+#bot3 thead,
+#bot3 tbody tr {
+  display: table;
+  width: 100%;
+  table-layout: fixed;
+}
+
+/* Scrollbar styling */
+#bot3 tbody::-webkit-scrollbar {
+  width: 10px;
+}
+
+#bot3 tbody::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.5);
+  border-left: 1px solid #5a4a3a;
+}
+
+#bot3 tbody::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 100%);
+  border: 1px solid #d4af37;
+}
+
+#bot3 tbody::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #cd853f 100%);
+}
+
+/* Buttons */
+button {
+  background: linear-gradient(135deg, #8b4513 0%, #a0522d 50%, #8b4513 100%);
+  border: 2px solid #d4af37;
+  color: #ffd700;
+  padding: 14px 28px;
+  font-size: 0.95em;
+  font-family: 'Georgia', serif;
+  font-weight: bold;
+  cursor: pointer;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5), 0 4px 10px rgba(0, 0, 0, 0.7);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+button:hover {
+  background: linear-gradient(135deg, #a0522d 0%, #cd853f 50%, #a0522d 100%);
+  box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.5), 0 6px 15px rgba(0, 0, 0, 0.8);
+  transform: translateY(-2px);
+}
+
+button:hover::before {
+  left: 100%;
+}
+
+button:active {
+  transform: translateY(0);
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* Responsive design */
+@media (max-width: 1200px) {
+  .sidebar {
+      flex: 0 0 250px;
+  }
+}
+
+@media (max-width: 900px) {
+  .header-section {
+      flex-direction: column;
+  }
+  
+  .action-bar {
+      flex-direction: column;
+  }
+  
+  .action-bar button {
+      width: 100%;
+  }
+  
+  .sidebar {
+      flex: 0 0 200px;
+  }
+}
+
+@media (max-width: 600px) {
+  body {
+      padding: 10px;
+  }
+  
+  .header-section {
+      flex-direction: column;
+  }
+  
+  button {
+      padding: 12px 20px;
+      font-size: 0.85em;
+  }
+  
+  td {
+      padding: 8px 10px;
+      font-size: 0.8em;
+  }
+  
+  #bot thead td:nth-child(3) {
+      display: none;
+  }
+  
+  #bot tbody td:nth-child(3) {
+      display: none;
+  }
+}
+
+.sidebar {
+  flex: 0 0 300px;
+  min-width: 0;
+  margin-top: 69px; /* matches action-bar height + margin */
 }

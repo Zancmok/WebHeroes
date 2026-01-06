@@ -1,0 +1,153 @@
+[gd_scene load_steps=6 format=3 uid="uid://cjeqi5byhfp8h"]
+
+[ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUp/LoginSignUpPage.cs" id="1_v4cxy"]
+[ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/LoginSignUp/SignUpVisuals.cs" id="2_4vdtq"]
+[ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/LoginSignUp/TabsWork.cs" id="2_6b5og"]
+[ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginSignUp/LoginVisuals.cs" id="2_vo05e"]
+[ext_resource type="Script" uid="uid://c7gcj1unyc8bu" path="res://scenes/LoginSignUp/SocketIo.cs" id="5_yhkbl"]
+
+[node name="Control_Base" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_v4cxy")
+
+[node name="CenterContainer_BasePlate" type="CenterContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BoxContainer" type="BoxContainer" parent="CenterContainer_BasePlate"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer"]
+layout_mode = 2
+script = ExtResource("2_6b5og")
+
+[node name="Tabs" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="LoginTab" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Login
+"
+
+[node name="SignUpTab" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/Tabs"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Sign up
+"
+
+[node name="FormLogin" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin"]
+layout_mode = 2
+script = ExtResource("2_vo05e")
+
+[node name="UsernameInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
+layout_mode = 2
+text = "Uername"
+
+[node name="UsernameLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PasswordInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
+layout_mode = 2
+text = "Password"
+
+[node name="PasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShowPassword" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput"]
+layout_mode = 2
+text = "Show"
+
+[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Submit"
+
+[node name="FormSignUp" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer"]
+custom_minimum_size = Vector2(500, 100)
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp"]
+layout_mode = 2
+
+[node name="UsernameInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
+layout_mode = 2
+text = "Uername"
+
+[node name="UsernameLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_4vdtq")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="PasswordInput" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/PasswordInput"]
+layout_mode = 2
+text = "Password"
+
+[node name="PasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/PasswordInput"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="RepeatPassword" type="HBoxContainer" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/RepeatPassword"]
+layout_mode = 2
+text = "Repeat Password"
+
+[node name="RepeatPasswordLine" type="LineEdit" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/RepeatPassword"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="ShowPassword" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+text = "Show"
+
+[node name="Submit" type="Button" parent="CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer"]
+layout_mode = 2
+text = "Submit
+"
+
+[node name="CallZancock" type="HTTPRequest" parent="."]
+
+[node name="SocketIO" type="Node" parent="."]
+script = ExtResource("5_yhkbl")
+metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
