@@ -34,7 +34,7 @@ IF %ERRORLEVEL% NEQ 0 (
 )
 
 echo Copying %OUTPUT_FILE%...
-docker cp %CONTAINER_NAME%:/build/%OUTPUT_FILE% "%SCRIPT_DIR%\%OUTPUT_FILE%"
+docker cp %CONTAINER_NAME%:/build/%OUTPUT_FILE% "%SCRIPT_DIR%\..\WebHeroes\%OUTPUT_FILE%"
 
 IF %ERRORLEVEL% NEQ 0 (
     echo Failed to copy output file!
