@@ -52,10 +52,13 @@
 
                 // Game Description - list all players
                 let playersList = "";
-                if (lobby.members && lobby.members.length > 0) {
-                    playersList = lobby.members.map(m => m.member_name).join(", ");
-                } else {
-                    playersList = "No players";
+
+                for (let i = 0; i < lobby.members.length; i++) {
+                    playersList += lobby.members[i].member_name;
+
+                    if (i < lobby.members.length - 1) {
+                        playersList += ", ";
+                    }
                 }
 
                 // Player Count
