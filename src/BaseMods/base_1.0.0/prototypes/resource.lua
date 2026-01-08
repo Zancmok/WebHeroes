@@ -1,0 +1,27 @@
+data:extend{
+    {
+        type="resource",
+        id="wood",
+        name="Wood"
+    },
+    {
+        type="resource",
+        id="ore",
+        name="Ore"
+    },
+    {
+        type="resource",
+        id="cow",
+        name="Cow"
+    },
+    {
+        type="resource",
+        id="buckwheat",
+        name="Buckwheat"
+    },
+    {
+        type="resource",
+        id="victory-point",
+        name="Victory Point"
+    }
+}
