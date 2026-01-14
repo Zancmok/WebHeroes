@@ -1,14 +1,14 @@
 from typing import Any
 import WebHeroes.config as config
+from WebHeroes.LobbyManagement.Errors.AlreadyOwningLobbyError import AlreadyOwningLobbyError
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
-from WebHeroes.Responses import dictify
+from WebHeroes.Responses import dictify, SuccessResponse, FailedResponse
 from WebHeroes.Responses.ResponseTypes.LobbyRefreshResponse import LobbyRefreshResponse
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
 from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
-from flask_socketio import emit
 from ZancmokLib.FlaskUtil import FlaskUtil
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode
@@ -25,14 +25,12 @@ class LobbyManagement(StaticClass):
         url_prefix="/lobby-management"
     )
 
-    socket_blueprint: SocketBlueprint = SocketBlueprint(
-        name="WebAPI:LobbyManagement"
-    )
+    socket_blueprint: SocketBlueprint = SocketBlueprint(name="lobby-management")
 
     @staticmethod
     @socket_blueprint.on("refresh")
     def refresh() -> None:
-        emit("refresh", dictify(LobbyRefreshResponse(
+        LobbyManagement.socket_blueprint.emit("refresh", dictify(LobbyRefreshResponse(
             members=[
                 MemberModel(
                     member_id=member_id,
@@ -56,4 +54,10 @@ class LobbyManagement(StaticClass):
     @staticmethod
     @socket_blueprint.on("create-lobby")
     def create_lobby(json: dict[str, Any]) -> None:
-        LobbyManager.create_lobby(lobby_name=json["lobby-name"])
+        try:
+            LobbyManager.create_lobby(lobby_name=json["lobby-name"])
+        except AlreadyOwningLobbyError as e:
+            LobbyManagement.socket_blueprint.emit("create-lobby", dictify(FailedResponse(reason=str(e))))
+            return
+
+        LobbyManagement.socket_blueprint.emit("create-lobby", dictify(SuccessResponse()))

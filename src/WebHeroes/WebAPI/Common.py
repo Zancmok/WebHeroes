@@ -19,9 +19,7 @@ class Common(StaticClass):
         static_folder=config.STATIC_PATH
     )
 
-    socket_blueprint: SocketBlueprint = SocketBlueprint(
-        name="WebAPI:Common"
-    )
+    socket_blueprint: SocketBlueprint = SocketBlueprint(name="")
 
     @staticmethod
     @route_blueprint.route("/ping", methods=[EHTTPMethod.POST])

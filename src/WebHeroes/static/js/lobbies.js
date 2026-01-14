@@ -9,16 +9,16 @@
         console.log("Connected to server!");
 
         // Initial refresh
-        socket.emit('refresh');
+        socket.emit('lobby-management:refresh');
 
         // Refresh every 10 seconds
         while (true) {
             await sleep(10000);
-            socket.emit('refresh');
+            socket.emit('lobby-management:refresh');
         }
     });
 
-    socket.on('refresh', (data) => {
+    socket.on('lobby-management:refresh', (data) => {
         console.log('Received refresh response:', data);
 
         // Update online players
@@ -93,9 +93,9 @@
     document.getElementById('newGame').addEventListener('click', function() {
         let lobbyName = prompt("Enter lobby name:");
         if (lobbyName && lobbyName.trim() !== "") {
-            socket.emit('create-lobby', {"lobby-name": lobbyName.trim()});
+            socket.emit('lobby-management:create-lobby', {"lobby-name": lobbyName.trim()});
             // Refresh immediately after creating
-            setTimeout(() => socket.emit('refresh'), 500);
+            setTimeout(() => socket.emit('lobby-management:refresh'), 500);
         }
     });
 })();
