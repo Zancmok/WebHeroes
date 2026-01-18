@@ -46,16 +46,17 @@ class LobbyManagement(StaticClass):
                             member_id=member_id,
                             member_name=str(UserRepository.get_by_id(member_id).username)
                         ) for member_id in lobby.member_ids
-                    ] 
+                    ]
                 ) for lobby in LobbyManager.get_lobbies()
             ]
         )), to=LobbyManager.online_lobby.name)
 
     @staticmethod
     @socket_blueprint.on("create-lobby")
-    def create_lobby(json: dict[str, Any]) -> None:
+    @FlaskUtil.verify_socket_arguments(socket_blueprint, lobby_name=str)
+    def create_lobby(lobby_name: str) -> None:
         try:
-            LobbyManager.create_lobby(lobby_name=json["lobby-name"])
+            LobbyManager.create_lobby(lobby_name=lobby_name)
         except AlreadyOwningLobbyError as e:
             LobbyManagement.socket_blueprint.emit("create-lobby", dictify(FailedResponse(reason=str(e))))
             return

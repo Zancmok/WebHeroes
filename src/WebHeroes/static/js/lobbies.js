@@ -93,7 +93,7 @@
     document.getElementById('newGame').addEventListener('click', function() {
         let lobbyName = prompt("Enter lobby name:");
         if (lobbyName && lobbyName.trim() !== "") {
-            socket.emit('lobby-management:create-lobby', {"lobby-name": lobbyName.trim()});
+            socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName.trim()});
             // Refresh immediately after creating
             setTimeout(() => socket.emit('lobby-management:refresh'), 500);
         }

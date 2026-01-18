@@ -6,6 +6,7 @@ from sqlalchemy.util.preloaded import orm_util
 
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.EHTTPCode import EHTTPCode
+from ZancmokLib.SocketBlueprint import SocketBlueprint
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.Responses import dictify
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
@@ -64,7 +65,7 @@ class FlaskUtil(StaticClass):
         return decorator
 
     @staticmethod
-    def verify_socket_arguments(**kwargs: type | list[type]) -> Callable[..., Any]:
+    def verify_socket_arguments(blueprint: SocketBlueprint, **kwargs: type | list[type]) -> Callable[..., Any]:
         def decorator(function: Callable[..., Any]) -> Callable[..., Any]:
             @functools.wraps(function)
             def wrapper(json: Optional[Any] = None) -> Optional[Any]:
@@ -85,6 +86,13 @@ class FlaskUtil(StaticClass):
 
                     if NoneType in allowed_types:
                         continue
+
+                    print(argument, allowed_types, flush=True)
+                    print(json, flush=True)
+
+                    # blueprint.emit()
+
+                    return None
 
                 return function(**output)
             return wrapper
