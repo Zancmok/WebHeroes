@@ -15,7 +15,7 @@ COPY . .
 RUN gcc -O3 -Wall -fPIC -shared \
     $(python3-config --cflags) \
     $(pkg-config --cflags lua5.4) \
-    lua_bridge.c \
+    lua_bridge.c base_prototype.c \
     $(pkg-config --libs lua5.4) \
     $(python3-config --ldflags) \
     -o /build/LuaBridge.so
