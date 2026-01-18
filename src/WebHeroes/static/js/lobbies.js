@@ -79,7 +79,7 @@
                 btn.addEventListener('click', function() {
                     const lobbyName = this.getAttribute('data-lobby');
                     console.log('Joining lobby:', lobbyName);
-                    // TODO: Implement join lobby functionality
+                    socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName.trim()});
                 });
             });
         } else {

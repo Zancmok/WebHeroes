@@ -1,7 +1,9 @@
 from typing import Any
 import WebHeroes.config as config
+from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.Errors.AlreadyOwningLobbyError import AlreadyOwningLobbyError
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
+from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.Responses import dictify, SuccessResponse, FailedResponse
 from WebHeroes.Responses.ResponseTypes.LobbyRefreshResponse import LobbyRefreshResponse
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
@@ -9,6 +11,8 @@ from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
+
+from WebHeroes.UserManagement.UserSession import UserSession
 from ZancmokLib.FlaskUtil import FlaskUtil
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from ZancmokLib.EHTTPCode import EHTTPCode, HTTPCode
@@ -62,3 +66,22 @@ class LobbyManagement(StaticClass):
             return
 
         LobbyManagement.socket_blueprint.emit("create-lobby", dictify(SuccessResponse()))
+
+    @staticmethod
+    @socket_blueprint.on("join-lobby")
+    @FlaskUtil.verify_socket_arguments(socket_blueprint, lobby_name=str)
+    def join_lobby(lobby_name: str) -> None:
+        if not (user_session := SessionManager.get_user_session()):
+            return
+        user_session: UserSession
+
+        lobbies: list[OwnedLobby] = LobbyManager.get_lobbies()
+        for lobby in lobbies:
+            if lobby.name == lobby_name:
+                try:
+                    lobby.join_member(user_session.get_user_id())
+                except AlreadyInLobbyError as e:
+                    LobbyManagement.socket_blueprint.emit("join-lobby", dictify(FailedResponse(reason=str(e))))
+                    return
+
+                break
