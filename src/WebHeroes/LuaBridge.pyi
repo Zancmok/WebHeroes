@@ -3,3 +3,7 @@ class BasePrototype:
 
     type: str  # type: str
     name: str  # type: str
+
+
+class LuaSandbox:
+    ...

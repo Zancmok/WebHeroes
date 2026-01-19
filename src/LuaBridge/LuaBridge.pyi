@@ -3,3 +3,9 @@ class BasePrototype:
 
     type: str  # type: str
     name: str  # type: str
+
+
+class LuaSandbox:
+    def __init__(self, prototypes: list[BasePrototype]) -> None: ...
+
+    prototypes: list[BasePrototype]  # type: list[BasePrototype]
