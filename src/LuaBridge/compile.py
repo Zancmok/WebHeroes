@@ -1,17 +1,13 @@
-#!/usr/bin/env python3
 import os
 import sys
 import subprocess
 from pathlib import Path
-
-# =========================================
-# Build LuaBridge Linux .so using Docker
-# Cross-platform Python version
-# =========================================
+import shutil
 
 IMAGE_NAME = "luabridge-builder"
 CONTAINER_NAME = "luabridge-temp"
 OUTPUT_FILE = "LuaBridge.so"
+PYI_FILE = "LuaBridge.pyi"
 
 def run(cmd, error_message):
     print(f"> {' '.join(cmd)}")
@@ -41,15 +37,26 @@ def main():
     )
 
     try:
-        # Destination path: ../WebHeroes/LuaBridge.so
-        destination = (script_dir / ".." / "WebHeroes" / OUTPUT_FILE).resolve()
-        destination.parent.mkdir(parents=True, exist_ok=True)
+        # Destination path: ../WebHeroes/
+        output_dir = (script_dir / ".." / "WebHeroes").resolve()
+        output_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"Copying {OUTPUT_FILE} to {destination}...")
+        # Copy the shared library
+        so_destination = output_dir / OUTPUT_FILE
+        print(f"Copying {OUTPUT_FILE} to {so_destination}...")
         run(
-            ["docker", "cp", f"{CONTAINER_NAME}:/build/{OUTPUT_FILE}", str(destination)],
+            ["docker", "cp", f"{CONTAINER_NAME}:/build/{OUTPUT_FILE}", str(so_destination)],
             "Failed to copy output file!"
         )
+
+        # Copy the .pyi file
+        pyi_source = script_dir / PYI_FILE
+        pyi_destination = output_dir / PYI_FILE
+        if pyi_source.exists():
+            print(f"Copying {PYI_FILE} to {pyi_destination}...")
+            shutil.copy(pyi_source, pyi_destination)
+        else:
+            print(f"Warning: {PYI_FILE} not found in {script_dir}")
 
     finally:
         # Cleanup container even if copy fails
@@ -57,7 +64,7 @@ def main():
         subprocess.run(["docker", "rm", "-f", CONTAINER_NAME], stdout=subprocess.DEVNULL)
 
     print("========================================")
-    print(f"Build complete: {OUTPUT_FILE}")
+    print(f"Build complete: {OUTPUT_FILE} + {PYI_FILE}")
     print("========================================")
 
 if __name__ == "__main__":

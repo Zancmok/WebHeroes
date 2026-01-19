@@ -13,10 +13,13 @@ static int init(BasePrototype *self, PyObject *args, PyObject *kwds)
 
     static char *kwlist[] = {"type", "name", NULL};
 
-    // Require both to be Python strings ("U")
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "UU", kwlist, &type, &name))
-    { return -1; } // raises TypeError automatically if not strings
-    
+        return -1;
+
+    if (PyObject_SetAttrString((PyObject *)self, "type", type) < 0)
+        return -1;
+    if (PyObject_SetAttrString((PyObject *)self, "name", name) < 0)
+        return -1;
 
     Py_INCREF(type);
     Py_INCREF(name);
@@ -32,7 +35,6 @@ static void dealloc(BasePrototype *self)
     Py_XDECREF(self->name);
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
-
 
 static PyMethodDef methods[] = {
     {NULL}  // Sentinel
