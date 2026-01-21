@@ -10,7 +10,7 @@ public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
 	private SocketIo socket;
-	private string testHttp = "https://127.0.0.1:5000/ping";
+	private string testHttp = "http://127.0.0.1:5000/ping";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
@@ -64,7 +64,7 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
 
-			MakePostRequest("https://127.0.0.1:5000/user-management/signup", jsonString);
+			MakePostRequest("http://127.0.0.1:5000/user-management/signup", jsonString);
 		}
 		else
 		{
@@ -89,7 +89,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
 
-		MakePostRequest("https://127.0.0.1:5000/user-management/login", jsonString);
+		MakePostRequest("http://127.0.0.1:5000/user-management/login", jsonString);
 	}
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
