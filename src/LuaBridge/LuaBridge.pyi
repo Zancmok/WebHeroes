@@ -6,6 +6,7 @@ class BasePrototype:
 
 
 class LuaSandbox:
-    def __init__(self, prototypes: list[BasePrototype]) -> None: ...
+    def __init__(self, prototypes: list[BasePrototype], mods: list[str]) -> None: ...
 
     prototypes: list[BasePrototype]  # type: list[BasePrototype]
+    mods: list[str]  # type: list[str]

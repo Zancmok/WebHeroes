@@ -45,3 +45,9 @@ class HTMLRoutes(StaticClass):
     @FlaskUtil.require_auth()
     def online_lobbies() -> str:
         return render_template("online-lobbies.html")
+
+    @staticmethod
+    @route_blueprint.route("/lobby/", methods=[EHTTPMethod.GET])
+    @FlaskUtil.require_auth()
+    def lobby() -> str:
+        return render_template("lobby.html")
