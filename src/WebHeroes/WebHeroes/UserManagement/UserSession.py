@@ -19,7 +19,7 @@ class UserSession:
     def get_lobby(self) -> Lobby:
         return self._lobby
 
-    def join_lobby(self, lobby: Lobby) -> None:
+    def join_lobby(self, lobby: Lobby) -> None:    
         if lobby is self._lobby:
             return
 

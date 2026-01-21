@@ -79,7 +79,7 @@ class LobbyManagement(StaticClass):
         for lobby in lobbies:
             if lobby.name == lobby_name:
                 try:
-                    lobby.join_member(user_session.get_user_id())
+                    user_session.join_lobby(lobby)
                 except AlreadyInLobbyError as e:
                     LobbyManagement.socket_blueprint.emit("join-lobby", dictify(FailedResponse(reason=str(e))))
                     return

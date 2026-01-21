@@ -1,6 +1,7 @@
 from typing import Optional
 
 from WebHeroes.UserManagement.SessionManager import SessionManager
+from WebHeroes.UserManagement import UserSession
 from ZancmokLib.StaticClass import StaticClass
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
@@ -15,6 +16,7 @@ class LobbyManager(StaticClass):
     @staticmethod
     def create_lobby(lobby_name: str, token: Optional[str] = None) -> None:
         user_id: int = SessionManager.get_user_id(token=token)
+        user_session: UserSession = SessionManager.get_user_session()
 
         for lobby in LobbyManager._player_lobbies:
             if lobby.owner_id == user_id:
@@ -27,6 +29,8 @@ class LobbyManager(StaticClass):
             name=lobby_name,
             owner_id=user_id
         ))
+
+        user_session.join_lobby(LobbyManager._player_lobbies[-1])
 
     @staticmethod
     def get_lobbies() -> list[OwnedLobby]:

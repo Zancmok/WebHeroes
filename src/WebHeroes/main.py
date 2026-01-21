@@ -18,13 +18,6 @@ def main() -> None:
     Runs the main class.
     :return:
     """
-
-    import LuaBridge
-
-    print(dir(LuaBridge))
-
-    return
-
     if not os.path.exists('.env'):
         print("Cant run, '.env' file missing!")
         return
