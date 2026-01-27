@@ -80,6 +80,7 @@
                     const lobbyName = this.getAttribute('data-lobby');
                     console.log('Joining lobby:', lobbyName);
                     socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName.trim()});
+                    window.location.href = "/lobby/"
                 });
             });
         } else {
