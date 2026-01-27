@@ -2,9 +2,10 @@ from typing import Type
 
 
 class BasePrototype:
-    def __init__(self, name: str) -> None: ...
+    def __init__(self, name: str, display_name: str) -> None: ...
 
     name: str  # type: str
+    display_name: str  # type: str
 
 
 class PrototypeDefinition:
