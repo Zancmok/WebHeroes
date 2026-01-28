@@ -3,22 +3,29 @@
 typedef struct {
     PyObject_HEAD
     PyObject *name;
+    PyObject *display_name;
 } BasePrototype;
 
 static int init(BasePrototype *self, PyObject *args, PyObject *kwds)
 {
     PyObject *name = NULL;
+    PyObject *display_name = NULL;
 
-    static char *kwlist[] = {"name", NULL};
+    static char *kwlist[] = {"name", "display_name", NULL};
 
-    if (!PyArg_ParseTupleAndKeywords(args, kwds, "U", kwlist, &name))
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "UU", kwlist, &name, &display_name))
         return -1;
 
     if (PyObject_SetAttrString((PyObject *)self, "name", name) < 0)
         return -1;
 
+    if (PyObject_SetAttrString((PyObject *)self, "display_name", display_name) < 0)
+        return -1;
+
     Py_INCREF(name);
+    Py_INCREF(display_name);
     self->name = name;
+    self->display_name = display_name;
 
     return 0;
 }
@@ -26,6 +33,7 @@ static int init(BasePrototype *self, PyObject *args, PyObject *kwds)
 static void dealloc(BasePrototype *self)
 {
     Py_XDECREF(self->name);
+    Py_XDECREF(self->display_name);
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
@@ -37,7 +45,7 @@ PyTypeObject BasePrototype_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "LuaBridge.BasePrototype",
     .tp_basicsize = sizeof(BasePrototype),
-    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_doc = "The Base Prototype",
     .tp_methods = methods,
     .tp_init = (initproc)init,
