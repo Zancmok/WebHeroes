@@ -2,10 +2,12 @@ from typing import Any
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.Errors.AlreadyOwningLobbyError import AlreadyOwningLobbyError
+from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.Responses import dictify, SuccessResponse, FailedResponse
 from WebHeroes.Responses.ResponseTypes.LobbyRefreshResponse import LobbyRefreshResponse
+from WebHeroes.Responses.ResponseTypes.GetLobbyResponse import GetLobbyResponse
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
 from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
@@ -54,6 +56,31 @@ class LobbyManagement(StaticClass):
                 ) for lobby in LobbyManager.get_lobbies()
             ]
         )), to=LobbyManager.online_lobby.name)
+
+    @staticmethod
+    @socket_blueprint.on("get-lobby")
+    def get_lobby() -> None:
+        if not (user_session := SessionManager.get_user_session()):
+            return
+        user_session: UserSession
+
+        lobby: Lobby = user_session.get_lobby()
+        if not isinstance(lobby, OwnedLobby):
+            return
+        lobby: OwnedLobby
+
+        LobbyManagement.socket_blueprint.emit("get-lobby", dictify(GetLobbyResponse(
+            owner=MemberModel(
+                member_id=lobby.owner_id,
+                member_name=str(UserRepository.get_by_id(lobby.owner_id).username)
+            ),
+            members=[
+                MemberModel(
+                    member_id=member_id,
+                    member_name=str(UserRepository.get_by_id(member_id).username)
+                ) for member_id in lobby.member_ids
+            ]
+        )), to=lobby.name)
 
     @staticmethod
     @socket_blueprint.on("create-lobby")
