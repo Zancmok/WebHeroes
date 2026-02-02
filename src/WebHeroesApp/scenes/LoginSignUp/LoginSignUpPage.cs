@@ -9,7 +9,7 @@ using System.Text.Json;
 public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
-	private SocketIo socket;
+	private UserManagement userManagement;
 	private string testHttp = "http://127.0.0.1:5000/ping";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
@@ -17,7 +17,7 @@ public partial class LoginSignUpPage : Control
 		
 	public override void _Ready()
 	{
-		socket = GetNode<SocketIo>("SocketIO");
+		userManagement = GetNode<UserManagement>("UserManagement");
 		httpRequest = GetNode<HttpRequest>("CallZancock");
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		
@@ -104,7 +104,7 @@ public partial class LoginSignUpPage : Control
 	
 	private void Send()
 	{
-		socket.SendMessage("Hello World!");
+		userManagement.SendMessage("Hello World!");
 	}
 	
 	public override void _UnhandledInput(InputEvent @event)

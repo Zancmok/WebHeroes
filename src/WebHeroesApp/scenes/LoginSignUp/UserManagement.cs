@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class SocketIo : Node
+public partial class UserManagement : Node
 {
 	public override void _Ready()
 	{
