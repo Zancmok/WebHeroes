@@ -80,7 +80,7 @@
                     const lobbyName = this.getAttribute('data-lobby');
                     console.log('Joining lobby:', lobbyName);
                     socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName.trim()});
-                    window.location.href = "/lobby/"
+                    
                 });
             });
         } else {
@@ -95,6 +95,7 @@
         let lobbyName = prompt("Enter lobby name:");
         if (lobbyName && lobbyName.trim() !== "") {
             socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName.trim()});
+            window.location.href = "/lobby/"
             // Refresh immediately after creating
             setTimeout(() => socket.emit('lobby-management:refresh'), 500);
         }
