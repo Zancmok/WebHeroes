@@ -77,10 +77,16 @@
             // Add event listeners to join buttons
             document.querySelectorAll('.join-btn').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const lobbyName = this.getAttribute('data-lobby');
+                    const lobbyName = this.getAttribute('data-lobby').trim();
                     console.log('Joining lobby:', lobbyName);
-                    socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName.trim()});
-                    
+
+                    // Save lobby name for lobby.html (no URL params)
+                    sessionStorage.setItem("currentLobbyName", lobbyName);
+
+                    socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName});
+
+                    // Redirect to lobby page
+                    window.location.href = "/lobby/";
                 });
             });
         } else {
@@ -91,11 +97,20 @@
     });
 
     // Create new game button handler
+// Create new game button handler
     document.getElementById('newGame').addEventListener('click', function() {
         let lobbyName = prompt("Enter lobby name:");
         if (lobbyName && lobbyName.trim() !== "") {
-            socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName.trim()});
-            window.location.href = "/lobby/"
+            lobbyName = lobbyName.trim();
+
+            // Save lobby name for lobby.html (no URL params)
+            sessionStorage.setItem("currentLobbyName", lobbyName);
+
+            socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName});
+
+            // Redirect creator to lobby page
+            window.location.href = "/lobby/";
+
             // Refresh immediately after creating
             setTimeout(() => socket.emit('lobby-management:refresh'), 500);
         }
