@@ -12,7 +12,7 @@ from Leek.Models.UserModel import UserModel
 class Leek(StaticClass):
     engine: Engine = sqlalchemy.create_engine(
         "mysql+pymysql://user:password@web_heroes_database:3306/WebHeroes",
-        echo=True
+        echo=False
     )
 
     @staticmethod
