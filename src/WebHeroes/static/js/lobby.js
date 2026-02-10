@@ -44,7 +44,7 @@
   }
 
   socket.on("connect", () => {
-    // Make sure the server session joins the lobby (works for joiners; creator is already in one)
+    // Make sure the server session joins the lobby
     socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
 
     requestRefresh();
@@ -64,7 +64,7 @@
     }
 
     // We don't have owner name directly in refresh, only owner_id.
-    // But we *do* have members list with names; owner is usually included in members.
+    // But we do have members list with names; owner is usually included in members.
     // So we guess owner name by matching owner_id to members.
     const ownerMember = (lobby.members || []).find(m => m.member_id === lobby.owner_id);
 

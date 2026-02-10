@@ -80,7 +80,7 @@
                     const lobbyName = this.getAttribute('data-lobby').trim();
                     console.log('Joining lobby:', lobbyName);
 
-                    // Save lobby name for lobby.html (no URL params)
+                    // Save lobby name for lobby.html
                     sessionStorage.setItem("currentLobbyName", lobbyName);
 
                     socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName});
@@ -96,14 +96,13 @@
         }
     });
 
-    // Create new game button handler
 // Create new game button handler
     document.getElementById('newGame').addEventListener('click', function() {
         let lobbyName = prompt("Enter lobby name:");
         if (lobbyName && lobbyName.trim() !== "") {
             lobbyName = lobbyName.trim();
 
-            // Save lobby name for lobby.html (no URL params)
+            // Save lobby name for lobby.html
             sessionStorage.setItem("currentLobbyName", lobbyName);
 
             socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName});
