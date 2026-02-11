@@ -1,0 +1,7 @@
+return {
+  name = "base",
+  version = "1.0.0",
+  title = "The Base WebHeroes mod",
+  author = "Team WebHeroes",
+  dependencies = {}
+}
