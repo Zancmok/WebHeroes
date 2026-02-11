@@ -18,5 +18,7 @@ class PrototypeDefinition:
 class LuaSandbox:
     def __init__(self, prototypes: list[PrototypeDefinition], mod_paths: list[str]) -> None: ...
 
+    def run(self) -> None: ...
+
     prototypes: list[PrototypeDefinition]  # type: list[PrototypeDefinition]
     mod_paths: list[str]  # type: list[str]

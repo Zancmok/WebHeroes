@@ -1,14 +1,79 @@
 #include <Python.h>
 
+#include "prototype_definition.h"
+
 typedef struct {
     PyObject_HEAD
+    PyObject *prototypes;
+    PyObject *mod_paths;
 } LuaSandbox;
 
 static int init(LuaSandbox *self, PyObject *args, PyObject *kwds)
-{ return 0; }
+{
+    PyObject *prototypes = NULL;
+    PyObject *mod_paths = NULL;
+
+    static char *kwlist[] = {"prototypes", "mod_paths", NULL};
+
+    if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist, &prototypes, &mod_paths))
+        return -1;
+
+    if (!PyList_Check(prototypes))
+    {
+        PyErr_SetString(PyExc_TypeError, "Prototypes must be a list");
+        return -1;
+    }
+
+    Py_ssize_t len;
+
+    len = PyList_Size(prototypes);
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        PyObject *item = PyList_GetItem(prototypes, i);
+
+        if (!PyObject_TypeCheck(item, &PrototypeDefinition_Type))
+        {
+            PyErr_SetString(PyExc_TypeError, "All prototypes must be instances of PrototypeDefinition");
+            return -1;
+        }
+    }
+
+    if (PyObject_SetAttrString((PyObject *)self, "prototypes", prototypes) < 0)
+        return -1;
+    
+    if (!PyList_Check(mod_paths))
+    {
+        PyErr_SetString(PyExc_TypeError, "Prototypes must be a list");
+        return -1;
+    }
+
+    len = PyList_Size(mod_paths);
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        PyObject *item = PyList_GetItem(mod_paths, i);
+
+        if (!PyUnicode_Check(item))
+        {
+            PyErr_SetString(PyExc_TypeError, "All items must be strings");
+            return -1;
+        }
+    }
+
+    if (PyObject_SetAttrString((PyObject *)self, "mod_paths", mod_paths) < 0)
+        return -1;
+
+    Py_INCREF(prototypes);
+    Py_INCREF(mod_paths);
+    self->prototypes = prototypes;
+    self->mod_paths = mod_paths;
+
+    return 0;
+}
 
 static void dealloc(LuaSandbox *self)
 {
+    Py_XDECREF(self->prototypes);
+    Py_XDECREF(self->mod_paths);
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
