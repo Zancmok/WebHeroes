@@ -1,9 +1,11 @@
 #include <Python.h>
+#include <stddef.h>
 
 #include "prototype_definition.h"
 
 typedef struct {
     PyObject_HEAD
+    PyObject *dict; 
     PyObject *prototypes;
     PyObject *mod_paths;
 } LuaSandbox;
@@ -37,9 +39,6 @@ static int init(LuaSandbox *self, PyObject *args, PyObject *kwds)
             return -1;
         }
     }
-
-    if (PyObject_SetAttrString((PyObject *)self, "prototypes", prototypes) < 0)
-        return -1;
     
     if (!PyList_Check(mod_paths))
     {
@@ -59,9 +58,6 @@ static int init(LuaSandbox *self, PyObject *args, PyObject *kwds)
         }
     }
 
-    if (PyObject_SetAttrString((PyObject *)self, "mod_paths", mod_paths) < 0)
-        return -1;
-
     Py_INCREF(prototypes);
     Py_INCREF(mod_paths);
     self->prototypes = prototypes;
@@ -77,7 +73,13 @@ static void dealloc(LuaSandbox *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
+{
+    Py_RETURN_NONE;
+}
+
 static PyMethodDef methods[] = {
+    {"run", (PyCFunction)run, METH_VARARGS, ""},
     {NULL}  // Sentinel
 };
 
@@ -85,10 +87,11 @@ PyTypeObject LuaSandbox_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "LuaBridge.LuaSandbox",
     .tp_basicsize = sizeof(LuaSandbox),
-    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_doc = "The Lua Sandbox",
     .tp_methods = methods,
     .tp_init = (initproc)init,
     .tp_new = PyType_GenericNew,
-    .tp_dealloc = (destructor)dealloc
+    .tp_dealloc = (destructor)dealloc,
+    .tp_dictoffset = offsetof(LuaSandbox, dict)
 };

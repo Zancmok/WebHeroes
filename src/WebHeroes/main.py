@@ -25,6 +25,12 @@ def main() -> None:
     if os.getenv("NO_RUN", "false").lower() == "true":
         return
 
+    import LuaBridge
+
+    print(LuaBridge.LuaSandbox([],[]).run())
+
+    return
+
     from WebHeroes.WebHeroes import WebHeroes
 
     WebHeroes.run()
