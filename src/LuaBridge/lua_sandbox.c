@@ -1,5 +1,8 @@
 #include <Python.h>
 #include <stddef.h>
+#include <lua.h>
+#include <lauxlib.h>
+#include <lualib.h>
 
 #include "prototype_definition.h"
 
@@ -75,6 +78,27 @@ static void dealloc(LuaSandbox *self)
 
 static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
 {
+    lua_State *L = luaL_newstate();
+    if (!L)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create a Lua state");
+        return NULL;
+    }
+
+    Py_ssize_t len = PyList_Size(self->mod_paths);
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        PyObject *item = PyList_GetItem(self->mod_paths, i);
+        const char* filename = PyUnicode_AsUTF8(item);
+
+        if (filename == NULL)
+        {
+            lua_close(L);
+
+            return NULL;
+        }
+    }
+
     Py_RETURN_NONE;
 }
 

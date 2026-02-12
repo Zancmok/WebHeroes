@@ -1,7 +1,4 @@
 #include <Python.h>
-#include <lua.h>
-#include <lauxlib.h>
-#include <lualib.h>
 
 #include "base_prototype.h"
 #include "lua_sandbox.h"
