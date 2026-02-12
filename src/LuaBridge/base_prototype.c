@@ -1,7 +1,9 @@
 #include <Python.h>
+#include <stddef.h>
 
 typedef struct {
     PyObject_HEAD
+    PyObject *dict;
     PyObject *name;
     PyObject *display_name;
 } BasePrototype;
@@ -14,12 +16,6 @@ static int init(BasePrototype *self, PyObject *args, PyObject *kwds)
     static char *kwlist[] = {"name", "display_name", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "UU", kwlist, &name, &display_name))
-        return -1;
-
-    if (PyObject_SetAttrString((PyObject *)self, "name", name) < 0)
-        return -1;
-
-    if (PyObject_SetAttrString((PyObject *)self, "display_name", display_name) < 0)
         return -1;
 
     Py_INCREF(name);
@@ -50,5 +46,6 @@ PyTypeObject BasePrototype_Type = {
     .tp_methods = methods,
     .tp_init = (initproc)init,
     .tp_new = PyType_GenericNew,
-    .tp_dealloc = (destructor)dealloc
+    .tp_dealloc = (destructor)dealloc,
+    .tp_dictoffset = offsetof(BasePrototype, dict)
 };

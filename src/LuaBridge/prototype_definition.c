@@ -1,9 +1,11 @@
 #include <Python.h>
+#include <stddef.h>
 
 #include "base_prototype.h"
 
 typedef struct {
     PyObject_HEAD
+    PyObject *dict;
     PyObject *prototype_definition;
     PyObject *synonym;
 } PrototypeDefinition;
@@ -30,12 +32,6 @@ static int init(PrototypeDefinition *self, PyObject *args, PyObject *kwds)
         return -1;
     }
 
-    if (PyObject_SetAttrString((PyObject *)self, "prototype_definition", prototype_definition) < 0)
-        return -1;
-
-    if (PyObject_SetAttrString((PyObject *)self, "synonym", synonym) < 0)
-        return -1;
-
     Py_INCREF(prototype_definition);
     Py_INCREF(synonym);
     self->prototype_definition = prototype_definition;
@@ -59,10 +55,11 @@ PyTypeObject PrototypeDefinition_Type = {
     PyVarObject_HEAD_INIT(NULL, 0)
     .tp_name = "LuaBridge.PrototypeDefinition",
     .tp_basicsize = sizeof(PrototypeDefinition),
-    .tp_flags = Py_TPFLAGS_DEFAULT,
+    .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_doc = "The definition of a prototype",
     .tp_methods = methods,
     .tp_init = (initproc)init,
     .tp_new = PyType_GenericNew,
-    .tp_dealloc = (destructor)dealloc
+    .tp_dealloc = (destructor)dealloc,
+    .tp_dictoffset = offsetof(PrototypeDefinition, dict)
 };
