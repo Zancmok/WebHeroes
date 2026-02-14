@@ -22,6 +22,8 @@ services:
     depends_on:
       - web_heroes_database
     command: bash -c "python ./main.py"
+    volumes:
+      - ./src/BaseMods:/app/BaseMods
   web_heroes_database:
     image: mysql
     ports:

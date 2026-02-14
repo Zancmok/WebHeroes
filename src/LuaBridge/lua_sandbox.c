@@ -1,4 +1,5 @@
 #include <Python.h>
+#include <string.h>
 #include <stddef.h>
 #include <lua.h>
 #include <lauxlib.h>
@@ -97,7 +98,21 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
 
             return NULL;
         }
-    }
+
+        char full_path[255];
+        snprintf(full_path, sizeof(full_path), "BaseMods/%s/info.lua", filename);
+        // filename = f"BaseMods/{filename}/info.lua"
+
+        if (luaL_loadfile(L, full_path) != 0)
+        {
+            const char* err = lua_tostring(L, -1);
+            PyErr_SetString(PyExc_RuntimeError, err);
+
+            lua_close(L);
+
+            return NULL;
+        }
+    }   
 
     Py_RETURN_NONE;
 }
