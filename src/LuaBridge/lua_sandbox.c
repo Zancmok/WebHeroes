@@ -87,23 +87,24 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
     }
 
     Py_ssize_t len = PyList_Size(self->mod_paths);
+
+    // Information stage
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *item = PyList_GetItem(self->mod_paths, i);
-        const char* filename = PyUnicode_AsUTF8(item);
+        const char* mod_name = PyUnicode_AsUTF8(item);
 
-        if (filename == NULL)
+        if (mod_name == NULL)
         {
             lua_close(L);
 
             return NULL;
         }
 
-        char full_path[255];
-        snprintf(full_path, sizeof(full_path), "BaseMods/%s/info.lua", filename);
-        // filename = f"BaseMods/{filename}/info.lua"
+        char filepath[255];
+        snprintf(filepath, sizeof(filepath), "BaseMods/%s/info.lua", mod_name);
 
-        if (luaL_loadfile(L, full_path) != 0)
+        if (luaL_loadfile(L, filepath) != 0)
         {
             const char* err = lua_tostring(L, -1);
             PyErr_SetString(PyExc_RuntimeError, err);
@@ -113,6 +114,44 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
             return NULL;
         }
     }   
+
+    // Reopen a new Lua instance
+    lua_close(L);
+    L = luaL_newstate();
+    if (!L)
+    {
+        PyErr_SetString(PyExc_RuntimeError, "Failed to create a Lua state");
+        return NULL;
+    }
+
+    // Load prototypes
+
+    // Data stage
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        PyObject *item = PyList_GetItem(self->mod_paths, i);
+        const char* mod_name = PyUnicode_AsUTF8(item);
+
+        if (mod_name == NULL)
+        {
+            lua_close(L);
+
+            return NULL;
+        }
+
+        char filepath[255];
+        snprintf(filepath, sizeof(filepath), "BaseMods/%s/data.lua", mod_name);
+
+        if (luaL_loadfile(L, filepath) != 0)
+        {
+            const char* err = lua_tostring(L, -1);
+            PyErr_SetString(PyExc_RuntimeError, err);
+
+            lua_close(L);
+
+            return NULL;
+        }
+    }
 
     Py_RETURN_NONE;
 }
