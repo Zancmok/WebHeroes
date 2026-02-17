@@ -5,4 +5,11 @@
 
 extern PyTypeObject PrototypeDefinition_Type;
 
+typedef struct {
+    PyObject_HEAD
+    PyObject *dict;
+    PyObject *prototype_definition;
+    PyObject *synonym;
+} PrototypeDefinition;
+
 #endif

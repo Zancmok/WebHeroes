@@ -1,14 +1,8 @@
 #include <Python.h>
 #include <stddef.h>
 
+#include "prototype_definition.h"
 #include "base_prototype.h"
-
-typedef struct {
-    PyObject_HEAD
-    PyObject *dict;
-    PyObject *prototype_definition;
-    PyObject *synonym;
-} PrototypeDefinition;
 
 static int init(PrototypeDefinition *self, PyObject *args, PyObject *kwds)
 {

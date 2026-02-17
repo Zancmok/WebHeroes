@@ -124,7 +124,24 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         return NULL;
     }
 
+    // Make the data table
+    lua_newtable(L);  // data
+    lua_newtable(L);  // data.raw
+
     // Load prototypes
+    Py_ssize_t prototype_type_amount = PyList_Size(self->prototypes);
+    for (Py_ssize_t i = 0; i < prototype_type_amount; i++)
+    {
+        PrototypeDefinition *item = (PrototypeDefinition *)PyList_GetItem(self->prototypes, i);
+        const char* synonym = PyUnicode_AsUTF8(item->synonym);
+
+        lua_newtable(L);
+
+        lua_setfield(L, -2, synonym);
+    }
+
+    lua_setfield(L, -2, "raw");
+    lua_setglobal(L, "data");
 
     // Data stage
     for (Py_ssize_t i = 0; i < len; i++)
