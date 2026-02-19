@@ -77,6 +77,80 @@ static void dealloc(LuaSandbox *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
+{
+    PyObject *py_dict = PyDict_New();
+
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0)
+    {
+        PyObject *value = NULL;
+
+        if (lua_isnil(L, -1))
+        {
+            Py_INCREF(Py_None);
+            value = Py_None;
+        }
+        else if (lua_isboolean(L, -1))
+        { value = PyBool_FromLong(lua_toboolean(L, -1)); }
+        else if (lua_isnumber(L, -1))
+        { value = PyLong_FromLongLong((long long)lua_tointeger(L, -1)); }
+        else if (lua_isstring(L, -1))
+        {
+            size_t len;
+            const char *s = lua_tolstring(L, -1, &len);
+
+            value = PyUnicode_FromStringAndSize(s, len);
+        }
+        else if (lua_istable(L, -1))
+        { value = create_pclass(self, L); }
+        // else if (lua_isfunction(L, -1))
+        // {  }
+        else
+        {
+            Py_INCREF(Py_None);
+            value = Py_None;
+        }
+
+        PyDict_SetItemString(py_dict, lua_tostring(L, -2), value);
+        Py_DECREF(value);
+        lua_pop(L, 1);
+    }
+
+    lua_getfield(L, -1, "type");
+
+    char *type = lua_tostring(L, -1);
+    PyObject *prototype_definition = NULL;
+
+    Py_ssize_t len;
+    len = PyList_Size(self->prototypes);
+    for (Py_ssize_t i = 0; i < len; i++)
+    {
+        PrototypeDefinition *item = PyList_GetItem(self->prototypes, i);
+
+        const char *synonym_str = PyUnicode_AsUTF8(item->synonym);
+
+        if (synonym_str && strcmp(synonym_str, type) == 0)
+        {
+            prototype_definition = item->prototype_definition;
+
+            break;
+        }
+    }
+
+    PyObject *args = PyTuple_New(0);
+
+    PyObject *pclass = PyObject_Call(prototype_definition, args, py_dict);
+
+    Py_DECREF(args);
+
+    lua_pop(L, 1);
+
+    Py_XDECREF(py_dict);
+
+    return pclass;
+}
+
 static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
 {
     lua_State *L = luaL_newstate();
@@ -186,25 +260,21 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         const char* synonym = PyUnicode_AsUTF8(item->synonym);
 
         lua_getfield(L, -1, synonym);
+        if (!lua_istable(L, -1)) {
+            lua_pop(L, 1);
+            continue;
+        }
 
         size_t list_len = lua_rawlen(L, -1);
         for (size_t j = 1; j <= list_len; j++)
         {
             lua_rawgeti(L, -1, j);
-            
-            PyObject *py_dict = PyDict_New();
-            lua_pushnil(L);
 
-            while (lua_next(L, -2) != 0)
-            {
-                const char *key = lua_tostring(L, -2);
+            PyObject *new_object = create_pclass(self, L);
 
-                // Add recursive magic
+            PyList_Append(py_list, new_object);
 
-                lua_pop(L, 1);
-            }
-
-            Py_DECREF(py_dict);
+            Py_DECREF(new_object);
 
             lua_pop(L, 1);
         }
