@@ -9,64 +9,28 @@
 
 typedef struct {
     PyObject_HEAD
-    PyObject *dict; 
+    PyObject *dict;
     PyObject *prototypes;
     PyObject *mod_paths;
 } LuaSandbox;
 
 static int init(LuaSandbox *self, PyObject *args, PyObject *kwds)
 {
-    PyObject *prototypes = NULL;
-    PyObject *mod_paths = NULL;
-
+    PyObject *prototypes = NULL, *mod_paths = NULL;
     static char *kwlist[] = {"prototypes", "mod_paths", NULL};
 
     if (!PyArg_ParseTupleAndKeywords(args, kwds, "OO", kwlist, &prototypes, &mod_paths))
         return -1;
 
-    if (!PyList_Check(prototypes))
-    {
-        PyErr_SetString(PyExc_TypeError, "Prototypes must be a list");
+    if (!PyList_Check(prototypes) || !PyList_Check(mod_paths)) {
+        PyErr_SetString(PyExc_TypeError, "prototypes and mod_paths must be lists");
         return -1;
-    }
-
-    Py_ssize_t len;
-
-    len = PyList_Size(prototypes);
-    for (Py_ssize_t i = 0; i < len; i++)
-    {
-        PyObject *item = PyList_GetItem(prototypes, i);
-
-        if (!PyObject_TypeCheck(item, &PrototypeDefinition_Type))
-        {
-            PyErr_SetString(PyExc_TypeError, "All prototypes must be instances of PrototypeDefinition");
-            return -1;
-        }
-    }
-    
-    if (!PyList_Check(mod_paths))
-    {
-        PyErr_SetString(PyExc_TypeError, "mod_paths must be a list");
-        return -1;
-    }
-
-    len = PyList_Size(mod_paths);
-    for (Py_ssize_t i = 0; i < len; i++)
-    {
-        PyObject *item = PyList_GetItem(mod_paths, i);
-
-        if (!PyUnicode_Check(item))
-        {
-            PyErr_SetString(PyExc_TypeError, "All items must be strings");
-            return -1;
-        }
     }
 
     Py_INCREF(prototypes);
     Py_INCREF(mod_paths);
     self->prototypes = prototypes;
     self->mod_paths = mod_paths;
-
     return 0;
 }
 
@@ -77,75 +41,80 @@ static void dealloc(LuaSandbox *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+// --- safe recursive table to dict conversion ---
 static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
 {
-    PyObject *py_dict = PyDict_New();
-
-    lua_pushnil(L);
-    while (lua_next(L, -2) != 0)
-    {
-        PyObject *value = NULL;
-
-        if (lua_isnil(L, -1))
-        {
-            Py_INCREF(Py_None);
-            value = Py_None;
-        }
-        else if (lua_isboolean(L, -1))
-        { value = PyBool_FromLong(lua_toboolean(L, -1)); }
-        else if (lua_isnumber(L, -1))
-        { value = PyLong_FromLongLong((long long)lua_tointeger(L, -1)); }
-        else if (lua_isstring(L, -1))
-        {
-            size_t len;
-            const char *s = lua_tolstring(L, -1, &len);
-
-            value = PyUnicode_FromStringAndSize(s, len);
-        }
-        else if (lua_istable(L, -1))
-        { value = create_pclass(self, L); }
-        // else if (lua_isfunction(L, -1))
-        // {  }
-        else
-        {
-            Py_INCREF(Py_None);
-            value = Py_None;
-        }
-
-        PyDict_SetItemString(py_dict, lua_tostring(L, -2), value);
-        Py_DECREF(value);
-        lua_pop(L, 1);
+    if (!lua_istable(L, -1)) {
+        PyErr_SetString(PyExc_RuntimeError, "Expected Lua table on stack");
+        return NULL;
     }
 
-    lua_getfield(L, -1, "type");
+    PyObject *py_dict = PyDict_New();
+    if (!py_dict) return NULL;
 
-    char *type = lua_tostring(L, -1);
-    PyObject *prototype_definition = NULL;
+    lua_pushnil(L);
+    while (lua_next(L, -2) != 0) {
+        const char *key = lua_tostring(L, -2);
+        if (!key) key = "unknown_key";
 
-    Py_ssize_t len;
-    len = PyList_Size(self->prototypes);
-    for (Py_ssize_t i = 0; i < len; i++)
-    {
-        PrototypeDefinition *item = PyList_GetItem(self->prototypes, i);
-
-        const char *synonym_str = PyUnicode_AsUTF8(item->synonym);
-
-        if (synonym_str && strcmp(synonym_str, type) == 0)
+        if (strcmp(key, "type") == 0)
         {
-            prototype_definition = item->prototype_definition;
+            lua_pop(L, 1);
+            continue;
+        }
 
+        PyObject *value = NULL;
+        if (lua_isnil(L, -1)) { Py_INCREF(Py_None); value = Py_None; }
+        else if (lua_isboolean(L, -1)) value = PyBool_FromLong(lua_toboolean(L, -1));
+        else if (lua_isnumber(L, -1)) value = PyLong_FromLongLong((long long)lua_tointeger(L, -1));
+        else if (lua_isstring(L, -1)) {
+            size_t len;
+            const char *s = lua_tolstring(L, -1, &len);
+            value = PyUnicode_FromStringAndSize(s, len);
+        }
+        else if (lua_istable(L, -1)) value = create_pclass(self, L);
+        else { Py_INCREF(Py_None); value = Py_None; }
+
+        if (!value) { lua_pop(L, 1); Py_DECREF(py_dict); return NULL; }
+
+        PyDict_SetItemString(py_dict, key, value);
+        Py_DECREF(value);
+        lua_pop(L, 1); // pop value
+    }
+
+    // Get the type
+    lua_getfield(L, -1, "type");
+    const char *type = lua_tostring(L, -1);
+    if (!type) {
+        Py_DECREF(py_dict);
+        lua_pop(L, 1);
+        PyErr_SetString(PyExc_RuntimeError, "Lua table missing 'type'");
+        return NULL;
+    }
+
+    PyObject *prototype_definition = NULL;
+    Py_ssize_t proto_len = PyList_Size(self->prototypes);
+    for (Py_ssize_t i = 0; i < proto_len; i++) {
+        PrototypeDefinition *item = PyList_GetItem(self->prototypes, i);
+        const char *synonym_str = PyUnicode_AsUTF8(item->synonym);
+        if (synonym_str && strcmp(synonym_str, type) == 0) {
+            prototype_definition = item->prototype_definition;
             break;
         }
     }
 
+    if (!prototype_definition || !PyCallable_Check(prototype_definition)) {
+        Py_DECREF(py_dict);
+        lua_pop(L, 1);
+        PyErr_Format(PyExc_RuntimeError, "No callable prototype found for type '%s'", type);
+        return NULL;
+    }
+
     PyObject *args = PyTuple_New(0);
-
     PyObject *pclass = PyObject_Call(prototype_definition, args, py_dict);
-
     Py_DECREF(args);
 
-    lua_pop(L, 1);
-
+    lua_pop(L, 1); // pop type
     Py_XDECREF(py_dict);
 
     return pclass;
@@ -159,76 +128,62 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         PyErr_SetString(PyExc_RuntimeError, "Failed to create a Lua state");
         return NULL;
     }
+    luaL_openlibs(L);
 
     Py_ssize_t len = PyList_Size(self->mod_paths);
 
-    // Information stage
+    // --- Information stage: load info.lua ---
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *item = PyList_GetItem(self->mod_paths, i);
         const char* mod_name = PyUnicode_AsUTF8(item);
-
-        if (mod_name == NULL)
-        {
-            lua_close(L);
-
-            return NULL;
-        }
+        if (!mod_name) { lua_close(L); return NULL; }
 
         char filepath[512];
         snprintf(filepath, sizeof(filepath), "BaseMods/%s/info.lua", mod_name);
 
         if (luaL_loadfile(L, filepath) != 0 || lua_pcall(L, 0, 0, 0) != 0)
         {
-            const char* err = lua_tostring(L, -1);
-            PyErr_SetString(PyExc_RuntimeError, err);
-
+            PyErr_SetString(PyExc_RuntimeError, lua_tostring(L, -1));
             lua_close(L);
-
             return NULL;
         }
-    }   
+    }
 
-    // Reopen a new Lua instance
+    // --- Prepare Lua environment for data.lua ---
     lua_close(L);
     L = luaL_newstate();
-    if (!L)
-    {
-        PyErr_SetString(PyExc_RuntimeError, "Failed to create a Lua state");
-        return NULL;
-    }
+    if (!L) { PyErr_SetString(PyExc_RuntimeError, "Failed to create Lua state"); return NULL; }
     luaL_openlibs(L);
 
-    // Make the data table
-    lua_newtable(L);  // data
-    lua_newtable(L);  // data.raw
+    // Create global `data` table for Lua mods to extend
+    lua_newtable(L);
+    lua_setglobal(L, "data");
 
-    // Load prototypes
+    // --- Setup data.raw and prototype tables ---
+    lua_getglobal(L, "data");      // push data
+    lua_newtable(L);                // data.raw
+
     Py_ssize_t prototype_type_amount = PyList_Size(self->prototypes);
     for (Py_ssize_t i = 0; i < prototype_type_amount; i++)
     {
         PrototypeDefinition *item = (PrototypeDefinition *)PyList_GetItem(self->prototypes, i);
         const char* synonym = PyUnicode_AsUTF8(item->synonym);
 
-        lua_newtable(L);
+        lua_newtable(L);             // empty table for this prototype type
         lua_setfield(L, -2, synonym);
     }
 
-    lua_setfield(L, -2, "raw");
-    lua_setglobal(L, "data");
+    lua_setfield(L, -2, "raw");    // data.raw = {...}
+    lua_pop(L, 1);                 // pop data
 
-    // Data stage
+
+    // --- Load data.lua for each mod ---
     for (Py_ssize_t i = 0; i < len; i++)
     {
         PyObject *item = PyList_GetItem(self->mod_paths, i);
         const char* mod_name = PyUnicode_AsUTF8(item);
-
-        if (mod_name == NULL)
-        {
-            lua_close(L);
-
-            return NULL;
-        }
+        if (!mod_name) { lua_close(L); return NULL; }
 
         char command[512];
         snprintf(command, sizeof(command), "package.path = 'BaseMods/%s/?.lua;' .. package.path", mod_name);
@@ -239,16 +194,13 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
 
         if (luaL_loadfile(L, filepath) != 0 || lua_pcall(L, 0, 0, 0) != 0)
         {
-            const char* err = lua_tostring(L, -1);
-            PyErr_SetString(PyExc_RuntimeError, err);
-
+            PyErr_SetString(PyExc_RuntimeError, lua_tostring(L, -1));
             lua_close(L);
-
             return NULL;
         }
     }
 
-    // Return prototypes
+    // --- Convert Lua tables to Python prototypes ---
     PyObject *py_list = PyList_New(0);
 
     lua_getglobal(L, "data");
@@ -260,10 +212,7 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         const char* synonym = PyUnicode_AsUTF8(item->synonym);
 
         lua_getfield(L, -1, synonym);
-        if (!lua_istable(L, -1)) {
-            lua_pop(L, 1);
-            continue;
-        }
+        if (!lua_istable(L, -1)) { lua_pop(L, 1); continue; }
 
         size_t list_len = lua_rawlen(L, -1);
         for (size_t j = 1; j <= list_len; j++)
@@ -271,9 +220,9 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
             lua_rawgeti(L, -1, j);
 
             PyObject *new_object = create_pclass(self, L);
+            if (!new_object) { lua_close(L); Py_DECREF(py_list); return NULL; }
 
             PyList_Append(py_list, new_object);
-
             Py_DECREF(new_object);
 
             lua_pop(L, 1);
@@ -282,7 +231,7 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         lua_pop(L, 1);
     }
 
-    lua_pop(L, 2);
+    lua_pop(L, 2);  // pop raw and data
     lua_close(L);
 
     return py_list;
@@ -290,7 +239,7 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
 
 static PyMethodDef methods[] = {
     {"run", (PyCFunction)run, METH_VARARGS, ""},
-    {NULL}  // Sentinel
+    {NULL}
 };
 
 PyTypeObject LuaSandbox_Type = {

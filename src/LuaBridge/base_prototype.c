@@ -1,4 +1,5 @@
 #include <Python.h>
+#include <structmember.h>
 #include <stddef.h>
 
 typedef struct {
@@ -33,6 +34,12 @@ static void dealloc(BasePrototype *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+static PyMemberDef members[] = {
+    {"name", T_OBJECT_EX, offsetof(BasePrototype, name), 0, "prototype name"},
+    {"display_name", T_OBJECT_EX, offsetof(BasePrototype, display_name), 0, "prototype display name"},
+    {NULL}  // sentinel
+};
+
 static PyMethodDef methods[] = {
     {NULL}  // Sentinel
 };
@@ -43,6 +50,7 @@ PyTypeObject BasePrototype_Type = {
     .tp_basicsize = sizeof(BasePrototype),
     .tp_flags = Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,
     .tp_doc = "The Base Prototype",
+    .tp_members = members,
     .tp_methods = methods,
     .tp_init = (initproc)init,
     .tp_new = PyType_GenericNew,

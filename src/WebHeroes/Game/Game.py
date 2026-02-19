@@ -8,5 +8,3 @@ class Game:
             mod_paths=["core_1.0.0", "base_1.0.0"],
             prototypes=prototype_definitions
         )
-
-        print(self.lua_sandbox.run(), flush=True)
