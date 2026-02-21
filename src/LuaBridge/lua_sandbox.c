@@ -41,6 +41,8 @@ static void dealloc(LuaSandbox *self)
     Py_TYPE(self)->tp_free((PyObject *)self);
 }
 
+static char sentinel;
+
 // --- safe recursive table to dict conversion ---
 static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
 {
@@ -65,14 +67,21 @@ static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
 
         PyObject *value = NULL;
         if (lua_isnil(L, -1)) { Py_INCREF(Py_None); value = Py_None; }
+        else if (lua_islightuserdata(L, -1) && lua_touserdata(L, -1) == &sentinel) { Py_INCREF(Py_None); value = Py_None; }
         else if (lua_isboolean(L, -1)) value = PyBool_FromLong(lua_toboolean(L, -1));
         else if (lua_isnumber(L, -1)) value = PyLong_FromLongLong((long long)lua_tointeger(L, -1));
-        else if (lua_isstring(L, -1)) {
+        else if (lua_isstring(L, -1))
+        {
             size_t len;
             const char *s = lua_tolstring(L, -1, &len);
             value = PyUnicode_FromStringAndSize(s, len);
         }
-        else if (lua_istable(L, -1)) value = create_pclass(self, L);
+        else if (lua_istable(L, -1))
+        {
+            lua_pushvalue(L, -1);              // duplicate table
+            value = create_pclass(self, L);    // recurse on copy
+            lua_pop(L, 1);                     // pop duplicate
+        }
         else { Py_INCREF(Py_None); value = Py_None; }
 
         if (!value) { lua_pop(L, 1); Py_DECREF(py_dict); return NULL; }
@@ -175,6 +184,12 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
     }
 
     lua_setfield(L, -2, "raw");    // data.raw = {...}
+
+    
+    // Create SENTINEL
+    lua_pushlightuserdata(L, &sentinel);
+    lua_setfield(L, -2, "SENTINEL");
+
     lua_pop(L, 1);                 // pop data
 
 
@@ -214,21 +229,19 @@ static PyObject* run(LuaSandbox *self, PyObject *args, PyObject *kwds)
         lua_getfield(L, -1, synonym);
         if (!lua_istable(L, -1)) { lua_pop(L, 1); continue; }
 
-        size_t list_len = lua_rawlen(L, -1);
-        for (size_t j = 1; j <= list_len; j++)
+        lua_pushnil(L);
+        while (lua_next(L, -2) != 0)
         {
-            lua_rawgeti(L, -1, j);
-
             PyObject *new_object = create_pclass(self, L);
             if (!new_object) { lua_close(L); Py_DECREF(py_list); return NULL; }
 
             PyList_Append(py_list, new_object);
             Py_DECREF(new_object);
 
-            lua_pop(L, 1);
+            lua_pop(L, 1); // pop value, leave key for next iteration
         }
 
-        lua_pop(L, 1);
+        lua_pop(L, 1); // pop synonym table
     }
 
     lua_pop(L, 2);  // pop raw and data

@@ -4,8 +4,10 @@ function _G.data:extend(prototypes)
         if v.type == nil then goto continue end
         if type(v.type) ~= "string" then goto continue end
         if self.raw[v.type] == nil then goto continue end
+        if v.name == nil then goto continue end
+        if type(v.name) ~= "string" then goto continue end
 
-        table.insert(self.raw[v.type], v)
+        self.raw[v.type][v.name] = v
 
         ::continue::
     end

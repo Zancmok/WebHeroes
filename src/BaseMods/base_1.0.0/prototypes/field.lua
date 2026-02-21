@@ -1,0 +1,31 @@
+data:extend{
+    {
+        type="field",
+        name="forest",
+        display_name="Gozd",
+        resource=data.raw.resource["wood"]
+    },
+    {
+        type="field",
+        name="grass",
+        display_name="Pašnik",
+        resource=data.raw.resource["cow"]
+    },
+    {
+        type="field",
+        name="mine",
+        display_name="Rudnik",
+        resource=data.raw.resource["ore"]
+    },
+    {
+        type="field",
+        name="field",
+        display_name="Polje",
+        resource=data.raw.resource["buckwheat"]
+    },
+    {
+        type="field",
+        name="dessert",
+        display_name="Puščava"
+    }
+}

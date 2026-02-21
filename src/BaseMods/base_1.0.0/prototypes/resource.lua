@@ -2,26 +2,26 @@ data:extend{
     {
         type="resource",
         name="wood",
-        display_name="Wood"
+        display_name="Les"
     },
     {
         type="resource",
         name="ore",
-        display_name="Ore"
+        display_name="Ruda"
     },
     {
         type="resource",
         name="cow",
-        display_name="Cow"
+        display_name="Krava"
     },
     {
         type="resource",
         name="buckwheat",
-        display_name="Buckwheat"
+        display_name="Ajda"
     },
     {
         type="resource",
         name="victory-point",
-        display_name="Victory Point"
+        display_name="Zmagovalna točka"
     }
 }

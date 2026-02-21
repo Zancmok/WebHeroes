@@ -1,12 +1,15 @@
 from LuaBridge import PrototypeDefinition
 
-from Prototype.Resource import Resource
+from Prototype.ResourceType import ResourceType
+from Prototype.FieldType import FieldType
 
 prototype_definitions: list[PrototypeDefinition] = [
-    PrototypeDefinition(Resource, "resource"),
+    PrototypeDefinition(ResourceType, "resource"),
+    PrototypeDefinition(FieldType, "field"),
 ]
 
 __all__ = [
     "prototype_definitions",
-    "Resource",
+    "ResourceType",
+    "FieldType",
 ]
