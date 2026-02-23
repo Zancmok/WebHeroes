@@ -23,9 +23,7 @@ function comparePasswords() {
 signupPassword.addEventListener("input", comparePasswords);
 confirmPassword.addEventListener("input", comparePasswords);
 
-/* ============================================================
-   SIGN UP
-   ============================================================ */
+// SIGN UP
 async function signupPress(event) {
     event.preventDefault();
 
@@ -72,9 +70,7 @@ async function signupPress(event) {
 
 form.addEventListener("submit", signupPress);
 
-/* ============================================================
-   LOGIN
-   ============================================================ */
+// LOGIN
 async function loginPress(event) {
     event.preventDefault();
 

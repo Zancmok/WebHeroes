@@ -1,6 +1,5 @@
-/* ============================================================
-   1. HEX GRID CANVAS — animated Catan-style board in background
-   ============================================================ */
+
+// HEX GRID CANVAS — animated Catan-style board in background
 (function () {
   const canvas = document.getElementById('hexCanvas');
   const ctx = canvas.getContext('2d');
@@ -103,9 +102,9 @@
   animate();
 })();
 
-/* ============================================================
-   2. FLOATING RESOURCE ICONS
-   ============================================================ */
+
+// FLOATING RESOURCE ICONS
+
 (function () {
   const resources = ['🌲', '🌾', '🐑', '🧱', '⛰️', '🌊', '⚓', '⚒'];
   function spawnResource() {
@@ -125,9 +124,7 @@
   for (let i = 0; i < 6; i++) setTimeout(spawnResource, i * 300);
 })();
 
-/* ============================================================
-   3. MOUSE TRAIL — golden road dots
-   ============================================================ */
+// MOUSE TRAIL — golden road dots
 (function () {
   let last = 0;
   document.addEventListener('mousemove', e => {
@@ -143,9 +140,8 @@
   });
 })();
 
-/* ============================================================
-   4. TAB ANIMATION — staggered form items appear
-   ============================================================ */
+
+// TAB ANIMATION — staggered form items appear
 function revealFormItems(paneId) {
   const pane  = document.getElementById(paneId);
   const items = pane.querySelectorAll('.form-item');
@@ -161,9 +157,7 @@ function revealFormItems(paneId) {
   });
 }
 
-/* ============================================================
-   5. DICE ROLL — exposed globally so login.js can call it
-   ============================================================ */
+// DICE ROLL — exposed globally so login.js can call it
 const DICE_FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
 function rollDice(callback) {
@@ -187,29 +181,9 @@ function rollDice(callback) {
   }, 120);
 }
 
-/* ============================================================
-   6. CARD TILT ON HOVER
-   ============================================================ */
-function initCardTilt() {
-  const card = document.querySelector('.card');
-  card.addEventListener('mousemove', function (e) {
-    const rect = this.getBoundingClientRect();
-    const x = (e.clientX - rect.left) / rect.width  - 0.5;
-    const y = (e.clientY - rect.top)  / rect.height - 0.5;
-    this.style.transform = `perspective(800px) rotateY(${x * 5}deg) rotateX(${-y * 5}deg)`;
-  });
-  card.addEventListener('mouseleave', function () {
-    this.style.transition = 'transform 0.5s ease';
-    this.style.transform  = 'perspective(800px) rotateY(0deg) rotateX(0deg)';
-  });
-}
-
-/* ============================================================
-   7. INIT ON DOM READY
-   ============================================================ */
+// 6. INIT ON DOM READY
 document.addEventListener('DOMContentLoaded', () => {
   revealFormItems('signup');
-  initCardTilt();
 
   document.querySelectorAll('.nav-link').forEach(tab => {
     tab.addEventListener('shown.bs.tab', function (e) {
