@@ -1,0 +1,34 @@
+data:extend{
+    {
+        type="player-color",
+        name="red",
+        display_name="Red",
+        r=255,
+        g=0,
+        b=0
+    },
+    {
+        type="player-color",
+        name="blue",
+        display_name="Blue",
+        r=0,
+        g=255,
+        b=0
+    },
+    {
+        type="player-color",
+        name="yellow",
+        display_name="Yellow",
+        r=255,
+        g=255,
+        b=0
+    },
+    {
+        type="player-color",
+        name="white",
+        display_name="White",
+        r=255,
+        g=255,
+        b=255
+    },
+}

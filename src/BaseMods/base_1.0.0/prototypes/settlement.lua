@@ -1,0 +1,16 @@
+data:extend{
+    {
+        type="settlement",
+        name="village",
+        display_name="Village",
+        point_value=1,
+        resource_multiplier=1
+    },
+    {
+        type="settlement",
+        name="city",
+        display_name="City",
+        point_value=2,
+        resource_multiplier=2
+    }
+}

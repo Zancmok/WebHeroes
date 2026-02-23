@@ -2,30 +2,36 @@ data:extend{
     {
         type="field",
         name="forest",
-        display_name="Gozd",
+        display_name="Forest",
         resource=data.raw.resource["wood"]
     },
     {
         type="field",
-        name="grass",
-        display_name="Pašnik",
+        name="grass-field",
+        display_name="Grass Field",
         resource=data.raw.resource["cow"]
     },
     {
         type="field",
-        name="mine",
-        display_name="Rudnik",
+        name="mountain",
+        display_name="Mountain",
         resource=data.raw.resource["ore"]
     },
     {
         type="field",
+        name="mine",
+        display_name="Mine",
+        resource=data.raw.resource["brick"]
+    },
+    {
+        type="field",
         name="field",
-        display_name="Polje",
+        display_name="Field",
         resource=data.raw.resource["buckwheat"]
     },
     {
         type="field",
-        name="dessert",
-        display_name="Puščava"
+        name="desert",
+        display_name="Desert"
     }
 }
