@@ -1,5 +1,8 @@
-from LuaBridge import LuaSandbox
-from Prototype import prototype_definitions, FieldType
+from typing import Optional
+
+from LuaBridge import LuaSandbox, BasePrototype
+from Prototype import prototype_definitions, FieldType, SettingsType
+from .Map import Map
 
 
 class Game:
@@ -9,4 +12,27 @@ class Game:
             prototypes=prototype_definitions
         )
 
-        self.lua_sandbox.run()
+        self.running: bool = False
+
+        print("Cyka", flush=True)
+
+        self.run()
+
+    def run(self) -> None:
+        if self.running:
+            raise Exception("Game already running!")
+
+        self.running = True
+
+        prototypes: list[BasePrototype] = self.lua_sandbox.run()
+        settings: Optional[SettingsType] = None
+
+        fields: list[FieldType] = []
+        for prototype in prototypes:
+            if isinstance(prototype, SettingsType):
+                settings = prototype
+
+            if isinstance(prototype, FieldType):
+                fields.append(prototype)
+
+        game_map: Map = Map(fields, settings)

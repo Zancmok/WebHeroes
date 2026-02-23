@@ -112,3 +112,9 @@ class LobbyManagement(StaticClass):
                     return
 
                 break
+
+    @staticmethod
+    @socket_blueprint.on("start-game")
+    @FlaskUtil.verify_socket_arguments(socket_blueprint)
+    def start_game() -> None:
+        ...
