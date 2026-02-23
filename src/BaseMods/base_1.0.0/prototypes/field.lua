@@ -3,35 +3,41 @@ data:extend{
         type="field",
         name="forest",
         display_name="Forest",
-        resource=data.raw.resource["wood"]
+        resource=data.raw.resource["wood"],
+        sprite="__base__/graphics/field/forest.png"
     },
     {
         type="field",
         name="grass-field",
         display_name="Grass Field",
-        resource=data.raw.resource["cow"]
+        resource=data.raw.resource["cow"],
+        sprite="__base__/graphics/field/grass-field.png"
     },
     {
         type="field",
         name="mountain",
         display_name="Mountain",
-        resource=data.raw.resource["ore"]
+        resource=data.raw.resource["ore"],
+        sprite="__base__/graphics/field/mountain.png"
     },
     {
         type="field",
         name="mine",
         display_name="Mine",
-        resource=data.raw.resource["brick"]
+        resource=data.raw.resource["brick"],
+        sprite="__base__/graphics/field/mine.png"
     },
     {
         type="field",
         name="field",
         display_name="Field",
-        resource=data.raw.resource["buckwheat"]
+        resource=data.raw.resource["buckwheat"],
+        sprite="__base__/graphics/field/field.png"
     },
     {
         type="field",
         name="desert",
-        display_name="Desert"
+        display_name="Desert",
+        sprite="__base__/graphics/field/desert.png"
     }
 }

@@ -17,4 +17,5 @@ __all__ = [
     "ResourceType",
     "FieldType",
     "SettlementType",
+    "PlayerColorType",
 ]
