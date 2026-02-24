@@ -11,25 +11,29 @@ class Map:
 
         tile_amount: int = settings_type.map_size + 2 * sum(range(3, settings_type.map_size))
 
-        fields: list[FieldType] = []
+        fields_types: list[FieldType] = []
         field_ranges: dict[range, FieldType] = {}
 
         total_weight: int = 0
         for field_type in field_types:
             for _ in range(field_type.minimum_amount):
-                fields.append(field_type)
+                fields_types.append(field_type)
 
             field_ranges[range(total_weight, total_weight + field_type.weight)] = field_type
             total_weight += field_type.weight
 
-        for _ in range(len(fields), tile_amount):
+        for _ in range(len(fields_types), tile_amount):
             random_num: int = random.randint(0, total_weight - 1)
 
             for v in field_ranges:
                 if random_num in v:
-                    fields.append(field_ranges[v])
+                    fields_types.append(field_ranges[v])
                     break
 
-        random.shuffle(fields)
+        random.shuffle(fields_types)
 
-        self.initial_field = Field(fields[0])
+        fields: list[Field] = []
+        for field_type in fields_types:
+            fields.append(Field(field_type))
+
+        self.initial_field = fields[0]
