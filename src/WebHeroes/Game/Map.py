@@ -16,7 +16,7 @@ class Map:
 
         total_weight: int = 0
         for field_type in field_types:
-            for i in range(field_type.minimum_amount):
+            for _ in range(field_type.minimum_amount):
                 fields.append(field_type)
 
             field_ranges[range(total_weight, total_weight + field_type.weight)] = field_type

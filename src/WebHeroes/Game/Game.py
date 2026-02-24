@@ -14,10 +14,6 @@ class Game:
 
         self.running: bool = False
 
-        print("Cyka", flush=True)
-
-        self.run()
-
     def run(self) -> None:
         if self.running:
             raise Exception("Game already running!")
