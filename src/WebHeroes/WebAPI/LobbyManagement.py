@@ -13,6 +13,7 @@ from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
+from Game.Game import Game
 
 from WebHeroes.UserManagement.UserSession import UserSession
 from ZancmokLib.FlaskUtil import FlaskUtil
@@ -115,6 +116,7 @@ class LobbyManagement(StaticClass):
 
     @staticmethod
     @socket_blueprint.on("start-game")
-    @FlaskUtil.verify_socket_arguments(socket_blueprint)
     def start_game() -> None:
-        ...
+        # TODO: Add safety
+
+        Game().run()

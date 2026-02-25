@@ -74,6 +74,6 @@
   });
 
   startBtn.addEventListener("click", () => {
-    alert("Start pressed (hook up your start-game logic here).");
+    socket.emit("lobby-management:start-game");
   });
 })();
