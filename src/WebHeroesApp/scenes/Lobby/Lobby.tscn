@@ -1,0 +1,88 @@
+[gd_scene load_steps=4 format=3 uid="uid://1ajpqc57yl8q"]
+
+[ext_resource type="Script" uid="uid://csn6jfnoms7h" path="res://scenes/Lobby/MarginContainerPlayersOnline.cs" id="1_lqr06"]
+[ext_resource type="Script" uid="uid://cq7q2bpumtc0a" path="res://scenes/Lobby/MarginContainerButton.cs" id="1_lychb"]
+[ext_resource type="Script" uid="uid://dvcq0eq5vf0ls" path="res://scenes/Lobby/MarginContainerButton2.cs" id="2_v72lb"]
+
+[node name="lobby" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="BoxContainer" type="BoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="BoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 0
+
+[node name="MarginContainerButton" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 2
+script = ExtResource("1_lychb")
+
+[node name="Button" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton"]
+layout_mode = 2
+size_flags_horizontal = 2
+text = "CREATE NEW GAME
+"
+
+[node name="MarginContainerButton2" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
+layout_mode = 2
+script = ExtResource("2_v72lb")
+
+[node name="Button2" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton2"]
+layout_mode = 2
+size_flags_horizontal = 10
+text = "BACK"
+
+[node name="HBoxContainer3" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+
+[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "HOST NAME"
+
+[node name="Label2" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "JOIN"
+
+[node name="Label3" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "GAME DISCRIPTION	"
+
+[node name="Label4" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "PLAYERS"
+
+[node name="MarginContainer_PlayersOnline" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+script = ExtResource("1_lqr06")
+
+[node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline"]
+layout_mode = 2
+
+[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline/HBoxContainer"]
+layout_mode = 2
+text = "PLAYERS ONLINE"
