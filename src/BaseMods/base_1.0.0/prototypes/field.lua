@@ -1,3 +1,8 @@
+local outer_bound = data.raw.field["outer-bound"]
+
+outer_bound.display_name = "Deep Sea"
+outer_bound.sprite = "__base__/graphics/field/sea.png"
+
 data:extend{
     {
         type="field",

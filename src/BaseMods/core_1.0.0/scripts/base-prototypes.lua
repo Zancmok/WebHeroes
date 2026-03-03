@@ -1,0 +1,16 @@
+data:extend{
+    {
+        type="settings-type",
+        name="settings",
+        display_name="Settings",
+        map_size=5
+    },
+    {
+        type="field",
+        name="outer-bound",
+        display_name="outer-bound",
+        sprite="__core__/graphics/empty.png",
+        weight=0,
+        minimum_amount=0
+    },
+}
