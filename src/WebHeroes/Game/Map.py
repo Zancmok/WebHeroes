@@ -58,6 +58,15 @@ class Map:
 
         return fields
 
+    @staticmethod
+    def _to_axial(col: int, row: int) -> tuple[int, int]:
+        #  row & 1 == row % 2 but works with negative numbers
+        parity: int = row & 1
+        q: int = col - (row - parity) // 2
+        r: int = row
+
+        return q, r
+
     def __init__(self, field_types: list[FieldType], settings_type: SettingsType) -> None:
         self.initial_field: Field
         self._field_references: dict[Field, FieldReference] = {}
@@ -84,39 +93,54 @@ class Map:
         # Generate map
 
         # Top row
-        for _ in range(DEEP_SEA_BORDER_SIZE):
+        for row in range(DEEP_SEA_BORDER_SIZE):
             new_row: list[Field] = []
 
-            for _ in range(outer_map_width):
-                new_row.append(Field(self.outer_bound_field_type))
+            for col in range(outer_map_width):
+                new_row.append(Field(
+                    *Map._to_axial(col, row),
+                    field_type=self.outer_bound_field_type
+                ))
 
             self.fields.append(new_row)
 
         # Middle row
         actual_tiles_appended: int = 0
-        for i in range(inner_map_height):
+        for row in range(inner_map_height):
             new_row: list[Field] = []
 
-            sea_tiles_in_row: int = abs(i - inner_map_height // 2)
+            sea_tiles_in_row: int = abs(row - inner_map_height // 2)
 
-            for _ in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2)):
-                new_row.append(Field(self.outer_bound_field_type))
+            for col in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2)):
+                new_row.append(Field(
+                    *Map._to_axial(col, row),
+                    field_type=self.outer_bound_field_type
+                ))
 
-            for _ in range(inner_map_width - sea_tiles_in_row):
-                new_row.append(Field(map_tiles[actual_tiles_appended]))
+            for col in range(inner_map_width - sea_tiles_in_row):
+                new_row.append(Field(
+                    *Map._to_axial(col + sea_tiles_in_row // 2, row),
+                    field_type=map_tiles[actual_tiles_appended]
+                ))
 
                 actual_tiles_appended += 1
 
-            for _ in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2) + (sea_tiles_in_row % 2)):
-                new_row.append(Field(self.outer_bound_field_type))
+            for col in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2) + (sea_tiles_in_row % 2)):
+                new_row.append(Field(
+                    *Map._to_axial(col + inner_map_width - sea_tiles_in_row // 2, row),
+                    field_type=self.outer_bound_field_type
+                ))
 
             self.fields.append(new_row)
 
         # Bottom row
-        for _ in range(DEEP_SEA_BORDER_SIZE):
+        for row in range(DEEP_SEA_BORDER_SIZE):
             new_row: list[Field] = []
 
-            for _ in range(outer_map_width):
-                new_row.append(Field(self.outer_bound_field_type))
-
+            for col in range(outer_map_width):
+                new_row.append(Field(
+                    *Map._to_axial(col, row),
+                    field_type=self.outer_bound_field_type
+                ))
+            
             self.fields.append(new_row)
