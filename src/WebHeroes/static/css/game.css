@@ -1,0 +1,124 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap');
+
+:root {
+--ocean: #1a3a5c;
+--ocean-deep: #0d2035;
+--sand: #f0d9a0;
+--ink: #1c1008;
+--parchment: #f5ead0;
+--gold: #c9933a;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+background: var(--ocean-deep);
+background-image:
+    radial-gradient(ellipse at 20% 50%, rgba(26,58,92,0.8) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 20%, rgba(13,32,53,0.9) 0%, transparent 50%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+min-height: 100vh;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+font-family: 'Crimson Pro', serif;
+padding: 2rem;
+overflow: hidden;
+}
+
+h1 {
+font-family: 'Cinzel', serif;
+color: var(--gold);
+font-size: clamp(1.4rem, 3vw, 2.2rem);
+letter-spacing: 0.3em;
+text-transform: uppercase;
+margin-bottom: 1.5rem;
+text-shadow: 0 0 40px rgba(201,147,58,0.4);
+}
+
+#board-container {
+position: relative;
+}
+
+#board-svg {
+filter: drop-shadow(0 20px 60px rgba(0,0,0,0.7));
+max-width: 90vw;
+max-height: 80vh;
+}
+
+.hex-cell {
+cursor: pointer;
+transition: filter 0.15s ease;
+}
+.hex-cell:hover polygon {
+filter: brightness(1.25);
+}
+
+.hex-outer polygon {
+opacity: 0.35;
+}
+
+.controls {
+margin-top: 1.5rem;
+display: flex;
+gap: 1rem;
+flex-wrap: wrap;
+justify-content: center;
+}
+
+button {
+font-family: 'Cinzel', serif;
+font-size: 0.75rem;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+background: transparent;
+border: 1px solid var(--gold);
+color: var(--gold);
+padding: 0.5rem 1.4rem;
+cursor: pointer;
+transition: all 0.2s ease;
+}
+button:hover {
+background: var(--gold);
+color: var(--ocean-deep);
+}
+
+#legend {
+margin-top: 1.2rem;
+display: flex;
+flex-wrap: wrap;
+gap: 0.6rem 1.4rem;
+justify-content: center;
+max-width: 700px;
+}
+
+.legend-item {
+display: flex;
+align-items: center;
+gap: 0.4rem;
+color: var(--sand);
+font-size: 0.9rem;
+opacity: 0.85;
+}
+.legend-swatch {
+width: 14px;
+height: 14px;
+border-radius: 2px;
+border: 1px solid rgba(255,255,255,0.2);
+}
+
+.tooltip {
+position: fixed;
+background: rgba(13,32,53,0.95);
+border: 1px solid var(--gold);
+color: var(--sand);
+font-size: 0.85rem;
+padding: 0.4rem 0.8rem;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.15s;
+white-space: nowrap;
+z-index: 100;
+}
+.tooltip.visible { opacity: 1; }

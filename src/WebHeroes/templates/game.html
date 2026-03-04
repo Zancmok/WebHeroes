@@ -3,9 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Catan</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/game.css" />
 </head>
 <body>
+    <h1>Catan Board</h1>
+    <div id="board-container">
+    <svg id="board-svg"></svg>
+    </div>
+    <div class="controls">
+    <button id="btn-regenerate">↺ Regenerate</button>
+    <button id="btn-toggle-numbers">Toggle Numbers</button>
+    <button id="btn-toggle-outer">Toggle Ocean</button>
+    </div>
+    <div id="legend"></div>
+    <div class="tooltip" id="tooltip"></div>
     
 
     <script src="../static/js/game.js"></script>
