@@ -78,7 +78,7 @@ class Map:
             if field.name == "outer-bound":
                 self.outer_bound_field_type = field
 
-        self.fields: list[list[Field]] = []
+        self.field_map: list[list[Field]] = []
 
         # map_size ** 2 - 6 = map_size + 2 * sum(from i = 3 to i = map_size - 1 : i)
         map_tiles: list[FieldType] = self._generate_tile_distribution(field_types, settings_type.map_size ** 2 - 6)
@@ -102,7 +102,7 @@ class Map:
                     field_type=self.outer_bound_field_type
                 ))
 
-            self.fields.append(new_row)
+            self.field_map.append(new_row)
 
         # Middle row
         actual_tiles_appended: int = 0
@@ -131,7 +131,7 @@ class Map:
                     field_type=self.outer_bound_field_type
                 ))
 
-            self.fields.append(new_row)
+            self.field_map.append(new_row)
 
         # Bottom row
         for row in range(DEEP_SEA_BORDER_SIZE):
@@ -143,4 +143,19 @@ class Map:
                     field_type=self.outer_bound_field_type
                 ))
             
-            self.fields.append(new_row)
+            self.field_map.append(new_row)
+
+        self.fields: dict[tuple[int, int], Field] = {}
+        for row in self.field_map:
+            for field in row:
+                self.fields[(field.q, field.r)] = field
+
+        # Calculate neighbours
+        axial_direction_vectors: list[tuple[int, int]] = [
+            (+1, 0), (+1, -1), (0, -1),
+            (-1, 0), (-1, +1), (0, +1)
+        ]
+
+        for field_cords in self.fields:
+            for direction_vector in axial_direction_vectors:
+                directed_field: Field = self.fields[(field_cords[0] + direction_vector[0], field_cords[1] + direction_vector[1])]
