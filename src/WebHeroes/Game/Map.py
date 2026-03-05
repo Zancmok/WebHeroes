@@ -5,28 +5,6 @@ from .Field import Field
 from .Intersection import Intersection
 from .Connection import Connection
 
-type FieldReference = tuple[
-    Intersection,
-    Intersection,
-    Intersection,
-    Intersection,
-    Intersection,
-    Intersection
-]
-
-type IntersectionReference = tuple[
-    tuple[Field],
-    tuple[Connection, Connection]
-] | tuple[
-    tuple[Field, Field] | tuple[Field, Field, Field],
-    tuple[Connection, Connection, Connection]
-]
-
-type ConnectionReference = tuple[
-    Intersection,
-    Intersection
-]
-
 
 class Map:
     def _generate_tile_distribution(self, field_types: list[FieldType], actual_field_count: int) -> list[FieldType]:
@@ -69,9 +47,6 @@ class Map:
 
     def __init__(self, field_types: list[FieldType], settings_type: SettingsType) -> None:
         self.initial_field: Field
-        self._field_references: dict[Field, FieldReference] = {}
-        self._intersection_references: dict[Intersection, IntersectionReference] = {}
-        self._connection_references: dict[Connection, ConnectionReference] = {}
 
         self.outer_bound_field_type: FieldType
         for field in field_types:
@@ -111,23 +86,23 @@ class Map:
 
             sea_tiles_in_row: int = abs(row - inner_map_height // 2)
 
-            for col in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2)):
+            for _ in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2)):
                 new_row.append(Field(
-                    *Map._to_axial(col, row),
+                    *Map._to_axial(len(new_row), row + DEEP_SEA_BORDER_SIZE),
                     field_type=self.outer_bound_field_type
                 ))
 
-            for col in range(inner_map_width - sea_tiles_in_row):
+            for _ in range(inner_map_width - sea_tiles_in_row):
                 new_row.append(Field(
-                    *Map._to_axial(col + sea_tiles_in_row // 2, row),
+                    *Map._to_axial(len(new_row), row + DEEP_SEA_BORDER_SIZE),
                     field_type=map_tiles[actual_tiles_appended]
                 ))
 
                 actual_tiles_appended += 1
 
-            for col in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2) + (sea_tiles_in_row % 2)):
+            for _ in range((DEEP_SEA_BORDER_SIZE // 2) + (sea_tiles_in_row // 2) + (sea_tiles_in_row % 2)):
                 new_row.append(Field(
-                    *Map._to_axial(col + inner_map_width - sea_tiles_in_row // 2, row),
+                    *Map._to_axial(len(new_row), row + DEEP_SEA_BORDER_SIZE),
                     field_type=self.outer_bound_field_type
                 ))
 
@@ -139,7 +114,7 @@ class Map:
 
             for col in range(outer_map_width):
                 new_row.append(Field(
-                    *Map._to_axial(col, row),
+                    *Map._to_axial(col, row + DEEP_SEA_BORDER_SIZE + inner_map_height),
                     field_type=self.outer_bound_field_type
                 ))
             
@@ -150,12 +125,49 @@ class Map:
             for field in row:
                 self.fields[(field.q, field.r)] = field
 
-        # Calculate neighbours
+        # Calculate neighbours + connections
         axial_direction_vectors: list[tuple[int, int]] = [
             (+1, 0), (+1, -1), (0, -1),
             (-1, 0), (-1, +1), (0, +1)
         ]
 
+        self.intersections: dict[frozenset[tuple[int, int]], Intersection] = {}
+        self.connections: dict[frozenset[tuple[int, int]], Connection] = {}
         for field_cords in self.fields:
+            first_field: Optional[Field] = None
+            previous_field: Optional[Field] = None
             for direction_vector in axial_direction_vectors:
-                directed_field: Field = self.fields[(field_cords[0] + direction_vector[0], field_cords[1] + direction_vector[1])]
+                directed_field: Optional[Field] = self.fields.get((field_cords[0] + direction_vector[0], field_cords[1] + direction_vector[1]))
+
+                if not directed_field:
+                    continue
+
+                new_connection_set: frozenset[tuple[int, int]] = frozenset({
+                    field_cords,
+                    (directed_field.q, directed_field.r)
+                })
+                if new_connection_set not in self.connections:
+                    self.connections[new_connection_set] = Connection()
+
+                if previous_field:
+                    new_set: frozenset[tuple[int, int]] = frozenset({
+                        field_cords,
+                        (directed_field.q, directed_field.r),
+                        (previous_field.q, previous_field.r)
+                    })
+
+                    if new_set not in self.intersections:
+                        self.intersections[new_set] = Intersection()
+                else:
+                    first_field = directed_field
+
+                previous_field = directed_field
+
+            new_set: frozenset[tuple[int, int]] = frozenset({
+                field_cords,
+                (first_field.q, first_field.r),
+                (previous_field.q, previous_field.r)
+            })
+
+            if new_set not in self.intersections:
+                self.intersections[new_set] = Intersection()
