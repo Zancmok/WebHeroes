@@ -44,9 +44,7 @@
   }
 
   socket.on("connect", () => {
-    // Make sure the server session joins the lobby
     socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
-
     requestRefresh();
     setInterval(requestRefresh, 2000);
   });
@@ -63,11 +61,7 @@
       return;
     }
 
-    // We don't have owner name directly in refresh, only owner_id.
-    // But we do have members list with names; owner is usually included in members.
-    // So we guess owner name by matching owner_id to members.
     const ownerMember = (lobby.members || []).find(m => m.member_id === lobby.owner_id);
-
     lobbyOwnerEl.textContent = ownerMember ? ownerMember.member_name : "Owner (ID: " + lobby.owner_id + ")";
     renderPlayers(lobby.members || []);
     setStatus("");
@@ -76,9 +70,10 @@
   startBtn.addEventListener("click", () => {
     socket.emit("lobby-management:start-game");
 
-    socket.on("game-management:get-game-data", (data) => {
-      console.log(data);
-    })
+    // Wait for confirmation that game data is ready, then navigate
+    socket.once("game-management:get-game-data", () => {
+      window.location.assign("/game/");
+    });
 
     socket.emit("game-management:get-game-data");
   });
