@@ -75,6 +75,11 @@
 
   startBtn.addEventListener("click", () => {
     socket.emit("lobby-management:start-game");
-    window.location.href = "/game/";
+
+    socket.on("game-management:get-game-data", (data) => {
+      console.log(data);
+    })
+
+    socket.emit("game-management:get-game-data");
   });
 })();

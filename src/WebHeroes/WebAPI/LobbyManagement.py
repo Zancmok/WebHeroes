@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, Optional
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.Errors.AlreadyOwningLobbyError import AlreadyOwningLobbyError
@@ -13,7 +13,6 @@ from WebHeroes.Responses.DataModels.LobbyModel import LobbyModel
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from Leek.Repositories.UserRepository import UserRepository
 from flask import Blueprint, Response
-from Game.Game import Game
 
 from WebHeroes.UserManagement.UserSession import UserSession
 from ZancmokLib.FlaskUtil import FlaskUtil
@@ -119,4 +118,11 @@ class LobbyManagement(StaticClass):
     def start_game() -> None:
         # TODO: Add safety
 
-        Game().run()
+        user_session: Optional[UserSession] = SessionManager.get_user_session()
+        if not user_session:
+            return
+        user_session: UserSession
+
+        lobby: OwnedLobby = user_session.get_lobby()
+
+        lobby.game.run()

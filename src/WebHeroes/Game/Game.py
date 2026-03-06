@@ -13,6 +13,7 @@ class Game:
         )
 
         self.running: bool = False
+        self.game_map: Optional[Map] = None
 
     def run(self) -> None:
         if self.running:
@@ -31,4 +32,4 @@ class Game:
             if isinstance(prototype, FieldType):
                 fields.append(prototype)
 
-        game_map: Map = Map(fields, settings)
+        self.game_map = Map(fields, settings)

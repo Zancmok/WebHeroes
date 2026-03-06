@@ -43,6 +43,9 @@ def dictify(data: BaseDataModel) -> dict:
         elif isinstance(attribute_value, list):
             for i, v in enumerate(attribute_value):
                 attribute_value[i] = dictify(v)
+        elif isinstance(attribute_value, dict):
+            for k, v in attribute_value.items():
+                attribute_value[k] = dictify(v)
 
         out[attribute] = attribute_value
 
