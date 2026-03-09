@@ -1,31 +1,39 @@
 (function () {
   // ─── Colour & label config ───────────────────────────────────────────────────
   const FIELD_STYLES = {
-    "forest":     { fill: "#2d5a1b", label: "Forest",    resource: "Lumber" },
-    "hill":       { fill: "#8b3a0f", label: "Hills",     resource: "Brick"  },
-    "pasture":    { fill: "#7ec850", label: "Pasture",   resource: "Wool"   },
-    "field":      { fill: "#d4b84a", label: "Fields",    resource: "Grain"  },
-    "mountain":   { fill: "#6b6b6b", label: "Mountains", resource: "Ore"    },
-    "desert":     { fill: "#c9b07a", label: "Desert",    resource: null     },
-    "outer-bound":{ fill: "#1a3a5c", label: "Ocean",     resource: null     },
+    "forest":      { fill: "#2d5a1b", label: "Forest",    resource: "Lumber" },
+    "hill":        { fill: "#8b3a0f", label: "Hills",     resource: "Brick"  },
+    "pasture":     { fill: "#7ec850", label: "Pasture",   resource: "Wool"   },
+    "field":       { fill: "#d4b84a", label: "Fields",    resource: "Grain"  },
+    "mountain":    { fill: "#6b6b6b", label: "Mountains", resource: "Ore"    },
+    "desert":      { fill: "#c9b07a", label: "Desert",    resource: null     },
+    "outer-bound": { fill: "#1a3a5c", label: "Ocean",     resource: null     },
+    "outer_bound": { fill: "#1a3a5c", label: "Ocean",     resource: null     },
   };
+
+  // Base URL where your Flask /img/<mod_id>/<image_id> endpoint is served.
+  const IMG_BASE = "/game-management/img/base/images/field/";
 
   const NUMBER_COLORS = { 6: "#e05c2e", 8: "#e05c2e" };
   const HEX_SIZE = 48;
 
-  // Pointy-top hex math — matches Python odd-r offset -> axial
+  // Pointy-top hex math
   function hexToPixel(q, r) {
     const x = HEX_SIZE * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r);
     const y = HEX_SIZE * (3 / 2 * r);
     return { x, y };
   }
 
-  function hexCorners(cx, cy, size) {
+  function hexCornerPoints(cx, cy, size) {
     const pts = [];
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 180) * (60 * i + 30); // +30 = pointy-top
+      const angle = (Math.PI / 180) * (60 * i + 30); // pointy-top
       pts.push([cx + size * Math.cos(angle), cy + size * Math.sin(angle)]);
     }
+    return pts;
+  }
+
+  function pointsAttr(pts) {
     return pts.map(([x, y]) => `${x},${y}`).join(" ");
   }
 
@@ -33,6 +41,18 @@
     const el = document.createElementNS("http://www.w3.org/2000/svg", tag);
     for (const [k, v] of Object.entries(attrs)) el.setAttribute(k, v);
     return el;
+  }
+
+  // Resolve sprite: strip any leading path from the backend sprite value so we
+  // only keep the filename (e.g. "__base__/graphics/field/sea.png" → "sea.png").
+  // Falls back to "sea.png" for outer-bound tiles if sprite is missing.
+  function resolveSprite(field) {
+    if (field.sprite) {
+      return field.sprite.split("/").pop();
+    }
+    const normType = (field.field_type || "").replace("_", "-");
+    if (normType === "outer-bound") return "sea.png";
+    return null;
   }
 
   const svg     = document.getElementById("board-svg");
@@ -56,23 +76,21 @@
 
     const fields = data.map.fields;
     const keys   = Object.keys(fields);
-    console.log(`[game.js] ${keys.length} fields. First 3 keys (JSON):`, keys.slice(0,3).map(k => JSON.stringify(k)));
+    console.log(`[game.js] ${keys.length} fields. First 3:`, keys.slice(0, 3).map(k => JSON.stringify(k)));
 
     const parsed = [];
     for (const [key, field] of Object.entries(fields)) {
-      // Keys arrive double-serialized with surrounding quotes: '"0\u00000"'
-      // Strip the extra quotes first, then split on the null byte
       const cleanKey = key.replace(/^"|"$/g, "");
       let parts = cleanKey.split("\u0000");
       if (parts.length !== 2) parts = cleanKey.split("\x00");
       if (parts.length !== 2) {
-        console.warn("[game.js] Unexpected key format:", JSON.stringify(key), "cleaned:", JSON.stringify(cleanKey));
+        console.warn("[game.js] Unexpected key format:", JSON.stringify(key));
         continue;
       }
       const q = Number(parts[0]);
       const r = Number(parts[1]);
       if (isNaN(q) || isNaN(r)) {
-        console.warn("[game.js] NaN coords for key:", JSON.stringify(key), "->", parts);
+        console.warn("[game.js] NaN coords:", JSON.stringify(key));
         continue;
       }
       const { x, y } = hexToPixel(q, r);
@@ -80,10 +98,7 @@
     }
 
     console.log(`[game.js] ${parsed.length} hexes parsed.`);
-    if (parsed.length === 0) {
-      console.error("[game.js] 0 hexes — nothing to render. Check key format above.");
-      return;
-    }
+    if (parsed.length === 0) return;
 
     // Bounding box
     let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
@@ -94,62 +109,102 @@
       maxY = Math.max(maxY, y + HEX_SIZE);
     }
     const pad = 12;
-    const vbW = maxX - minX + pad * 2;
-    const vbH = maxY - minY + pad * 2;
-    const vb  = `${minX - pad} ${minY - pad} ${vbW} ${vbH}`;
-    console.log("[game.js] viewBox:", vb);
+    const vb  = `${minX - pad} ${minY - pad} ${maxX - minX + pad * 2} ${maxY - minY + pad * 2}`;
     svg.setAttribute("viewBox", vb);
-    svg.setAttribute("width",  vbW);
-    svg.setAttribute("height", vbH);
+    svg.setAttribute("width",  maxX - minX + pad * 2);
+    svg.setAttribute("height", maxY - minY + pad * 2);
 
     // Outer behind inner
-    parsed.sort((a, b) => (a.field.field_type === "outer-bound" ? 0 : 1) - (b.field.field_type === "outer-bound" ? 0 : 1));
+    parsed.sort((a, b) =>
+      (a.field.field_type === "outer-bound" || a.field.field_type === "outer_bound" ? 0 : 1) -
+      (b.field.field_type === "outer-bound" || b.field.field_type === "outer_bound" ? 0 : 1)
+    );
 
-    // Defs
+    // ── Defs ─────────────────────────────────────────────────────────────────
     const defs = svgEl("defs");
+
+    // Drop shadow filter
     const filt = svgEl("filter", { id: "hex-shadow", x: "-20%", y: "-20%", width: "140%", height: "140%" });
-    const drop = svgEl("feDropShadow", { dx: "0", dy: "3", stdDeviation: "4", "flood-color": "rgba(0,0,0,0.5)" });
-    filt.appendChild(drop);
+    filt.appendChild(svgEl("feDropShadow", { dx: "0", dy: "3", stdDeviation: "4", "flood-color": "rgba(0,0,0,0.5)" }));
     defs.appendChild(filt);
+
+    // One clipPath per hex so images are masked to the hex shape
+    for (const { x, y, q, r } of parsed) {
+      const cp = svgEl("clipPath", { id: `clip-${q}-${r}` });
+      cp.appendChild(svgEl("polygon", {
+        points: pointsAttr(hexCornerPoints(x, y, HEX_SIZE - 1.5)),
+      }));
+      defs.appendChild(cp);
+    }
+
     svg.appendChild(defs);
 
     const seen = new Set();
 
-    for (const { x, y, field } of parsed) {
-      const isOuter = field.field_type === "outer-bound";
+    for (const { x, y, q, r, field } of parsed) {
+      const normType = (field.field_type || "").replace("_", "-");
+      const isOuter  = normType === "outer-bound";
       if (isOuter && !showOuter) continue;
 
-      const style   = FIELD_STYLES[field.field_type] || { fill: "#888", label: field.field_type };
-      const corners = hexCorners(x, y, HEX_SIZE - 1.5);
-      const g       = svgEl("g", { class: isOuter ? "hex-cell hex-outer" : "hex-cell" });
+      // Look up style using both hyphen and underscore variants
+      const style  = FIELD_STYLES[field.field_type] || FIELD_STYLES[normType] || { fill: "#888", label: field.field_type };
+      const pts    = hexCornerPoints(x, y, HEX_SIZE - 1.5);
+      const pAttr  = pointsAttr(pts);
+      const clipId = `clip-${q}-${r}`;
+      const sprite = resolveSprite(field);
+      const g      = svgEl("g", { class: isOuter ? "hex-cell hex-outer" : "hex-cell" });
 
-      const poly = svgEl("polygon", {
-        points: corners,
-        fill:   style.fill,
-        stroke: isOuter ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.4)",
+      // Layer 1: solid colour base (visible while image loads or if img missing)
+      g.appendChild(svgEl("polygon", { points: pAttr, fill: style.fill, stroke: "none" }));
+
+      // Layer 2: image clipped to hex shape — driven by field.sprite from backend,
+      // with a client-side fallback for sea tiles. Applies to ALL hexes incl. outer.
+      if (sprite) {
+        const imgSize = HEX_SIZE * 2.05;
+        g.appendChild(svgEl("image", {
+          href:                `${IMG_BASE}${sprite}`,
+          x:                   x - imgSize / 2,
+          y:                   y - imgSize / 2,
+          width:               imgSize,
+          height:              imgSize,
+          preserveAspectRatio: "xMidYMid slice",
+          "clip-path":         `url(#${clipId})`,
+        }));
+      }
+
+      // Layer 3: border stroke (+ drop shadow on inner hexes)
+      g.appendChild(svgEl("polygon", {
+        points:         pAttr,
+        fill:           "none",
+        stroke:         isOuter ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.45)",
         "stroke-width": isOuter ? "1" : "1.5",
-        filter: isOuter ? "" : "url(#hex-shadow)",
-      });
-      g.appendChild(poly);
+        filter:         isOuter ? "" : "url(#hex-shadow)",
+      }));
 
       if (!isOuter) {
-        const inner = svgEl("polygon", {
-          points: hexCorners(x, y, HEX_SIZE * 0.78),
+        // Subtle inner ring
+        g.appendChild(svgEl("polygon", {
+          points: pointsAttr(hexCornerPoints(x, y, HEX_SIZE * 0.78)),
           fill: "none", stroke: "rgba(255,255,255,0.12)", "stroke-width": "1",
-        });
-        g.appendChild(inner);
+        }));
 
+        // Layer 4: number token
         if (showNumbers && field.assigned_number != null) {
           const numColor = NUMBER_COLORS[field.assigned_number] || "#f5ead0";
-          const circ = svgEl("circle", { cx: x, cy: y, r: 16, fill: "#f5ead0", stroke: "rgba(0,0,0,0.35)", "stroke-width": "1.5" });
-          const txt  = svgEl("text", {
+          g.appendChild(svgEl("circle", {
+            cx: x, cy: y, r: 16,
+            fill: "rgba(245,234,208,0.93)",
+            stroke: "rgba(0,0,0,0.35)", "stroke-width": "1.5",
+          }));
+          const txt = svgEl("text", {
             x, y, "text-anchor": "middle", "dominant-baseline": "central",
-            fill: numColor, "font-size": "14", "font-family": "Cinzel, serif", "font-weight": "bold",
+            fill: numColor, "font-size": "14",
+            "font-family": "Cinzel, serif", "font-weight": "bold",
           });
           txt.textContent = field.assigned_number;
-          g.appendChild(circ);
           g.appendChild(txt);
-        } else {
+        } else if (!sprite) {
+          // Fallback label when there's no image and no number
           const lbl = svgEl("text", {
             x, y, "text-anchor": "middle", "dominant-baseline": "central",
             fill: "rgba(255,255,255,0.55)", "font-size": "9",
@@ -159,6 +214,7 @@
           g.appendChild(lbl);
         }
 
+        // Tooltip
         g.addEventListener("mousemove", (e) => {
           const lines = [`Type: ${style.label || field.field_type}`];
           if (style.resource)        lines.push(`Resource: ${style.resource}`);
@@ -175,7 +231,7 @@
       svg.appendChild(g);
     }
 
-    // Legend
+    // Legend — swatches show the actual image thumbnail
     legend.innerHTML = "";
     for (const ft of seen) {
       const style  = FIELD_STYLES[ft] || { fill: "#888", label: ft };
@@ -183,13 +239,23 @@
       item.className = "legend-item";
       const swatch = document.createElement("div");
       swatch.className = "legend-swatch";
-      swatch.style.background = style.fill;
+      // Find a parsed hex of this type to get its sprite
+      const sample = parsed.find(p => p.field.field_type === ft);
+      const sampleSprite = sample ? resolveSprite(sample.field) : null;
+      if (sampleSprite) {
+        swatch.style.backgroundImage    = `url(${IMG_BASE}${sampleSprite})`;
+        swatch.style.backgroundSize     = "cover";
+        swatch.style.backgroundPosition = "center";
+      } else {
+        swatch.style.background = style.fill;
+      }
       const lbl = document.createElement("span");
       lbl.textContent = style.label || ft;
       item.appendChild(swatch);
       item.appendChild(lbl);
       legend.appendChild(item);
     }
+
     console.log("[game.js] Render complete.");
   }
 
@@ -198,38 +264,31 @@
 
   socket.on("connect", () => {
     console.log("[game.js] Socket connected, sid:", socket.id);
-
-    // Re-join the lobby so the server session knows which game to serve
     const lobbyName = (sessionStorage.getItem("currentLobbyName") || "").trim();
     if (lobbyName) {
       console.log("[game.js] Re-joining lobby:", lobbyName);
       socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
     } else {
-      console.warn("[game.js] No lobbyName in sessionStorage — server may not find the game.");
+      console.warn("[game.js] No lobbyName in sessionStorage.");
     }
-
     socket.emit("game-management:get-game-data");
     console.log("[game.js] Emitted game-management:get-game-data");
   });
 
-  socket.on("connect_error", (err) => {
-    console.error("[game.js] Socket connect error:", err);
-  });
+  socket.on("connect_error", (err) => console.error("[game.js] Socket connect error:", err));
 
   socket.on("game-management:get-game-data", (data) => {
-    console.log("[game.js] Received game-management:get-game-data:", data);
+    console.log("[game.js] Received game data:", data);
     render(data);
   });
 
-  // Log ALL socket events for debugging
   const _onevent = socket.onevent.bind(socket);
-  socket.onevent = function(packet) {
+  socket.onevent = function (packet) {
     console.log("[game.js] RAW socket event:", packet.data);
     _onevent(packet);
   };
 
   // ─── Controls ────────────────────────────────────────────────────────────────
-
   document.getElementById("btn-toggle-numbers").addEventListener("click", () => {
     showNumbers = !showNumbers;
     if (lastData) render(lastData);
