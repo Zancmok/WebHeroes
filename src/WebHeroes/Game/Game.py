@@ -8,7 +8,7 @@ from .Map import Map
 class Game:
     def __init__(self) -> None:
         self.lua_sandbox: LuaSandbox = LuaSandbox(
-            mod_paths=["core", "base"],
+            mod_paths=["core", "base", "til-mod"],
             prototypes=prototype_definitions
         )
 
