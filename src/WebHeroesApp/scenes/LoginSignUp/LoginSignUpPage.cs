@@ -10,7 +10,7 @@ public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
-	private string testHttp = "http://127.0.0.1:5000/ping";
+	private string realHttp = "http://127.0.0.1:5000";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
@@ -64,7 +64,7 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
 
-			MakePostRequest("http://127.0.0.1:5000/user-management/signup", jsonString);
+			MakePostRequest($"{realHttp}/user-management/signup", jsonString);
 		}
 		else
 		{
@@ -89,7 +89,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
 
-		MakePostRequest("http://127.0.0.1:5000/user-management/login", jsonString);
+		MakePostRequest($"{realHttp}/user-management/login", jsonString);
 	}
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
@@ -113,7 +113,7 @@ public partial class LoginSignUpPage : Control
 		{
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
-				GD.Print($"{testHttp}");
+				GD.Print($"{realHttp}");
 				GD.Print($"{testHttpResult}");
 				GD.Print(currentUserToken);
 			}

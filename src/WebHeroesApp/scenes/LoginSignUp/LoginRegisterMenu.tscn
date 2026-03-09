@@ -4,7 +4,7 @@
 [ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/LoginSignUp/SignUpVisuals.cs" id="2_4vdtq"]
 [ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/LoginSignUp/TabsWork.cs" id="2_6b5og"]
 [ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginSignUp/LoginVisuals.cs" id="2_vo05e"]
-[ext_resource type="Script" uid="uid://c7gcj1unyc8bu" path="res://scenes/LoginSignUp/SocketIo.cs" id="5_yhkbl"]
+[ext_resource type="Script" uid="uid://dvnho6kdkw8oq" path="res://scenes/LoginSignUp/UserManagement.cs" id="5_yhkbl"]
 
 [node name="Control_Base" type="Control"]
 layout_mode = 3
