@@ -12,7 +12,9 @@
   };
 
   // Base URL where your Flask /img/<mod_id>/<image_id> endpoint is served.
-  const IMG_BASE = "/game-management/img/base/images/field/";
+  // The sprite value from the backend is a full path like "__base__/graphics/field/sea.png",
+  // which maps directly to /game-management/img/__base__/graphics/field/sea.png
+  const IMG_BASE = "/game-management/img/";
 
   const NUMBER_COLORS = { 6: "#e05c2e", 8: "#e05c2e" };
   const HEX_SIZE = 48;
@@ -43,18 +45,20 @@
     return el;
   }
 
-  // Resolve sprite: strip any leading path from the backend sprite value so we
-  // only keep the filename (e.g. "__base__/graphics/field/sea.png" → "sea.png").
-  // Falls back to "sea.png" for outer-bound tiles if sprite is missing.
+  // Resolve sprite: use the full sprite path from the backend as-is, since it
+  // maps directly to the Flask /game-management/img/<mod_id>/<path:image_id> endpoint.
+  // e.g. "__base__/graphics/field/sea.png" → "/game-management/img/__base__/graphics/field/sea.png"
+  // Falls back to a sensible default for outer-bound tiles if sprite is missing.
   function resolveSprite(field) {
-    if (field.sprite) {
-      return field.sprite.split("/").pop();
-    }
-    const normType = (field.field_type || "").replace("_", "-");
-    if (normType === "outer-bound") return "sea.png";
-    return null;
+  if (field.sprite) {
+    return field.sprite
+      .replace(/^__|__(?=\/)/g, "")   // __til-mod__/... → til-mod/...
+      .replace("graphics/", "images/");
   }
-
+  const normType = (field.field_type || "").replace("_", "-");
+  if (normType === "outer-bound") return "base/images/field/sea.png";
+  return null;
+}
   const svg     = document.getElementById("board-svg");
   const tooltip = document.getElementById("tooltip");
   const legend  = document.getElementById("legend");
