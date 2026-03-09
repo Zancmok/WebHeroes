@@ -1,5 +1,5 @@
 (function () {
-  // ─── Colour & label config ───────────────────────────────────────────────────
+  //Colour & label config
   const FIELD_STYLES = {
     "forest":      { fill: "#2d5a1b", label: "Forest",    resource: "Lumber" },
     "hill":        { fill: "#8b3a0f", label: "Hills",     resource: "Brick"  },
@@ -11,9 +11,6 @@
     "outer_bound": { fill: "#1a3a5c", label: "Ocean",     resource: null     },
   };
 
-  // Base URL where your Flask /img/<mod_id>/<image_id> endpoint is served.
-  // The sprite value from the backend is a full path like "__base__/graphics/field/sea.png",
-  // which maps directly to /game-management/img/__base__/graphics/field/sea.png
   const IMG_BASE = "/game-management/img/";
 
   const NUMBER_COLORS = { 6: "#e05c2e", 8: "#e05c2e" };
@@ -45,20 +42,14 @@
     return el;
   }
 
-  // Resolve sprite: use the full sprite path from the backend as-is, since it
-  // maps directly to the Flask /game-management/img/<mod_id>/<path:image_id> endpoint.
-  // e.g. "__base__/graphics/field/sea.png" → "/game-management/img/__base__/graphics/field/sea.png"
-  // Falls back to a sensible default for outer-bound tiles if sprite is missing.
   function resolveSprite(field) {
-  if (field.sprite) {
-    return field.sprite
-      .replace(/^__|__(?=\/)/g, "")   // __til-mod__/... → til-mod/...
-      .replace("graphics/", "images/");
+    if (field.sprite) {
+      return field.sprite
+        .replace(/^__|__(?=\/)/g, "")
+        .replace("graphics/", "images/");
+    }
+    return null;
   }
-  const normType = (field.field_type || "").replace("_", "-");
-  if (normType === "outer-bound") return "base/images/field/sea.png";
-  return null;
-}
   const svg     = document.getElementById("board-svg");
   const tooltip = document.getElementById("tooltip");
   const legend  = document.getElementById("legend");
@@ -124,7 +115,7 @@
       (b.field.field_type === "outer-bound" || b.field.field_type === "outer_bound" ? 0 : 1)
     );
 
-    // ── Defs ─────────────────────────────────────────────────────────────────
+    //Defs
     const defs = svgEl("defs");
 
     // Drop shadow filter
@@ -263,7 +254,7 @@
     console.log("[game.js] Render complete.");
   }
 
-  // ─── Socket.IO ───────────────────────────────────────────────────────────────
+  //Socket.IO
   const socket = io();
 
   socket.on("connect", () => {
@@ -292,7 +283,7 @@
     _onevent(packet);
   };
 
-  // ─── Controls ────────────────────────────────────────────────────────────────
+  //Controls
   document.getElementById("btn-toggle-numbers").addEventListener("click", () => {
     showNumbers = !showNumbers;
     if (lastData) render(lastData);
