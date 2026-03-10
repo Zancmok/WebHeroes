@@ -1,12 +1,14 @@
 from typing import Optional
 
+from WebHeroes.UserManagement.UserSession import UserSession
+from WebHeroes.UserManagement.SessionManager import SessionManager
 from LuaBridge import LuaSandbox, BasePrototype
 from Prototype import prototype_definitions, FieldType, SettingsType
 from .Map import Map
 
 
 class Game:
-    def __init__(self) -> None:
+    def __init__(self, member_ids: set[int]) -> None:
         self.lua_sandbox: LuaSandbox = LuaSandbox(
             mod_paths=["core", "base", "til-mod"],
             prototypes=prototype_definitions
@@ -14,6 +16,8 @@ class Game:
 
         self.running: bool = False
         self.game_map: Optional[Map] = None
+        self.member_ids: set[int] = member_ids
+        self.users: list[UserSession] = []
 
     def run(self) -> None:
         if self.running:
@@ -33,3 +37,6 @@ class Game:
                 fields.append(prototype)
 
         self.game_map = Map(fields, settings)
+
+        for member_id in self.member_ids:
+            self.users.append(SessionManager.get_user_session_by_user_id(member_id))

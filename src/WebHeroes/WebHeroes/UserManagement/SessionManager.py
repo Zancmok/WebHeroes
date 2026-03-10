@@ -85,3 +85,10 @@ class SessionManager(StaticClass):
             return SessionManager._socket_connections.get(socket_id)
 
         return SessionManager._socket_connections.get(request.sid)
+
+    @staticmethod
+    def get_user_session_by_user_id(user_id: int) -> Optional[UserSession]:
+        for session in SessionManager._socket_connections.values():
+            if session.get_user_id() == user_id:
+                return session
+        return None

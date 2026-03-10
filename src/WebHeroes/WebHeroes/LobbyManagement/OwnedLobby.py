@@ -8,7 +8,7 @@ class OwnedLobby(Lobby):
     def __init__(self, name: str, owner_id: int) -> None:
         super().__init__(name)
         self.owner_id: int = owner_id
-        self.game: Game = Game()
+        self.game: Game = Game(self.member_ids)
 
     @override
     def __str__(self) -> str:
