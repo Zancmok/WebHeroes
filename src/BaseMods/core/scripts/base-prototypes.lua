@@ -3,7 +3,7 @@ data:extend{
         type="settings-type",
         name="settings",
         display_name="Settings",
-        map_size=21
+        map_size=5
     },
     {
         type="field",

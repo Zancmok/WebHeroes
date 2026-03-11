@@ -125,6 +125,9 @@ class Map:
             for field in row:
                 self.fields[(field.q, field.r)] = field
 
+                if field.field_type.resource:
+                    field.assigned_number = random.randint(1, 6) + random.randint(1, 6)
+
         # Calculate neighbours + connections
         axial_direction_vectors: list[tuple[int, int]] = [
             (+1, 0), (+1, -1), (0, -1),
