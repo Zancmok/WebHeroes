@@ -1,5 +1,5 @@
 (function () {
-  //Colour & label config
+  // Colour & label config — keyed by field_type.name from the backend
   const FIELD_STYLES = {
     "forest":      { fill: "#2d5a1b", label: "Forest",    resource: "Lumber" },
     "hill":        { fill: "#8b3a0f", label: "Hills",     resource: "Brick"  },
@@ -43,13 +43,15 @@
   }
 
   function resolveSprite(field) {
-    if (field.sprite) {
-      return field.sprite
+    const sprite = field.field_type?.sprite;
+    if (sprite) {
+      return sprite
         .replace(/^__|__(?=\/)/g, "")
         .replace("graphics/", "images/");
     }
     return null;
   }
+
   const svg     = document.getElementById("board-svg");
   const tooltip = document.getElementById("tooltip");
   const legend  = document.getElementById("legend");
@@ -109,21 +111,19 @@
     svg.setAttribute("width",  maxX - minX + pad * 2);
     svg.setAttribute("height", maxY - minY + pad * 2);
 
-    // Outer behind inner
-    parsed.sort((a, b) =>
-      (a.field.field_type === "outer-bound" || a.field.field_type === "outer_bound" ? 0 : 1) -
-      (b.field.field_type === "outer-bound" || b.field.field_type === "outer_bound" ? 0 : 1)
-    );
+    parsed.sort((a, b) => {
+      const aOuter = a.field.field_type?.name === "outer-bound" || a.field.field_type?.name === "outer_bound";
+      const bOuter = b.field.field_type?.name === "outer-bound" || b.field.field_type?.name === "outer_bound";
+      return (aOuter ? 0 : 1) - (bOuter ? 0 : 1);
+    });
 
-    //Defs
+    // Defs
     const defs = svgEl("defs");
 
-    // Drop shadow filter
     const filt = svgEl("filter", { id: "hex-shadow", x: "-20%", y: "-20%", width: "140%", height: "140%" });
     filt.appendChild(svgEl("feDropShadow", { dx: "0", dy: "3", stdDeviation: "4", "flood-color": "rgba(0,0,0,0.5)" }));
     defs.appendChild(filt);
 
-    // One clipPath per hex so images are masked to the hex shape
     for (const { x, y, q, r } of parsed) {
       const cp = svgEl("clipPath", { id: `clip-${q}-${r}` });
       cp.appendChild(svgEl("polygon", {
@@ -137,23 +137,20 @@
     const seen = new Set();
 
     for (const { x, y, q, r, field } of parsed) {
-      const normType = (field.field_type || "").replace("_", "-");
+      const typeName = field.field_type?.name || "";
+      const normType = typeName.replace("_", "-");
       const isOuter  = normType === "outer-bound";
       if (isOuter && !showOuter) continue;
 
-      // Look up style using both hyphen and underscore variants
-      const style  = FIELD_STYLES[field.field_type] || FIELD_STYLES[normType] || { fill: "#888", label: field.field_type };
+      const style  = FIELD_STYLES[typeName] || FIELD_STYLES[normType] || { fill: "#888", label: field.field_type?.display_name || typeName };
       const pts    = hexCornerPoints(x, y, HEX_SIZE - 1.5);
       const pAttr  = pointsAttr(pts);
       const clipId = `clip-${q}-${r}`;
       const sprite = resolveSprite(field);
       const g      = svgEl("g", { class: isOuter ? "hex-cell hex-outer" : "hex-cell" });
 
-      // Layer 1: solid colour base (visible while image loads or if img missing)
       g.appendChild(svgEl("polygon", { points: pAttr, fill: style.fill, stroke: "none" }));
 
-      // Layer 2: image clipped to hex shape — driven by field.sprite from backend,
-      // with a client-side fallback for sea tiles. Applies to ALL hexes incl. outer.
       if (sprite) {
         const imgSize = HEX_SIZE * 2.05;
         g.appendChild(svgEl("image", {
@@ -167,7 +164,6 @@
         }));
       }
 
-      // Layer 3: border stroke (+ drop shadow on inner hexes)
       g.appendChild(svgEl("polygon", {
         points:         pAttr,
         fill:           "none",
@@ -177,13 +173,11 @@
       }));
 
       if (!isOuter) {
-        // Subtle inner ring
         g.appendChild(svgEl("polygon", {
           points: pointsAttr(hexCornerPoints(x, y, HEX_SIZE * 0.78)),
           fill: "none", stroke: "rgba(255,255,255,0.12)", "stroke-width": "1",
         }));
 
-        // Layer 4: number token
         if (showNumbers && field.assigned_number != null) {
           const numColor = NUMBER_COLORS[field.assigned_number] || "#f5ead0";
           g.appendChild(svgEl("circle", {
@@ -199,20 +193,21 @@
           txt.textContent = field.assigned_number;
           g.appendChild(txt);
         } else if (!sprite) {
-          // Fallback label when there's no image and no number
           const lbl = svgEl("text", {
             x, y, "text-anchor": "middle", "dominant-baseline": "central",
             fill: "rgba(255,255,255,0.55)", "font-size": "9",
             "font-family": "Crimson Pro, serif", "letter-spacing": "0.05em",
           });
-          lbl.textContent = (style.label || field.field_type).toUpperCase();
+
+          lbl.textContent = (style.label || field.field_type?.display_name || typeName).toUpperCase();
           g.appendChild(lbl);
         }
 
-        // Tooltip
         g.addEventListener("mousemove", (e) => {
-          const lines = [`Type: ${style.label || field.field_type}`];
-          if (style.resource)        lines.push(`Resource: ${style.resource}`);
+          const displayName = field.field_type?.display_name || style.label || typeName;
+          const resource    = field.field_type?.resource?.display_name || style.resource;
+          const lines = [`Type: ${displayName}`];
+          if (resource)              lines.push(`Resource: ${resource}`);
           if (field.assigned_number) lines.push(`Number: ${field.assigned_number}`);
           tooltip.textContent = lines.join("  ·  ");
           tooltip.classList.add("visible");
@@ -220,13 +215,12 @@
           tooltip.style.top  = (e.clientY - 28) + "px";
         });
         g.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
-        if (!seen.has(field.field_type)) seen.add(field.field_type);
+        if (!seen.has(typeName)) seen.add(typeName);
       }
 
       svg.appendChild(g);
     }
 
-    // Legend — swatches show the actual image thumbnail
     legend.innerHTML = "";
     for (const ft of seen) {
       const style  = FIELD_STYLES[ft] || { fill: "#888", label: ft };
@@ -234,8 +228,7 @@
       item.className = "legend-item";
       const swatch = document.createElement("div");
       swatch.className = "legend-swatch";
-      // Find a parsed hex of this type to get its sprite
-      const sample = parsed.find(p => p.field.field_type === ft);
+      const sample = parsed.find(p => p.field.field_type?.name === ft);
       const sampleSprite = sample ? resolveSprite(sample.field) : null;
       if (sampleSprite) {
         swatch.style.backgroundImage    = `url(${IMG_BASE}${sampleSprite})`;
@@ -245,7 +238,7 @@
         swatch.style.background = style.fill;
       }
       const lbl = document.createElement("span");
-      lbl.textContent = style.label || ft;
+      lbl.textContent = sample?.field.field_type?.display_name || style.label || ft;
       item.appendChild(swatch);
       item.appendChild(lbl);
       legend.appendChild(item);
@@ -254,7 +247,7 @@
     console.log("[game.js] Render complete.");
   }
 
-  //Socket.IO
+  // Socket.IO
   const socket = io();
 
   socket.on("connect", () => {
@@ -283,7 +276,7 @@
     _onevent(packet);
   };
 
-  //Controls
+  // Controls
   document.getElementById("btn-toggle-numbers").addEventListener("click", () => {
     showNumbers = !showNumbers;
     if (lastData) render(lastData);
