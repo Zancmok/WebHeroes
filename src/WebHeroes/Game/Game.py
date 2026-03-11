@@ -10,7 +10,7 @@ from .Map import Map
 class Game:
     def __init__(self, member_ids: set[int]) -> None:
         self.lua_sandbox: LuaSandbox = LuaSandbox(
-            mod_paths=["core", "base", "til-mod"],
+            mod_paths=["core", "base"],
             prototypes=prototype_definitions
         )
 

@@ -5,7 +5,9 @@ from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
+from WebHeroes.Responses.DataModels.FieldTypeModel import FieldTypeModel
 from WebHeroes.Responses.DataModels.MapModel import MapModel
+from WebHeroes.Responses.DataModels.ResourceTypeModel import ResourceTypeModel
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.UserSession import UserSession
@@ -53,9 +55,19 @@ class GameManagement(StaticClass):
             curr: Field = lobby.game.game_map.fields[cords]
 
             fields[f"{cords[0]}\0{cords[1]}"] = FieldModel(
-                field_type=curr.field_type.name,
-                sprite=curr.field_type.sprite,
-                resource=curr.field_type.resource.name if curr.field_type.resource else None,
+                field_type=FieldTypeModel(
+                    name=curr.field_type.name,
+                    display_name=curr.field_type.display_name,
+                    sprite=curr.field_type.sprite,
+                    weight=curr.field_type.weight,
+                    minimum_amount=curr.field_type.minimum_amount,
+                    resource=ResourceTypeModel(
+                        name=curr.field_type.resource.name,
+                        display_name=curr.field_type.resource.display_name
+                    ) if curr.field_type.resource else None
+                ),
+                q=curr.q,
+                r=curr.r,
                 assigned_number=curr.assigned_number
             )
 
