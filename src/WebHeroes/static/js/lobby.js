@@ -41,32 +41,28 @@
 
   lobbyNameEl.textContent = lobbyName;
 
-  function requestRefresh() {
-    socket.emit("lobby-management:refresh");
+  function requestLobby() {
+    socket.emit("lobby-management:get-lobby");
   }
 
   socket.on("connect", () => {
     socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
-    requestRefresh();
+    requestLobby();
     if (refreshInterval) clearInterval(refreshInterval);
-    refreshInterval = setInterval(requestRefresh, 2000);
+    refreshInterval = setInterval(requestLobby, 2000);
   });
 
-  socket.on("lobby-management:refresh", (data) => {
-    if (!data || !data.lobbies) return;
+  // get-lobby returns { owner: MemberModel, members: MemberModel[] }
+  socket.on("lobby-management:get-lobby", (data) => {
+    if (!data) return;
 
-    const lobby = data.lobbies.find(l => (l.lobby_name || "").trim() === lobbyName);
-
-    if (!lobby) {
+    if (data.owner) {
+      lobbyOwnerEl.textContent = data.owner.member_name || ("Owner (ID: " + data.owner.member_id + ")");
+    } else {
       lobbyOwnerEl.textContent = "Unknown";
-      renderPlayers([]);
-      setStatus("Lobby not found (maybe it was deleted or not created yet).");
-      return;
     }
 
-    const ownerMember = (lobby.members || []).find(m => m.member_id === lobby.owner_id);
-    lobbyOwnerEl.textContent = ownerMember ? ownerMember.member_name : "Owner (ID: " + lobby.owner_id + ")";
-    renderPlayers(lobby.members || []);
+    renderPlayers(data.members || []);
     setStatus("");
   });
 
