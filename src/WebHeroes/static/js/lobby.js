@@ -36,8 +36,12 @@
     lobbyOwnerEl.textContent = "Unknown";
     renderPlayers([]);
     setStatus("No lobby selected. Go back and create/join a lobby first.");
+    startBtn.style.display = "none";
     return;
   }
+
+  // Hide until confirmed as owner
+  startBtn.style.display = "none";
 
   lobbyNameEl.textContent = lobbyName;
 
@@ -52,7 +56,7 @@
     refreshInterval = setInterval(requestLobby, 2000);
   });
 
-  // get-lobby returns { owner: MemberModel, members: MemberModel[] }
+  // Only the owner receives this event — if we get it, we are the owner
   socket.on("lobby-management:get-lobby", (data) => {
     if (!data) return;
 
@@ -64,6 +68,9 @@
 
     renderPlayers(data.members || []);
     setStatus("");
+
+    // Receiving this response means we are the owner
+    startBtn.style.display = "";
   });
 
   // All clients listen for game start and relocate simultaneously
@@ -76,4 +83,4 @@
     setStatus("Starting game...");
     socket.emit("lobby-management:start-game");
   });
-})();
+}());
