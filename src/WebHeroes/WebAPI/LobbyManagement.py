@@ -128,6 +128,9 @@ class LobbyManagement(StaticClass):
 
         lobby: OwnedLobby = user_session.get_lobby()
 
+        if user_session.get_user_id() != lobby.owner_id:
+            return
+
         lobby.game.run()
 
         print(flush=True)
