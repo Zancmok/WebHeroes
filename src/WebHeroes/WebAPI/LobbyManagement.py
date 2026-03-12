@@ -1,4 +1,7 @@
 from typing import Any, Optional
+
+from flask_socketio import rooms
+
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.Errors.AlreadyInLobbyError import AlreadyInLobbyError
 from WebHeroes.LobbyManagement.Errors.AlreadyOwningLobbyError import AlreadyOwningLobbyError
@@ -126,3 +129,8 @@ class LobbyManagement(StaticClass):
         lobby: OwnedLobby = user_session.get_lobby()
 
         lobby.game.run()
+
+        print(flush=True)
+        print(rooms(), flush=True)
+
+        LobbyManagement.socket_blueprint.emit("game-started", dictify(SuccessResponse()), to=lobby.name)

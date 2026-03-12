@@ -1,7 +1,7 @@
 from typing import Optional
 
 from flask import session, request
-from flask_socketio import join_room, leave_room
+from flask_socketio import join_room, leave_room, rooms
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.UserManagement.Errors.SessionAlreadyBoundError import SessionAlreadyBoundError
 from WebHeroes.UserManagement.UserSession import UserSession
@@ -55,29 +55,33 @@ class SessionManager(StaticClass):
 
     @staticmethod
     def bind_socket_connection(socket_id: str, token: str, lobby: Lobby) -> None:
-        for user_session in SessionManager._socket_connections.values():
-            if user_session.get_token() == token:
-                raise SessionAlreadyBoundError
+        old_session: Optional[UserSession] = SessionManager.get_user_session_by_user_id(SessionManager.get_user_id(token))
+        if not old_session:
+            new_user_session: UserSession = UserSession(
+                user_id=SessionManager.get_user_id(token),
+                token=token,
+                lobby=lobby
+            )
 
-        new_user_session: UserSession = UserSession(
-            user_id=SessionManager.get_user_id(token),
-            token=token,
-            lobby=lobby
-        )
+            lobby.join_member(new_user_session.get_user_id())
+            join_room(lobby.name)
 
-        lobby.join_member(new_user_session.get_user_id())
-        join_room(lobby.name)
+            SessionManager._socket_connections[socket_id] = new_user_session
+        else:
+            lobby: Lobby = old_session.get_lobby()
 
-        SessionManager._socket_connections[socket_id] = new_user_session
+            join_room(lobby.name)
+
+            SessionManager._socket_connections[socket_id] = old_session
 
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
-        user_session: UserSession = SessionManager._socket_connections.pop(socket_id)
+        user_session: UserSession = SessionManager._socket_connections.get(socket_id)
 
         lobby: Lobby = user_session.get_lobby()
 
-        lobby.leave_member(user_session.get_user_id())
-        leave_room(lobby.name)
+        # lobby.leave_member(user_session.get_user_id())
+        # leave_room(lobby.name)
 
     @staticmethod
     def get_user_session(socket_id: Optional[str] = None) -> Optional[UserSession]:

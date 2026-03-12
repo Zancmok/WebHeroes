@@ -68,13 +68,17 @@
   });
 
   startBtn.addEventListener("click", () => {
-    socket.emit("lobby-management:start-game");
-
+    // Yo Rožle neki bom break-ol kle for fun, shhh - Petja Ščetinin 12/03/2026
     // Wait for confirmation that game data is ready, then navigate
-    socket.once("game-management:get-game-data", () => {
-      window.location.assign("/game/");
+    socket.once("lobby-management:game-started", () => {
+      console.log("Game is worky worky fishy fishy - Vid Iskra 12/03/2032");
+      // window.location.assign("/game/");
     });
 
-    socket.emit("game-management:get-game-data");
+    socket.on("lobby-management:game-started", () => {
+      console.log("Cyka");
+    });
+
+    socket.emit("lobby-management:start-game");
   });
 })();
