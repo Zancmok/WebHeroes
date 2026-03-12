@@ -18,6 +18,7 @@ class Game:
         self.game_map: Optional[Map] = None
         self.member_ids: set[int] = member_ids
         self.users: list[UserSession] = []
+        self.current_user_index: int = 0
 
     def run(self) -> None:
         if self.running:
@@ -40,3 +41,7 @@ class Game:
 
         for member_id in self.member_ids:
             self.users.append(SessionManager.get_user_session_by_user_id(member_id))
+
+    def end_turn(self) -> None:
+        self.current_user_index += 1
+        self.current_user_index %= len(self.users) - 1

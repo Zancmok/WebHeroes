@@ -4,6 +4,7 @@ from Game.Field import Field
 from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
+from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
 from WebHeroes.Responses.DataModels.FieldTypeModel import FieldTypeModel
 from WebHeroes.Responses.DataModels.MapModel import MapModel
@@ -76,3 +77,24 @@ class GameManagement(StaticClass):
                 fields=fields
             )
         )))
+
+    @staticmethod
+    @socket_blueprint.on("end-turn")
+    def end_turn() -> None:
+        user_session: Optional[UserSession] = SessionManager.get_user_session()
+        if not user_session:
+            return
+        user_session: UserSession
+
+        lobby: Lobby = user_session.get_lobby()
+
+        if not isinstance(lobby, OwnedLobby):
+            return
+        lobby: OwnedLobby
+
+        if lobby.owner_id != user_session.get_user_id():
+            return
+
+        lobby.game.end_turn()
+
+        GameManagement.socket_blueprint.emit("end-turn", lobby.game.current_user_index, to=lobby.game)

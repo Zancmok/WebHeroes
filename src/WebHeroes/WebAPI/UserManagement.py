@@ -1,6 +1,5 @@
 from types import NoneType
 from typing import Optional
-
 import WebHeroes.config as config
 from WebHeroes.UserManagement.Errors.AlreadyLoggedInError import AlreadyLoggedInError
 from WebHeroes.UserManagement.Errors.AuthFailedError import AuthFailedError
@@ -17,6 +16,9 @@ from flask import Blueprint, Response
 from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
 from WebHeroes.Responses.ResponseTypes.LoginResponse import LoginResponse
+from ZancmokLib.SocketBlueprint import SocketBlueprint
+from WebHeroes.UserManagement.SessionManager import SessionManager
+from WebHeroes.UserManagement.UserSession import UserSession
 from WebHeroes.Responses import jsonify
 
 
@@ -28,6 +30,8 @@ class UserManagement(StaticClass):
         static_folder=config.STATIC_PATH,
         url_prefix="/user-management"
     )
+
+    socket_blueprint: SocketBlueprint = SocketBlueprint(name="user-management")
 
     @staticmethod
     @route_blueprint.route("/signup", methods=[EHTTPMethod.POST])
@@ -84,3 +88,13 @@ class UserManagement(StaticClass):
             )), EHTTPCode.FORBIDDEN
 
         return jsonify(SuccessResponse()), EHTTPCode.OK
+
+    @staticmethod
+    @socket_blueprint.on("get-own-id")
+    def get_own_id() -> None:
+        user_session: Optional[UserSession] = SessionManager.get_user_session()
+        if not user_session:
+            return
+        user_session: UserSession
+
+        UserManagement.socket_blueprint.emit("get-own-id", user_session.get_user_id())
