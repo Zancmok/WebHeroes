@@ -9,6 +9,8 @@
 
   const lobbyName = (sessionStorage.getItem("currentLobbyName") || "").trim();
 
+  let refreshInterval = null;
+
   function setStatus(msg) {
     statusEl.textContent = msg || "";
   }
@@ -46,7 +48,8 @@
   socket.on("connect", () => {
     socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
     requestRefresh();
-    setInterval(requestRefresh, 2000);
+    if (refreshInterval) clearInterval(refreshInterval);
+    refreshInterval = setInterval(requestRefresh, 2000);
   });
 
   socket.on("lobby-management:refresh", (data) => {
@@ -67,18 +70,14 @@
     setStatus("");
   });
 
+  // All clients listen for game start and relocate simultaneously
+  socket.once("lobby-management:game-started", () => {
+    window.location.assign("/game/");
+  });
+
   startBtn.addEventListener("click", () => {
-    // Yo Rožle neki bom break-ol kle for fun, shhh - Petja Ščetinin 12/03/2026
-    // Wait for confirmation that game data is ready, then navigate
-    socket.once("lobby-management:game-started", () => {
-      console.log("Game is worky worky fishy fishy - Vid Iskra 12/03/2032");
-      // window.location.assign("/game/");
-    });
-
-    socket.on("lobby-management:game-started", () => {
-      console.log("Cyka");
-    });
-
+    startBtn.disabled = true;
+    setStatus("Starting game...");
     socket.emit("lobby-management:start-game");
   });
 })();

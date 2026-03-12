@@ -179,7 +179,7 @@
         }));
 
         if (showNumbers && field.assigned_number != null) {
-          const numColor = NUMBER_COLORS[field.assigned_number] || "#f5ead0";
+          const numColor = NUMBER_COLORS[field.assigned_number] || "#000000";
           g.appendChild(svgEl("circle", {
             cx: x, cy: y, r: 16,
             fill: "rgba(245,234,208,0.93)",
