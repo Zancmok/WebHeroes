@@ -43,6 +43,38 @@ static void dealloc(LuaSandbox *self)
 
 static char sentinel;
 
+static int is_lua_array(lua_State *L, int index)
+{
+    if (!lua_istable(L, index)) return 0;
+
+    // normalize index to positive
+    if (index < 0) index = lua_gettop(L) + index + 1;
+
+    lua_Integer max_index = 0;
+    int is_array = 1;
+
+    lua_pushnil(L);
+    while (lua_next(L, index) != 0) {
+        if (!lua_isinteger(L, -2)) { 
+            is_array = 0; 
+            lua_pop(L, 2); 
+            break; 
+        }
+        lua_Integer key = lua_tointeger(L, -2);
+        if (key > max_index) max_index = key;
+        lua_pop(L, 1); // pop value, leave key
+    }
+
+    // Check dense 1..max_index
+    for (lua_Integer i = 1; i <= max_index; i++) {
+        lua_rawgeti(L, index, i);
+        if (lua_isnil(L, -1)) is_array = 0;
+        lua_pop(L, 1);
+    }
+
+    return is_array;
+}
+
 // --- safe recursive table to dict conversion ---
 static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
 {
@@ -78,9 +110,23 @@ static PyObject* create_pclass(LuaSandbox *self, lua_State *L)
         }
         else if (lua_istable(L, -1))
         {
-            lua_pushvalue(L, -1);              // duplicate table
-            value = create_pclass(self, L);    // recurse on copy
-            lua_pop(L, 1);                     // pop duplicate
+            if (is_lua_array(L, -1)) {
+                // Convert to Python list
+                PyObject *py_list = PyList_New(0);
+                lua_Integer len = lua_rawlen(L, -1);
+                for (lua_Integer i = 1; i <= len; i++) {
+                    lua_rawgeti(L, -1, i);
+                    PyObject *item = create_pclass(self, L);  // recurse
+                    PyList_Append(py_list, item);
+                    Py_DECREF(item);
+                    lua_pop(L, 1);
+                }
+                value = py_list;
+            } else {
+                lua_pushvalue(L, -1);
+                value = create_pclass(self, L);
+                lua_pop(L, 1);
+            }
         }
         else { Py_INCREF(Py_None); value = Py_None; }
 

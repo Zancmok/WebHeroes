@@ -3,7 +3,7 @@ from typing import Optional
 from WebHeroes.UserManagement.UserSession import UserSession
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from LuaBridge import LuaSandbox, BasePrototype
-from Prototype import prototype_definitions, FieldType, SettingsType
+from Prototype import prototype_definitions, FieldType, SettingsType, Recipe
 from .Map import Map
 
 
