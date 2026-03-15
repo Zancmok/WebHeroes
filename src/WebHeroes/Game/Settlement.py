@@ -1,8 +1,8 @@
 from .Player import Player
-from Prototype import SettlementType
+from Prototype import SettlementPrototype
 
 
 class Settlement:
-    def __init__(self, settlement_type: SettlementType, owner: Player) -> None:
-        self.settlement_type: SettlementType = settlement_type
+    def __init__(self, settlement_type: SettlementPrototype, owner: Player) -> None:
+        self.settlement_type: SettlementPrototype = settlement_type
         self.owner: Player = owner

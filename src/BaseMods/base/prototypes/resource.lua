@@ -2,31 +2,37 @@ data:extend{
     {
         type="resource",
         name="wood",
-        display_name="Wood"
+        display_name="Wood",
+        sprite="__core__/images/empty.png"
     },
     {
         type="resource",
         name="ore",
-        display_name="Ore"
+        display_name="Ore",
+        sprite="__core__/images/empty.png"
     },
     {
         type="resource",
         name="brick",
-        display_name="Brick"
+        display_name="Brick",
+        sprite="__core__/images/empty.png"
     },
     {
         type="resource",
         name="cow",
-        display_name="Cow"
+        display_name="Cow",
+        sprite="__core__/images/empty.png"
     },
     {
         type="resource",
         name="buckwheat",
-        display_name="Buckwheat"
+        display_name="Buckwheat",
+        sprite="__core__/images/empty.png"
     },
     {
         type="resource",
         name="victory-point",
-        display_name="Victory Point"
+        display_name="Victory Point",
+        sprite="__core__/images/empty.png"
     }
 }

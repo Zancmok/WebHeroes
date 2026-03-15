@@ -1,9 +1,8 @@
 from typing import Optional
-
 from WebHeroes.UserManagement.UserSession import UserSession
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from LuaBridge import LuaSandbox, BasePrototype
-from Prototype import prototype_definitions, FieldType, SettingsType, Recipe
+from Prototype import prototype_definitions, FieldPrototype, SettingsPrototype, Recipe
 from .Map import Map
 
 
@@ -18,6 +17,7 @@ class Game:
         self.game_map: Optional[Map] = None
         self.member_ids: set[int] = member_ids
         self.users: list[UserSession] = []
+        self.recipes: list[Recipe] = []
         self.current_user_index: int = 0
 
     def run(self) -> None:
@@ -27,15 +27,18 @@ class Game:
         self.running = True
 
         prototypes: list[BasePrototype] = self.lua_sandbox.run()
-        settings: Optional[SettingsType] = None
+        settings: Optional[SettingsPrototype] = None
 
-        fields: list[FieldType] = []
+        fields: list[FieldPrototype] = []
         for prototype in prototypes:
-            if isinstance(prototype, SettingsType):
+            if isinstance(prototype, SettingsPrototype):
                 settings = prototype
 
-            if isinstance(prototype, FieldType):
+            if isinstance(prototype, FieldPrototype):
                 fields.append(prototype)
+
+            if isinstance(prototype, Recipe):
+                self.recipes.append(prototype)
 
         self.game_map = Map(fields, settings)
 

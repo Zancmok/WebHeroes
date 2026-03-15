@@ -1,7 +1,7 @@
 from LuaBridge import BasePrototype
 
 
-class SettingsType(BasePrototype):
+class SettingsPrototype(BasePrototype):
     def __init__(self, name: str, display_name: str, map_size: int) -> None:
         super().__init__(name, display_name)
 

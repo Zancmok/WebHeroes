@@ -1,7 +1,7 @@
 from LuaBridge import BasePrototype
 
 
-class PlayerColorType(BasePrototype):
+class PlayerColor(BasePrototype):
     def __init__(self, name: str, display_name: str, r: int, g: int, b: int) -> None:
         super().__init__(name, display_name)
 

@@ -1,10 +1,9 @@
 from LuaBridge import BasePrototype
-from .ResourceType import ResourceType
 
 
 class Ingredient(BasePrototype):
-    def __init__(self, resource: ResourceType, amount: int) -> None:
-        super().__init__(f"r_{resource.name}", resource.display_name)
+    def __init__(self, resource: str, amount: int) -> None:
+        super().__init__(f"r_{resource}", resource)
 
-        self.resource: ResourceType = resource
+        self.resource: str = resource
         self.amount: int = amount

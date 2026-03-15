@@ -1,15 +1,15 @@
 from typing import Optional
 import random
-from Prototype import FieldType, SettingsType
+from Prototype import FieldPrototype, SettingsPrototype
 from .Field import Field
 from .Intersection import Intersection
 from .Connection import Connection
 
 
 class Map:
-    def _generate_tile_distribution(self, field_types: list[FieldType], actual_field_count: int) -> list[FieldType]:
-        fields: list[FieldType] = []
-        field_ranges: dict[range, FieldType] = {}
+    def _generate_tile_distribution(self, field_types: list[FieldPrototype], actual_field_count: int) -> list[FieldPrototype]:
+        fields: list[FieldPrototype] = []
+        field_ranges: dict[range, FieldPrototype] = {}
 
         total_weight: int = 0
         for field_type in field_types:
@@ -45,10 +45,10 @@ class Map:
 
         return q, r
 
-    def __init__(self, field_types: list[FieldType], settings_type: SettingsType) -> None:
+    def __init__(self, field_types: list[FieldPrototype], settings_type: SettingsPrototype) -> None:
         self.initial_field: Field
 
-        self.outer_bound_field_type: FieldType
+        self.outer_bound_field_type: FieldPrototype
         for field in field_types:
             if field.name == "outer-bound":
                 self.outer_bound_field_type = field
@@ -56,7 +56,7 @@ class Map:
         self.field_map: list[list[Field]] = []
 
         # map_size ** 2 - 6 = map_size + 2 * sum(from i = 3 to i = map_size - 1 : i)
-        map_tiles: list[FieldType] = self._generate_tile_distribution(field_types, settings_type.map_size ** 2 - 6)
+        map_tiles: list[FieldPrototype] = self._generate_tile_distribution(field_types, settings_type.map_size ** 2 - 6)
 
         inner_map_width: int = settings_type.map_size
         inner_map_height: int = 1 + 2 * (settings_type.map_size - 3)

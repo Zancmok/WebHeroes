@@ -8,6 +8,7 @@ from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
 from WebHeroes.Responses.DataModels.FieldTypeModel import FieldTypeModel
 from WebHeroes.Responses.DataModels.MapModel import MapModel
+from WebHeroes.Responses.DataModels.RecipeModel import RecipeModel
 from WebHeroes.Responses.DataModels.ResourceTypeModel import ResourceTypeModel
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
@@ -52,6 +53,7 @@ class GameManagement(StaticClass):
         lobby: OwnedLobby = user_session.get_lobby()
 
         fields: dict[str, FieldModel] = {}
+        """
         for cords in lobby.game.game_map.fields:
             curr: Field = lobby.game.game_map.fields[cords]
 
@@ -71,11 +73,15 @@ class GameManagement(StaticClass):
                 r=curr.r,
                 assigned_number=curr.assigned_number
             )
+        """
 
         GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
             map=MapModel(
                 fields=fields
-            )
+            ),
+            recipes=[RecipeModel(
+
+            ) for recipe in lobby.game.recipes]
         )))
 
     @staticmethod

@@ -3,6 +3,7 @@ data:extend{
         type="settlement",
         name="village",
         display_name="Village",
+        sprite="__core__/images/empty.png",
         point_value=1,
         resource_multiplier=1
     },
@@ -10,6 +11,7 @@ data:extend{
         type="settlement",
         name="city",
         display_name="City",
+        sprite="__core__/images/empty.png",
         point_value=2,
         resource_multiplier=2
     }

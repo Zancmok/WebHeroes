@@ -1,34 +1,34 @@
-local wood = data.raw.resource["wood"]
-local ore = data.raw.resource["ore"]
-local brick = data.raw.resource["brick"]
-local cow = data.raw.resource["cow"]
-local buckwheat = data.raw.resource["buckwheat"]
+local wood = data:get_prototype("resource", "wood")
+local ore = data:get_prototype("resource", "ore")
+local brick = data:get_prototype("resource", "brick")
+local cow = data:get_prototype("resource", "cow")
+local buckwheat = data:get_prototype("resource", "buckwheat")
 
 data:extend{
     {
         type="recipe",
         name="build-village",
         display_name="Build Village",
-        result=data.raw.settlement["village"],
+        result=data:id_of("settlement", "village"),
         ingredients={
             {
                 type="ingredient",
-                resource=wood,
+                resource=data:id(wood),
                 amount=1
             },
             {
                 type="ingredient",
-                resource=brick,
+                resource=data:id(brick),
                 amount=1
             },
             {
                 type="ingredient",
-                resource=cow,
+                resource=data:id(cow),
                 amount=1
             },
             {
                 type="ingredient",
-                resource=buckwheat,
+                resource=data:id(buckwheat),
                 amount=1
             }
         }
@@ -37,16 +37,16 @@ data:extend{
         type="recipe",
         name="build-city",
         display_name="Build City",
-        result=data.raw.settlement["city"],
+        result=data:id_of("settlement", "city"),
         ingredients={
             {
                 type="ingredient",
-                resource=buckwheat,
+                resource=data:id(buckwheat),
                 amount=2
             },
             {
                 type="ingredient",
-                resource=ore,
+                resource=data:id(ore),
                 amount=3
             }
         }

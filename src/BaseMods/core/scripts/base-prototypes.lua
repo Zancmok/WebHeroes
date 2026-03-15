@@ -1,6 +1,6 @@
 data:extend{
     {
-        type="settings-type",
+        type="settings",
         name="settings",
         display_name="Settings",
         map_size=5
