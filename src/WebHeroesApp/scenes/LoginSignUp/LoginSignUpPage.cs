@@ -10,7 +10,7 @@ public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
-	private string realHttp = "http://127.0.0.1:5000";
+	private string realHttps = "https://localhost";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
@@ -19,6 +19,7 @@ public partial class LoginSignUpPage : Control
 	{
 		userManagement = GetNode<UserManagement>("UserManagement");
 		httpRequest = GetNode<HttpRequest>("CallZancock");
+		httpRequest.RequestCompleted -= OnRequestCompleted;
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		
 		Button signUpSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/Submit");
@@ -38,6 +39,10 @@ public partial class LoginSignUpPage : Control
 	
 	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
 	{
+		GD.Print("Response code: ", responseCode);
+		string jsonTemporary = Encoding.UTF8.GetString(body);
+		GD.Print("Response body: ", jsonTemporary);
+		
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print(json);
 		currentUserToken = JsonDocument.Parse(json).RootElement.GetProperty("token").GetString();
@@ -64,7 +69,7 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
 
-			MakePostRequest($"{realHttp}/user-management/signup", jsonString);
+			MakePostRequest($"{realHttps}/user-management/signup", jsonString);
 		}
 		else
 		{
@@ -89,7 +94,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
 
-		MakePostRequest($"{realHttp}/user-management/login", jsonString);
+		MakePostRequest($"{realHttps}/user-management/login", jsonString);
 	}
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
@@ -104,6 +109,9 @@ public partial class LoginSignUpPage : Control
 		}
 		
 		httpRequest.Request(url, headers, HttpClient.Method.Post, body);
+		
+		Error err = httpRequest.Request(url, headers, HttpClient.Method.Post, body);
+		GD.Print("Request error code: ", err); // should print 0 (OK) if request started
 	}
 	
 	private void Send()
@@ -117,7 +125,7 @@ public partial class LoginSignUpPage : Control
 		{
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
-				GD.Print($"{realHttp}");
+				GD.Print($"{realHttps}");
 				GD.Print($"{testHttpResult}");
 				GD.Print(currentUserToken);
 			}
