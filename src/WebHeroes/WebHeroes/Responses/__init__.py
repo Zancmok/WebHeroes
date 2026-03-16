@@ -2,6 +2,7 @@ from enum import Enum
 from typing import Any
 
 from WebHeroes.Responses.BaseDataModel import BaseDataModel
+from WebHeroes.Responses.AlternateDataModel import AlternateDataModel
 from WebHeroes.Responses.DataModels.MemberModel import MemberModel
 from WebHeroes.Responses.ResponseTypes.SuccessResponse import SuccessResponse
 from WebHeroes.Responses.ResponseTypes.FailedResponse import FailedResponse
@@ -11,7 +12,7 @@ from flask import Response
 from flask import jsonify as flask_jsonify
 
 
-def dictify(data: BaseDataModel) -> dict:
+def dictify(data: BaseDataModel | AlternateDataModel) -> dict:
     """
     Converts a response object into a dictionary, handling nested objects and enums.
 
@@ -30,6 +31,9 @@ def dictify(data: BaseDataModel) -> dict:
 
     out: dict[str, Any] = {}
 
+    if isinstance(data, AlternateDataModel):
+        return data.to_dictify()
+
     for attribute in dir(data):
         if attribute[:2] == "__":
             continue
@@ -38,7 +42,7 @@ def dictify(data: BaseDataModel) -> dict:
 
         if isinstance(attribute_value, Enum):
             attribute_value = str(attribute_value.value)
-        elif isinstance(attribute_value, BaseDataModel):
+        elif isinstance(attribute_value, BaseDataModel) or isinstance(attribute_value, AlternateDataModel):
             attribute_value = dictify(attribute_value)
         elif isinstance(attribute_value, list):
             for i, v in enumerate(attribute_value):
@@ -54,6 +58,7 @@ def dictify(data: BaseDataModel) -> dict:
 
 def jsonify(data: BaseDataModel) -> Response:
     return flask_jsonify(dictify(data))
+
 
 __all__ = [
     "dictify",

@@ -27,6 +27,7 @@ class Game:
         self.running = True
 
         prototypes: list[BasePrototype] = self.lua_sandbox.run()
+
         settings: Optional[SettingsPrototype] = None
 
         fields: list[FieldPrototype] = []
