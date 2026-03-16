@@ -1,6 +1,6 @@
 from typing import Optional
+from Prototype import FieldPrototype
 from WebHeroes.Responses.BaseDataModel import BaseDataModel
-from WebHeroes.Responses.DataModels.FieldTypeModel import FieldTypeModel
 from dataclasses import field, dataclass
 
 
@@ -8,7 +8,5 @@ from dataclasses import field, dataclass
 class FieldModel(BaseDataModel):
     object_type: str = field(default="field-model", kw_only=True)
 
-    field_type: FieldTypeModel
-    q: int
-    r: int
+    field_type: FieldPrototype
     assigned_number: Optional[int]

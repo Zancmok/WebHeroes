@@ -19,6 +19,7 @@ class Game:
         self.users: list[UserSession] = []
         self.recipes: list[Recipe] = []
         self.current_user_index: int = 0
+        self.prototypes: list[BasePrototype] = []
 
     def run(self) -> None:
         if self.running:
@@ -26,12 +27,12 @@ class Game:
 
         self.running = True
 
-        prototypes: list[BasePrototype] = self.lua_sandbox.run()
+        self.prototypes = self.lua_sandbox.run()
 
         settings: Optional[SettingsPrototype] = None
 
         fields: list[FieldPrototype] = []
-        for prototype in prototypes:
+        for prototype in self.prototypes:
             if isinstance(prototype, SettingsPrototype):
                 settings = prototype
 

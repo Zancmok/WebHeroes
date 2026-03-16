@@ -6,10 +6,6 @@ import WebHeroes.config as config
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
-from WebHeroes.Responses.DataModels.FieldTypeModel import FieldTypeModel
-from WebHeroes.Responses.DataModels.MapModel import MapModel
-from WebHeroes.Responses.DataModels.RecipeModel import RecipeModel
-from WebHeroes.Responses.DataModels.ResourceTypeModel import ResourceTypeModel
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.UserSession import UserSession
@@ -53,35 +49,17 @@ class GameManagement(StaticClass):
         lobby: OwnedLobby = user_session.get_lobby()
 
         fields: dict[str, FieldModel] = {}
-        """
         for cords in lobby.game.game_map.fields:
             curr: Field = lobby.game.game_map.fields[cords]
 
             fields[f"{cords[0]}\0{cords[1]}"] = FieldModel(
-                field_type=FieldTypeModel(
-                    name=curr.field_type.name,
-                    display_name=curr.field_type.display_name,
-                    sprite=curr.field_type.sprite,
-                    weight=curr.field_type.weight,
-                    minimum_amount=curr.field_type.minimum_amount,
-                    resource=ResourceTypeModel(
-                        name=curr.field_type.resource.name,
-                        display_name=curr.field_type.resource.display_name
-                    ) if curr.field_type.resource else None
-                ),
-                q=curr.q,
-                r=curr.r,
+                field_type=curr.field_type,
                 assigned_number=curr.assigned_number
             )
-        """
 
         GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
-            map=MapModel(
-                fields=fields
-            ),
-            recipes=[RecipeModel(
-
-            ) for recipe in lobby.game.recipes]
+            fields=fields,
+            prototypes=lobby.game.prototypes,
         )))
 
     @staticmethod

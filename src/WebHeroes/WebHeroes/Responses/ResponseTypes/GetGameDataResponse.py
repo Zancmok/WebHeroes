@@ -1,6 +1,6 @@
+from Prototype.AbstractBasePrototype import AbstractBasePrototype
 from WebHeroes.Responses.BaseResponseModel import BaseResponseModel
-from WebHeroes.Responses.DataModels.MapModel import MapModel
-from WebHeroes.Responses.DataModels.RecipeModel import RecipeModel
+from WebHeroes.Responses.DataModels.FieldModel import FieldModel
 from dataclasses import field, dataclass
 
 
@@ -8,5 +8,5 @@ from dataclasses import field, dataclass
 class GetGameDataResponse(BaseResponseModel):
     object_type: str = field(default="get-game-data-response", kw_only=True)
 
-    map: MapModel
-    recipes: list[RecipeModel]
+    fields: dict[str, FieldModel]
+    prototypes: list[AbstractBasePrototype]
