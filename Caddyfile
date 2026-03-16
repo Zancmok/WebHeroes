@@ -1,11 +1,15 @@
-:80 {
-    reverse_proxy web_heroes_server:5000
-}
-:443 {
-    reverse_proxy web_heroes_server:5000
-    tls internal
-}
 localhost {
     reverse_proxy web_heroes_server:5000
     tls internal
+    encode gzip
+    log {
+        output file /var/log/caddy/caddy.log
+        format console
+    }
+
+    # automatic HTTP → HTTPS redirection
+    @http {
+        protocol http
+    }
+    redir @http https://{host}{uri} permanent
 }
