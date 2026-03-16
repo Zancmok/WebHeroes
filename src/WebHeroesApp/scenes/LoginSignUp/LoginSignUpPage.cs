@@ -94,6 +94,10 @@ public partial class LoginSignUpPage : Control
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
 	{
+		GD.Print("Requesting: ", url);
+		if (httpRequest.GetHttpClientStatus() != HttpClient.Status.Disconnected)
+			return; // already busy, ignore
+		
 		if (headers == null)
 		{
 			headers = ["Content-Type: application/json"];
