@@ -9,7 +9,7 @@ data:extend{
         type="recipe",
         name="build-village",
         display_name="Build Village",
-        result=data:id_of("settlement", "village"),
+        result=data:get_prototype("settlement", "village"),
         ingredients={
             {
                 type="ingredient",
@@ -37,7 +37,7 @@ data:extend{
         type="recipe",
         name="build-city",
         display_name="Build City",
-        result=data:id_of("settlement", "city"),
+        result=data:get_prototype("settlement", "city"),
         ingredients={
             {
                 type="ingredient",
