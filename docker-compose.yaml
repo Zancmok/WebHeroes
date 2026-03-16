@@ -17,8 +17,6 @@ services:
       dockerfile: ./Dockerfile
       args:
         no_run: "true"
-    expose:
-      - "5000"
     depends_on:
       - web_heroes_database
     command: bash -c "python ./main.py"
