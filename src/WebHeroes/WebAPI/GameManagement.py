@@ -82,3 +82,23 @@ class GameManagement(StaticClass):
         lobby.game.end_turn()
 
         GameManagement.socket_blueprint.emit("end-turn", lobby.game.current_user_index, to=lobby.game)
+
+    @staticmethod
+    @socket_blueprint.on("build-settlement")
+    def build_settlement() -> None:
+        user_session: Optional[UserSession] = SessionManager.get_user_session()
+        if not user_session:
+            return
+        user_session: UserSession
+
+        lobby: Lobby = user_session.get_lobby()
+
+        if not isinstance(lobby, OwnedLobby):
+            return
+        lobby: OwnedLobby
+
+        if lobby.owner_id != user_session.get_user_id():
+            return
+
+        # TODO: Implement!
+
