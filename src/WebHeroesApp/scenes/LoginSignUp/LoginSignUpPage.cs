@@ -40,12 +40,21 @@ public partial class LoginSignUpPage : Control
 	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
 	{
 		GD.Print("Response code: ", responseCode);
-		string jsonTemporary = Encoding.UTF8.GetString(body);
-		GD.Print("Response body: ", jsonTemporary);
+		string json = Encoding.UTF8.GetString(body);
+		GD.Print("Response body: ", json);
 		
+
+		var doc = JsonDocument.Parse(json).RootElement;
+		if (doc.TryGetProperty("token", out var tokenProp))
+		{
+			currentUserToken = tokenProp.GetString();
+			GD.Print("Token saved: ", currentUserToken);
+		}
+		/*
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print(json);
 		currentUserToken = JsonDocument.Parse(json).RootElement.GetProperty("token").GetString();
+		*/
 	}
 	
 	private void SignUp()
@@ -107,8 +116,6 @@ public partial class LoginSignUpPage : Control
 		{
 			headers = ["Content-Type: application/json"];
 		}
-		
-		httpRequest.Request(url, headers, HttpClient.Method.Post, body);
 		
 		Error err = httpRequest.Request(url, headers, HttpClient.Method.Post, body);
 		GD.Print("Request error code: ", err); // should print 0 (OK) if request started
