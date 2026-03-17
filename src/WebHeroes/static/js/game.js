@@ -65,13 +65,13 @@
     lastData = data;
     svg.innerHTML = "";
 
-    if (!data || !data.map || !data.map.fields) {
-      console.warn("[game.js] No map/fields in data:", data);
-      svg.setAttribute("viewBox", "0 0 400 400");
-      return;
+    if (!data || !data.fields) {
+    console.warn("[game.js] No fields in data:", data);
+    svg.setAttribute("viewBox", "0 0 400 400");
+    return;
     }
 
-    const fields = data.map.fields;
+    const fields = data.fields;
     const keys   = Object.keys(fields);
     console.log(`[game.js] ${keys.length} fields. First 3:`, keys.slice(0, 3).map(k => JSON.stringify(k)));
 
