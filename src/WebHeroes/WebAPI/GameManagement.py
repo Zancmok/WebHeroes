@@ -3,9 +3,11 @@ from os import path
 from Game.Field import Field
 from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
+import random
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
+from WebHeroes.Responses.ResponseTypes.EndTurnResponse import EndTurnResponse
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.UserSession import UserSession
@@ -60,6 +62,7 @@ class GameManagement(StaticClass):
         GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
             fields=fields,
             prototypes=lobby.game.prototypes,
+            players=[lobby.game.players[player] for player in lobby.game.players]
         )))
 
     @staticmethod
@@ -79,9 +82,14 @@ class GameManagement(StaticClass):
         if lobby.owner_id != user_session.get_user_id():
             return
 
+        rolled_number: int = random.randint(1, 6) + random.randint(1, 6)
         lobby.game.end_turn()
 
-        GameManagement.socket_blueprint.emit("end-turn", lobby.game.current_user_index, to=lobby.game)
+        GameManagement.socket_blueprint.emit("end-turn", dictify(EndTurnResponse(
+            rolled_number=rolled_number,
+            next_user_index=lobby.game.current_user_index,
+            players=[lobby.game.players[player] for player in lobby.game.players]
+        )), to=lobby.game)
 
     @staticmethod
     @socket_blueprint.on("build-settlement")

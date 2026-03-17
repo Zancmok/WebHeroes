@@ -28,11 +28,5 @@ data:extend{
         name="buckwheat",
         display_name="Buckwheat",
         sprite="__core__/images/empty.png"
-    },
-    {
-        type="resource",
-        name="victory-point",
-        display_name="Victory Point",
-        sprite="__core__/images/empty.png"
     }
 }
