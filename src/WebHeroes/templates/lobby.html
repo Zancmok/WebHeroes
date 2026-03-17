@@ -1,30 +1,72 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Lobby</title>
-  <link rel="stylesheet" type="text/css" href="../static/css/lobby.css" />
-  <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
-</head>
-<body>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Heroes — Lobby</title>
 
-  <div class="card">
-    <h1>Lobby: <span id="lobbyName">...</span></h1>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Shared Styles -->
+    <link rel="stylesheet" type="text/css" href="../static/css/shared.css">
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+  </head>
+  <body>
 
-    <div class="row"><b>Owner:</b> <span id="lobbyOwner">...</span></div>
+    <!-- Animated Hex Grid Canvas -->
+    <canvas id="hexCanvas"></canvas>
 
-    <div class="row">
-      <b>Players joined:</b>
-      <ul id="playersList"></ul>
-      <div id="status" class="muted" style="margin-top:8px;"></div>
+    <!-- Dice Roll Overlay -->
+    <div class="dice-overlay" id="diceOverlay">
+      <div class="dice-pair">
+        <div class="die" id="die1">&#9856;</div>
+        <div class="die" id="die2">&#9861;</div>
+      </div>
     </div>
 
-    <div class="row" style="margin-top: 14px;">
-      <button id="startBtn">Start</button>
-    </div>
-  </div>
+    <div class="lobby-wrap">
+      <div class="card lobby-card">
+        <div class="card-grain"></div>
+        <div class="card-corner-tr"></div>
+        <div class="card-corner-bl"></div>
+        <div class="harbor-top"></div>
+        <div class="card-inner">
 
-  <script src="../static/js/lobby.js"></script>
-</body>
+          <!-- Title -->
+          <div class="lobby-name-display" id="lobbyName">&#8230;</div>
+          <div class="lobby-sub">Waiting for Settlers</div>
+
+          <div class="hex-divider">
+            <div class="hex-divider-line"></div>
+            <div class="hex-divider-icon">&#11041;</div>
+            <div class="hex-divider-line"></div>
+          </div>
+
+          <!-- Owner Row -->
+          <div class="lobby-row form-item visible">
+            <div class="lobby-row-label">Campaign Lord</div>
+            <div class="lobby-owner-name" id="lobbyOwner">&#8230;</div>
+          </div>
+
+          <!-- Players Row -->
+          <div class="lobby-row form-item visible" style="transition-delay: 0.1s;">
+            <div class="lobby-row-label">Settlers Joined</div>
+            <ul id="playersList"></ul>
+            <div id="status"></div>
+          </div>
+
+          <!-- Start Button -->
+          <div class="form-item visible" style="transition-delay: 0.2s;">
+            <button class="btn-start" id="startBtn">&#9876; Begin the Campaign</button>
+          </div>
+
+          <div class="port-seal">&#11041; Port of Heroes &#11041;</div>
+        </div>
+      </div>
+    </div>
+
+    <script src="../static/js/sharedAnims.js"></script>
+    <script src="../static/js/lobby.js"></script>
+  </body>
 </html>

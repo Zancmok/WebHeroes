@@ -1,29 +1,29 @@
 (function () {
   const socket = io();
 
-  const lobbyNameEl = document.getElementById("lobbyName");
+  const lobbyNameEl  = document.getElementById("lobbyName");
   const lobbyOwnerEl = document.getElementById("lobbyOwner");
   const playersListEl = document.getElementById("playersList");
-  const statusEl = document.getElementById("status");
-  const startBtn = document.getElementById("startBtn");
+  const statusEl     = document.getElementById("status");
+  const startBtn     = document.getElementById("startBtn");
 
   const lobbyName = (sessionStorage.getItem("currentLobbyName") || "").trim();
 
   let refreshInterval = null;
 
-  function setStatus(msg) {
+  function setStatus(msg, isError) {
     statusEl.textContent = msg || "";
+    statusEl.className   = isError ? "msg-err" : "";
   }
 
   function renderPlayers(members) {
     playersListEl.innerHTML = "";
     if (!members || members.length === 0) {
       const li = document.createElement("li");
-      li.textContent = "No players joined yet";
+      li.textContent = "No settlers joined yet";
       playersListEl.appendChild(li);
       return;
     }
-
     for (const m of members) {
       const li = document.createElement("li");
       li.textContent = m.member_name;
@@ -31,18 +31,18 @@
     }
   }
 
+  // No lobby selected
   if (!lobbyName) {
-    lobbyNameEl.textContent = "Unknown";
+    lobbyNameEl.textContent  = "Unknown Campaign";
     lobbyOwnerEl.textContent = "Unknown";
     renderPlayers([]);
-    setStatus("No lobby selected. Go back and create/join a lobby first.");
+    setStatus("No lobby selected. Go back and create or join a lobby first.", true);
     startBtn.style.display = "none";
     return;
   }
 
-  // Hide until confirmed as owner
+  // Hide start button until confirmed as owner
   startBtn.style.display = "none";
-
   lobbyNameEl.textContent = lobbyName;
 
   function requestLobby() {
@@ -60,11 +60,9 @@
   socket.on("lobby-management:get-lobby", (data) => {
     if (!data) return;
 
-    if (data.owner) {
-      lobbyOwnerEl.textContent = data.owner.member_name || ("Owner (ID: " + data.owner.member_id + ")");
-    } else {
-      lobbyOwnerEl.textContent = "Unknown";
-    }
+    lobbyOwnerEl.textContent = data.owner
+      ? (data.owner.member_name || "Owner (ID: " + data.owner.member_id + ")")
+      : "Unknown";
 
     renderPlayers(data.members || []);
     setStatus("");
@@ -73,14 +71,14 @@
     startBtn.style.display = "";
   });
 
-  // All clients listen for game start and relocate simultaneously
+  // All clients redirect when the game starts
   socket.once("lobby-management:game-started", () => {
     window.location.assign("/game/");
   });
 
   startBtn.addEventListener("click", () => {
     startBtn.disabled = true;
-    setStatus("Starting game...");
+    setStatus("Rallying the troops…");
     socket.emit("lobby-management:start-game");
   });
 }());

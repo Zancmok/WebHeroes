@@ -1,73 +1,118 @@
-
 <!doctype html>
-
 <html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="description" content="Web Heroes — Online Lobbies">
+    <meta name="author" content="Rožle Lipej">
+    <meta name="keywords" content="Heroes, Online, Lobbies">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Heroes — Lobbies</title>
 
-	<head>
-		<meta charset="utf-8">
-		<meta name="description" content="heroes online">
-		<meta name="author" content="Rožle Lipej">
-		<meta name="keywords" content="Heroes,Online">
-		<meta name="viewport" content="width=device-width, initial-scale=1.0">
-		<script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="../static/css/lobbies.css" />
-	</head>
+    <!-- Socket.IO -->
+    <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@400;600;700&family=Crimson+Text:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+    <!-- Shared Styles -->
+    <link rel="stylesheet" type="text/css" href="../static/css/shared.css">
+  </head>
+  <body>
 
-	<body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header-section">
-            <div class="header-ad">
-                Advertisement Spot
-            </div>
-            <div class="header-nav">
-                <button id="back">Back</button>
-            </div>
-        </div>
+    <!-- Animated Hex Grid Canvas -->
+    <canvas id="hexCanvas"></canvas>
 
-        <!-- Main content wrapper -->
-        <div class="content-wrapper">
-            <!-- Main content area -->
-            <div class="main-content">
-                <!-- Action bar -->
-                <div class="action-bar">
-                    <button id="newGame">Create New Game</button>
-                </div>
-
-                <!-- Lobbies table -->
-                <table id="bot">
-                    <thead>
-                        <tr>
-                            <td>Host Name</td>
-                            <td>Join</td>
-                            <td>Game Description</td>
-                            <td>Players</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Lobbies will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-
-            <!-- Sidebar -->
-            <div class="sidebar">
-                <table id="bot3">
-                    <thead>
-                        <tr>
-                            <td>Players Online</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Players will be populated here -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <!-- Dice Roll Overlay -->
+    <div class="dice-overlay" id="diceOverlay">
+      <div class="dice-pair">
+        <div class="die" id="die1">&#9856;</div>
+        <div class="die" id="die2">&#9861;</div>
+      </div>
     </div>
 
+    <!-- Main Lobbies Wrapper -->
+    <div class="lobbies-wrap">
+
+      <!-- Header Card -->
+      <div class="card lobbies-header-card">
+        <div class="card-grain"></div>
+        <div class="card-corner-tr"></div>
+        <div class="card-corner-bl"></div>
+        <div class="harbor-top"></div>
+        <div class="card-inner">
+          <div class="lobbies-title-group">
+            <div>
+              <div class="card-title">WEB HEROES</div>
+              <div class="card-subtitle">Settle &middot; Trade &middot; Conquer</div>
+            </div>
+          </div>
+          <div class="action-bar">
+            <button class="btn-action" id="newGame">&#9876; New Campaign</button>
+            <button class="btn-back" id="back">&#8592; Retreat</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Layout: Table + Sidebar -->
+      <div class="lobbies-main-layout">
+
+        <!-- Lobbies Table Card -->
+        <div class="card table-card form-item visible">
+          <div class="card-grain"></div>
+          <div class="card-corner-tr"></div>
+          <div class="card-corner-bl"></div>
+          <div class="card-inner">
+
+            <div class="hex-divider" style="margin-bottom: 14px;">
+              <div class="hex-divider-line"></div>
+              <div class="hex-divider-icon">&#11041;</div>
+              <div class="hex-divider-line"></div>
+            </div>
+
+            <div class="lobbies-table-title">Active Campaigns</div>
+
+            <table class="hex-table" id="lobbiesTable">
+              <thead>
+                <tr>
+                  <td>Campaign Name</td>
+                  <td>Join</td>
+                  <td>Settlers</td>
+                  <td>Players</td>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- Lobbies populated by lobbies.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Sidebar: Online Players -->
+        <div class="card sidebar-card form-item visible" style="transition-delay: 0.15s;">
+          <div class="card-grain"></div>
+          <div class="card-corner-tr"></div>
+          <div class="card-corner-bl"></div>
+          <div class="card-inner">
+
+            <div class="hex-divider" style="margin-bottom: 14px;">
+              <div class="hex-divider-line"></div>
+              <div class="hex-divider-icon">&#11041;</div>
+              <div class="hex-divider-line"></div>
+            </div>
+
+            <div class="lobbies-table-title">Settlers Online</div>
+            <div class="players-list" id="playersList">
+              <!-- Players populated by lobbies.js -->
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="port-seal">&#11041; Port of Heroes &#11041;</div>
+
+    </div>
+
+    <script src="../static/js/sharedAnims.js"></script>
     <script src="../static/js/lobbies.js"></script>
     <script src="../static/js/logout.js"></script>
-</body>
-
+  </body>
 </html>

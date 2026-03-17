@@ -1,117 +1,97 @@
 (function init() {
-    var socket = io()
+  var socket = io();
 
-    function sleep(ms) {
-        return new Promise(resolve => setTimeout(resolve, ms));
+  function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  socket.on('connect', async () => {
+    console.log('Connected to server!');
+    socket.emit('lobby-management:refresh');
+
+    while (true) {
+      await sleep(10000);
+      socket.emit('lobby-management:refresh');
+    }
+  });
+
+  socket.on('lobby-management:refresh', (data) => {
+    console.log('Received refresh response:', data);
+
+    //Update online players list
+    const playersList = document.getElementById('playersList');
+    playersList.innerHTML = '';
+
+    if (data.members && data.members.length > 0) {
+      data.members.forEach(member => {
+        const row = document.createElement('div');
+        row.className = 'player-row';
+        row.textContent = member.member_name;
+        playersList.appendChild(row);
+      });
+    } else {
+      const empty = document.createElement('div');
+      empty.className = 'no-players';
+      empty.textContent = 'No settlers online';
+      playersList.appendChild(empty);
     }
 
-    socket.on("connect", async () => {
-        console.log("Connected to server!");
+    //Update lobbies table
+    const tbody = document.querySelector('#lobbiesTable tbody');
+    tbody.innerHTML = '';
 
-        // Initial refresh
-        socket.emit('lobby-management:refresh');
+    if (data.lobbies && data.lobbies.length > 0) {
+      data.lobbies.forEach(lobby => {
+        const row = document.createElement('tr');
 
-        // Refresh every 10 seconds
-        while (true) {
-            await sleep(10000);
-            socket.emit('lobby-management:refresh');
-        }
-    });
+        const lobbyName   = lobby.lobby_name || 'Unknown';
+        const playersList = lobby.members.map(m => m.member_name).join(', ');
+        const playerCount = lobby.members ? lobby.members.length : 0;
 
-    socket.on('lobby-management:refresh', (data) => {
-        console.log('Received refresh response:', data);
+        row.innerHTML = `
+          <td>${lobbyName}</td>
+          <td><button class="join-btn" data-lobby="${lobby.lobby_name}">⚔ Join</button></td>
+          <td>${playersList}</td>
+          <td>${playerCount}</td>
+        `;
 
-        // Update online players
-        const onlinePlayers = document.querySelector("#bot3 tbody");
-        onlinePlayers.innerHTML = "";
+        tbody.appendChild(row);
+      });
 
-        if (data.members && data.members.length > 0) {
-            for (let i = 0; i < data.members.length; i++) {
-                let member = data.members[i];
-                let row = document.createElement("tr");
-                row.innerHTML = "<td>" + member.member_name + "</td>";
-                onlinePlayers.append(row);
-            }
-        } else {
-            let row = document.createElement("tr");
-            row.innerHTML = "<td>No players online</td>";
-            onlinePlayers.append(row);
-        }
+      // Attach join button listeners
+      document.querySelectorAll('.join-btn').forEach(btn => {
+        btn.addEventListener('click', function () {
+          const lobbyName = this.getAttribute('data-lobby').trim();
+          console.log('Joining lobby:', lobbyName);
+          sessionStorage.setItem('currentLobbyName', lobbyName);
+          socket.emit('lobby-management:join-lobby', { lobby_name: lobbyName });
+          window.location.href = '/lobby/';
+        });
+      });
 
-        // Update lobbies
-        const lobbiesTable = document.querySelector("#bot tbody");
-        lobbiesTable.innerHTML = "";
+    } else {
+      const row = document.createElement('tr');
+      row.className = 'no-data';
+      row.innerHTML = "<td colspan='4'>No active campaigns — be the first to raise your banner!</td>";
+      tbody.appendChild(row);
+    }
+  });
 
-        if (data.lobbies && data.lobbies.length > 0) {
-            for (let i = 0; i < data.lobbies.length; i++) {
-                let lobby = data.lobbies[i];
-                let row = document.createElement("tr");
+  //Create new game
+  document.getElementById('newGame').addEventListener('click', function () {
+    let lobbyName = prompt('Name your campaign:');
+    if (lobbyName && lobbyName.trim() !== '') {
+      lobbyName = lobbyName.trim();
+      sessionStorage.setItem('currentLobbyName', lobbyName);
+      socket.emit('lobby-management:create-lobby', { lobby_name: lobbyName });
+      window.location.href = '/lobby/';
+      setTimeout(() => socket.emit('lobby-management:refresh'), 500);
+    }
+  });
 
-                // Host Name - use the lobby name
-                let lobbyName = lobby.lobby_name || "Unknown";
+  //Back button
+  document.getElementById('back').addEventListener('click', function () {
+    window.history.back();
+  });
 
-                // Game Description - list all players
-                let playersList = "";
-
-                for (let i = 0; i < lobby.members.length; i++) {
-                    playersList += lobby.members[i].member_name;
-
-                    if (i < lobby.members.length - 1) {
-                        playersList += ", ";
-                    }
-                }
-
-                // Player Count
-                let playerCount = lobby.members ? lobby.members.length : 0;
-
-                row.innerHTML = `
-                    <td>${lobbyName}</td>
-                    <td><button class="join-btn" data-lobby="${lobby.lobby_name}">Join</button></td>
-                    <td>${playersList}</td>
-                    <td>${playerCount}</td>
-                `;
-
-                lobbiesTable.append(row);
-            }
-
-            // Add event listeners to join buttons
-            document.querySelectorAll('.join-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const lobbyName = this.getAttribute('data-lobby').trim();
-                    console.log('Joining lobby:', lobbyName);
-
-                    // Save lobby name for lobby.html
-                    sessionStorage.setItem("currentLobbyName", lobbyName);
-
-                    socket.emit('lobby-management:join-lobby', {"lobby_name": lobbyName});
-
-                    // Redirect to lobby page
-                    window.location.href = "/lobby/";
-                });
-            });
-        } else {
-            let row = document.createElement("tr");
-            row.innerHTML = "<td colspan='4'>No active lobbies</td>";
-            lobbiesTable.append(row);
-        }
-    });
-
-// Create new game button handler
-    document.getElementById('newGame').addEventListener('click', function() {
-        let lobbyName = prompt("Enter lobby name:");
-        if (lobbyName && lobbyName.trim() !== "") {
-            lobbyName = lobbyName.trim();
-
-            // Save lobby name for lobby.html
-            sessionStorage.setItem("currentLobbyName", lobbyName);
-
-            socket.emit('lobby-management:create-lobby', {"lobby_name": lobbyName});
-
-            // Redirect creator to lobby page
-            window.location.href = "/lobby/";
-
-            // Refresh immediately after creating
-            setTimeout(() => socket.emit('lobby-management:refresh'), 500);
-        }
-    });
 })();

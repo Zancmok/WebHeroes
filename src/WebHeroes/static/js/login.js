@@ -1,44 +1,39 @@
-/* ============================================================
-   PASSWORD MATCH CHECK
-   ============================================================ */
 const signupPassword = document.getElementById("signup-password");
 const confirmPassword = document.getElementById("confirm-password");
 const matchPass       = document.getElementById("matchPass");
-const loginShit       = document.getElementById("loginWork");
-const form  = document.getElementById("signupForm");
-const login = document.getElementById("loginForm");
+const loginWork       = document.getElementById("loginWork");
+const form            = document.getElementById("signupForm");
+const loginForm       = document.getElementById("loginForm");
 
 function comparePasswords() {
     if (signupPassword.value === "" && confirmPassword.value === "") {
         matchPass.textContent = "";
+        matchPass.className = "";
     } else if (signupPassword.value === confirmPassword.value) {
         matchPass.textContent = "✅ Passwords match!";
-        matchPass.style.color = "green";
+        matchPass.className = "msg-ok";
     } else {
         matchPass.textContent = "❌ Passwords do not match.";
-        matchPass.style.color = "red";
+        matchPass.className = "msg-err";
     }
 }
 
 signupPassword.addEventListener("input", comparePasswords);
 confirmPassword.addEventListener("input", comparePasswords);
 
-// SIGN UP
+
 async function signupPress(event) {
     event.preventDefault();
 
-    if (signupPassword.value === "" && confirmPassword.value === "") {
-        return;
-    } else if (signupPassword.value !== confirmPassword.value) {
-        return;
-    }
+    if (signupPassword.value === "" && confirmPassword.value === "") return;
+    if (signupPassword.value !== confirmPassword.value) return;
 
     const signup_data = {
         username: document.getElementById("signup-name").value,
         password: signupPassword.value
     };
 
-    // rollDice is defined in animations.js (loaded before this file)
+    // rollDice is defined in sharedAnims.js (loaded before this file)
     rollDice(async () => {
         try {
             const response = await fetch("/user-management/signup", {
@@ -52,25 +47,21 @@ async function signupPress(event) {
             if (response.status === 201) {
                 form.reset();
                 matchPass.textContent = "✅ Account created successfully!";
-                matchPass.style.color = "green";
-            } else if (response.status === 400) {
+                matchPass.className = "msg-ok";
+            } else if (response.status === 400 || response.status === 409) {
                 matchPass.textContent = `❌ ${data.reason}`;
-                matchPass.style.color = "red";
-            } else if (response.status === 409) {
-                matchPass.textContent = `❌ ${data.reason}`;
-                matchPass.style.color = "red";
+                matchPass.className = "msg-err";
             }
         } catch (error) {
-            console.error("Request failed:", error);
+            console.error("Signup request failed:", error);
             matchPass.textContent = "❌ An error occurred. Please try again.";
-            matchPass.style.color = "red";
+            matchPass.className = "msg-err";
         }
     });
 }
 
 form.addEventListener("submit", signupPress);
 
-// LOGIN
 async function loginPress(event) {
     event.preventDefault();
 
@@ -79,7 +70,7 @@ async function loginPress(event) {
         password: document.getElementById("login-password").value
     };
 
-    // rollDice is defined in animations.js (loaded before this file)
+    // rollDice is defined in sharedAnims.js (loaded before this file)
     rollDice(async () => {
         try {
             const response = await fetch("/user-management/login", {
@@ -91,25 +82,48 @@ async function loginPress(event) {
             const data = await response.json();
 
             if (response.status === 200) {
-                console.log("Login successful!");
-                loginShit.textContent = "✅ Login successful!";
-                loginShit.style.color = "green";
+                loginWork.textContent = "✅ Login successful!";
+                loginWork.className = "msg-ok";
                 window.location.assign("/online-lobbies/");
-            } else if (response.status === 400) {
-                console.error("Error:", data.reason);
-                loginShit.textContent = `❌ ${data.reason}`;
-                loginShit.style.color = "red";
-            } else if (response.status === 403) {
-                console.error("Error:", data.reason);
-                loginShit.textContent = `❌ ${data.reason}`;
-                loginShit.style.color = "red";
+            } else if (response.status === 400 || response.status === 403) {
+                console.error("Login error:", data.reason);
+                loginWork.textContent = `❌ ${data.reason}`;
+                loginWork.className = "msg-err";
             }
         } catch (error) {
-            console.error("Request failed:", error);
-            loginShit.textContent = "❌ An error occurred. Please try again.";
-            loginShit.style.color = "red";
+            console.error("Login request failed:", error);
+            loginWork.textContent = "❌ An error occurred. Please try again.";
+            loginWork.className = "msg-err";
         }
     });
 }
 
-login.addEventListener("submit", loginPress);
+loginForm.addEventListener("submit", loginPress);
+
+//tab animation
+function revealFormItems(paneId) {
+    const pane = document.getElementById(paneId);
+    if (!pane) return;
+    const items = pane.querySelectorAll('.form-item');
+    items.forEach(item => {
+        item.classList.remove('visible');
+        item.style.transitionDelay = '0s';
+    });
+    requestAnimationFrame(() => {
+        items.forEach((item, i) => {
+            item.style.transitionDelay = (i * 0.1 + 0.1) + 's';
+            setTimeout(() => item.classList.add('visible'), 20);
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    revealFormItems('signup');
+
+    document.querySelectorAll('.nav-link').forEach(tab => {
+        tab.addEventListener('shown.bs.tab', function (e) {
+            const target = e.target.getAttribute('href').replace('#', '');
+            revealFormItems(target);
+        });
+    });
+});

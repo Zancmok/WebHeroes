@@ -1,7 +1,7 @@
-
-// HEX GRID CANVAS — animated Catan-style board in background
+//HEX GRID CANVAS — animated Catan-style board
 (function () {
   const canvas = document.getElementById('hexCanvas');
+  if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let W, H, hexes = [];
 
@@ -103,10 +103,10 @@
 })();
 
 
-// FLOATING RESOURCE ICONS
-
+//FLOATING RESOURCE ICONS
 (function () {
   const resources = ['🌲', '🌾', '🐑', '🧱', '⛰️', '🌊', '⚓', '⚒'];
+
   function spawnResource() {
     const el = document.createElement('div');
     el.className = 'resource-float';
@@ -120,11 +120,13 @@
     document.body.appendChild(el);
     setTimeout(() => el.remove(), (dur + 4) * 1000);
   }
+
   setInterval(spawnResource, 1200);
   for (let i = 0; i < 6; i++) setTimeout(spawnResource, i * 300);
 })();
 
-// MOUSE TRAIL — golden road dots
+
+// ─── MOUSE TRAIL — golden road dots ───
 (function () {
   let last = 0;
   document.addEventListener('mousemove', e => {
@@ -141,29 +143,14 @@
 })();
 
 
-// TAB ANIMATION — staggered form items appear
-function revealFormItems(paneId) {
-  const pane  = document.getElementById(paneId);
-  const items = pane.querySelectorAll('.form-item');
-  items.forEach(item => {
-    item.classList.remove('visible');
-    item.style.transitionDelay = '0s';
-  });
-  requestAnimationFrame(() => {
-    items.forEach((item, i) => {
-      item.style.transitionDelay = (i * 0.1 + 0.1) + 's';
-      setTimeout(() => item.classList.add('visible'), 20);
-    });
-  });
-}
-
-// DICE ROLL — exposed globally so login.js can call it
+//DICE ROLL — exposed globally so login.js can call it
 const DICE_FACES = ['⚀', '⚁', '⚂', '⚃', '⚄', '⚅'];
 
 function rollDice(callback) {
   const overlay = document.getElementById('diceOverlay');
   const d1 = document.getElementById('die1');
   const d2 = document.getElementById('die2');
+  if (!overlay || !d1 || !d2) { if (callback) callback(); return; }
   overlay.classList.add('active');
   let cycles = 0;
   const interval = setInterval(() => {
@@ -180,15 +167,3 @@ function rollDice(callback) {
     }
   }, 120);
 }
-
-// 6. INIT ON DOM READY
-document.addEventListener('DOMContentLoaded', () => {
-  revealFormItems('signup');
-
-  document.querySelectorAll('.nav-link').forEach(tab => {
-    tab.addEventListener('shown.bs.tab', function (e) {
-      const target = e.target.getAttribute('href').replace('#', '');
-      revealFormItems(target);
-    });
-  });
-});
