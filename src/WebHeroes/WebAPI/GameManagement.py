@@ -83,7 +83,7 @@ class GameManagement(StaticClass):
             return
 
         rolled_number: int = random.randint(1, 6) + random.randint(1, 6)
-        lobby.game.end_turn()
+        lobby.game.end_turn(rolled_number)
 
         GameManagement.socket_blueprint.emit("end-turn", dictify(EndTurnResponse(
             rolled_number=rolled_number,

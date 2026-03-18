@@ -65,7 +65,9 @@ class Game:
         for user_session in self.players:
             print(self.players[user_session].to_dictify(), flush=True)
 
-    def end_turn(self) -> None:
+    def end_turn(self, rolled_number: int) -> None:
+        
+
         for intersection in self.game_map.intersections:
             settlement: Settlement = self.game_map.intersections[intersection].settlement
             if not settlement:
@@ -74,7 +76,7 @@ class Game:
             for field_cords in intersection:
                 field: Field = self.game_map.fields[field_cords]
 
-                if not field.assigned_number:
+                if field.assigned_number != rolled_number:
                     continue
 
                 # TODO: do shit hia...
