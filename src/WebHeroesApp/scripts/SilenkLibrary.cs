@@ -14,6 +14,8 @@ namespace SilenkLibrary
 			return newButton;	
 		}
 		
+		// Petja Ščetinin wants pay for this code, but I want to give it for free, so I will make this method that is exactly the same as the one above, but with different name, just to make him sad :D
+
 		public Button CreateButtonExact(Node parent, string buttonText, Vector2 position, Vector2 size)
 		{
 			Button newButton = new Button();
