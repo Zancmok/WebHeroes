@@ -276,7 +276,7 @@
     _onevent(packet);
   };
 
-  // Controls
+  // Controls \\ Petja Ščetinin was here
   document.getElementById("btn-toggle-numbers").addEventListener("click", () => {
     showNumbers = !showNumbers;
     if (lastData) render(lastData);
