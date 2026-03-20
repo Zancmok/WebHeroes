@@ -43,12 +43,16 @@ public partial class LoginSignUpPage : Control
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print("Response body: ", json);
 		
-
 		var doc = JsonDocument.Parse(json).RootElement;
 		if (doc.TryGetProperty("token", out var tokenProp))
 		{
 			currentUserToken = tokenProp.GetString();
 			GD.Print("Token saved: ", currentUserToken);
+			
+			var gameState = GetNode<Node>("/root/GameState");
+			gameState.Set("token", currentUserToken);
+			
+			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 		}
 		/*
 		string json = Encoding.UTF8.GetString(body);

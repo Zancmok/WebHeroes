@@ -16,7 +16,16 @@ public partial class UserManagementLobby : Node
             new Callable(this, nameof(OnLobbyRefresh)));
         socketIOLobby.Connect("lobby_created", 
             new Callable(this, nameof(OnLobbyCreated)));
+
+        // Read token forom global state and connect
+        var gameState = GetNode<Node>("/root/GameState");
+        string token = gameState.Get("token").AsString();
+        GD.Print("Connecting with token: ", token);
+        ConnectToServer(token);
     }
+
+    // _Ready() Login success -> token is saved to GameState -> scene change to Lobby
+    // Lobby load -> reads token from GameState -> connects socket with token
 
     public void ConnectToServer(string token)
     {
