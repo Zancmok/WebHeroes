@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://chmt4e0rc2iwr"]
 
-[ext_resource type="Script" uid="uid://dd8qa1osblyyh" path="res://scenes/WaitingRoom.cs" id="1_0q7jc"]
+[ext_resource type="Script" uid="uid://dd8qa1osblyyh" path="res://scenes/Lobby/WaitingRoom.cs" id="1_0q7jc"]
 
 [node name="WaitingRoom" type="Control"]
 layout_mode = 3
