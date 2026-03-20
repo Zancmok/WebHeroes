@@ -3,7 +3,8 @@ data:extend{
         type="settings",
         name="settings",
         display_name="Settings",
-        map_size=5
+        map_size=5,
+        point_requirement=1
     },
     {
         type="field",
