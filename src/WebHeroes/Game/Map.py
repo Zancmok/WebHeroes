@@ -1,9 +1,11 @@
 from typing import Optional
 import random
-from Prototype import FieldPrototype, SettingsPrototype
+from Prototype import FieldPrototype, SettingsPrototype, RoadPrototype
 from .Field import Field
 from .Intersection import Intersection
 from .Connection import Connection
+from .Player import Player
+from .Road import Road
 
 
 class Map:
@@ -174,3 +176,38 @@ class Map:
 
             if new_set not in self.intersections:
                 self.intersections[new_set] = Intersection()
+
+    def build_road(self, location: frozenset[tuple[int, int]], player: Player, road_prototype: RoadPrototype) -> bool:
+        connection: Optional[Connection] = self.connections.get(location)
+
+        if not connection or connection.road:
+            return False
+        connection: Connection
+
+        neighboring_intersections: list[Intersection] = [
+            intersection for fields_set, intersection in self.intersections.items()
+            if location.issubset(fields_set)
+        ]
+
+        if not neighboring_intersections:
+            return False
+
+        can_place: bool = any(
+            (intersection.settlement and intersection.settlement.owner == player)
+            or any(
+                conn.road and conn.road.owner == player
+                for conn_fields, conn in self.connections.items()
+                if conn_fields.issubset(fields_set) and conn_fields != location
+            )
+            for fields_set, intersection in self.intersections.items()
+            if location.issubset(fields_set)
+        )
+        if not can_place:
+            return False
+
+        connection.road = Road(
+            road_type=road_prototype,
+            owner=player
+        )
+
+        return True

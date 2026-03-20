@@ -62,12 +62,7 @@ class Game:
             self.users.append(user)
             self.players[user] = Player(player_colors[i], resources)
 
-        for user_session in self.players:
-            print(self.players[user_session].to_dictify(), flush=True)
-
     def end_turn(self, rolled_number: int) -> None:
-        
-
         for intersection in self.game_map.intersections:
             settlement: Settlement = self.game_map.intersections[intersection].settlement
             if not settlement:
@@ -79,7 +74,7 @@ class Game:
                 if field.assigned_number != rolled_number:
                     continue
 
-                # TODO: do shit hia...
+                settlement.owner.resources[field.field_type.resource] += settlement.settlement_type.resource_multiplier
 
         self.current_user_index += 1
-        self.current_user_index %= len(self.users) - 1
+        self.current_user_index %= len(self.users)

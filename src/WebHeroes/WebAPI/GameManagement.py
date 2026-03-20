@@ -4,6 +4,9 @@ from Game.Field import Field
 from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
 import random
+
+from Game.Player import Player
+from Prototype import Recipe, RoadPrototype, SettlementPrototype
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
@@ -13,6 +16,7 @@ from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.UserSession import UserSession
 from ZancmokLib.EHTTPMethod import EHTTPMethod
 from ZancmokLib.EHTTPCode import EHTTPCode
+from ZancmokLib.FlaskUtil import FlaskUtil
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.SocketBlueprint import SocketBlueprint
 from WebHeroes.Responses import dictify
@@ -79,7 +83,7 @@ class GameManagement(StaticClass):
             return
         lobby: OwnedLobby
 
-        if lobby.owner_id != user_session.get_user_id():
+        if lobby.game.users[lobby.game.current_user_index].get_user_id() != user_session.get_user_id():
             return
 
         rolled_number: int = random.randint(1, 6) + random.randint(1, 6)
@@ -93,7 +97,8 @@ class GameManagement(StaticClass):
 
     @staticmethod
     @socket_blueprint.on("build-settlement")
-    def build_settlement() -> None:
+    @FlaskUtil.verify_socket_arguments(socket_blueprint, recipe_id=str, location=list[int])
+    def build_settlement(recipe_id: str, location: list[int]) -> None:
         user_session: Optional[UserSession] = SessionManager.get_user_session()
         if not user_session:
             return
@@ -105,8 +110,51 @@ class GameManagement(StaticClass):
             return
         lobby: OwnedLobby
 
-        if lobby.owner_id != user_session.get_user_id():
+        if lobby.game.users[lobby.game.current_user_index].get_user_id() != user_session.get_user_id():
             return
 
-        # TODO: Implement!
+        player: Player = lobby.game.players[user_session]
 
+        actual_recipe: Optional[Recipe] = None
+        for recipe in lobby.game.recipes:
+            if recipe.name == recipe_id:
+                actual_recipe = recipe
+                break
+
+        if not actual_recipe:
+            return
+        actual_recipe: Recipe
+
+        for ingredient in actual_recipe.ingredients:
+            if player.resources[ingredient.resource] < ingredient.amount:
+                return
+
+        actual_location: frozenset[tuple[int, int]]
+        if isinstance(actual_recipe.result, RoadPrototype):
+            if not len(location) == 4:
+                return
+
+            for coordinate in location:
+                if not isinstance(coordinate, int):
+                    return
+
+            actual_location = frozenset({
+                (location[0], location[1]),
+                (location[2], location[3])
+            })
+
+            if not lobby.game.game_map.build_road(actual_location, player, actual_recipe.result):
+                return
+        elif isinstance(actual_recipe.result, SettlementPrototype):
+            if not len(location) == 6:
+                return
+
+            for coordinate in location:
+                if not isinstance(coordinate, int):
+                    return
+
+            actual_location = frozenset({
+                (location[0], location[1]),
+                (location[2], location[3]),
+                (location[4], location[5])
+            })
