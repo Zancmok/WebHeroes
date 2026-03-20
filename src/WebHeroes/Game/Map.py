@@ -1,11 +1,12 @@
 from typing import Optional
 import random
-from Prototype import FieldPrototype, SettingsPrototype, RoadPrototype
+from Prototype import FieldPrototype, SettingsPrototype, RoadPrototype, SettlementPrototype
 from .Field import Field
 from .Intersection import Intersection
 from .Connection import Connection
 from .Player import Player
 from .Road import Road
+from .Settlement import Settlement
 
 
 class Map:
@@ -207,6 +208,53 @@ class Map:
 
         connection.road = Road(
             road_type=road_prototype,
+            owner=player
+        )
+
+        return True
+
+    def build_settlement(self, location: frozenset[tuple[int, int]], player: Player, settlement_prototype: SettlementPrototype) -> bool:
+        intersection: Optional[Intersection] = self.intersections.get(location)
+
+        if not intersection:
+            return False
+        intersection: Intersection
+
+        if settlement_prototype.prerequisite_building:
+            if not intersection.settlement or settlement_prototype.prerequisite_building != intersection.settlement.settlement_type.name:
+                return False
+        else:
+            if intersection.settlement:
+                return False
+
+        player_settlement_count: int = sum(
+            1 for i in self.intersections.values()
+            if i.settlement and i.settlement.owner == player
+        )
+
+        too_close: bool = any(
+            i.settlement
+            for fields_set, i in self.intersections.items()
+            if fields_set != location and any(
+                conn_fields.issubset(fields_set) and conn_fields.issubset(location)
+                for conn_fields in self.connections
+            )
+        )
+
+        if too_close:
+            return False
+
+        if player_settlement_count != 0:
+            can_place: bool = any(
+                conn.road and conn.road.owner == player
+                for conn_fields, conn in self.connections.items()
+                if conn_fields.issubset(location)
+            )
+            if not can_place:
+                return False
+
+        intersection.settlement = Settlement(
+            settlement_type=settlement_prototype,
             owner=player
         )
 

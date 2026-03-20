@@ -10,6 +10,7 @@ from Prototype import Recipe, RoadPrototype, SettlementPrototype
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
+from WebHeroes.Responses.ResponseTypes.BuildResponse import BuildResponse
 from WebHeroes.Responses.ResponseTypes.EndTurnResponse import EndTurnResponse
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
@@ -96,9 +97,9 @@ class GameManagement(StaticClass):
         )), to=lobby.game)
 
     @staticmethod
-    @socket_blueprint.on("build-settlement")
+    @socket_blueprint.on("build")
     @FlaskUtil.verify_socket_arguments(socket_blueprint, recipe_id=str, location=list[int])
-    def build_settlement(recipe_id: str, location: list[int]) -> None:
+    def build(recipe_id: str, location: list[int]) -> None:
         user_session: Optional[UserSession] = SessionManager.get_user_session()
         if not user_session:
             return
@@ -158,3 +159,17 @@ class GameManagement(StaticClass):
                 (location[2], location[3]),
                 (location[4], location[5])
             })
+
+            if not lobby.game.game_map.build_settlement(actual_location, player, actual_recipe.result):
+                return
+        else:
+            return
+
+        for ingredient in actual_recipe.ingredients:
+            player.resources[ingredient.resource] -= ingredient.amount
+
+        GameManagement.socket_blueprint.emit("build", dictify(BuildResponse(
+            building=actual_recipe.result,
+            location=location,
+            player=player
+        )), to=lobby.game)
