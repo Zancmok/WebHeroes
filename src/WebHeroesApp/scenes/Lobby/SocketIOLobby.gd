@@ -4,14 +4,14 @@ extends Node
 
 signal lobby_refresh_received(data)
 signal lobby_created(data)
+signal game_started()
 
 func _ready() -> void:
 	client.event_received.connect(_on_event_received)
 	client.socket_connected.connect(_on_connected)
 
 func connect_to_server(token: String) -> void:
-	client.auth = { "token": token }
-	client.connect_socket()
+	client.connect_socket({ "token": token })
 
 func _on_connected() -> void:
 	print("Socket connected!")
@@ -32,12 +32,5 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 		emit_signal("lobby_refresh_received", data)
 	elif event == "lobby-management:create-lobby":
 		emit_signal("lobby_created", data)
-
-## **Step 2** — in your `Lobby.tscn`, add two child nodes under the root: a `Node` with `SocketIOLobby.gd` attached, and under that a `Node` with the SocketIO addon script (`res://addons/godot-socketio/socketio.gd`) with `autoconnect = false` and `base_url = "https://localhost"`.
-
-## The scene tree should look like:
-
-##  lobby (Control)
-##  ├── ... (your existing UI nodes)
-##  └── SocketIOLobby (Node) ← SocketIOLobby.gd
-##      └── SocketIO (Node)  ← addons/godot-socketio/socketio.gd
+	elif event == "lobby-management:game-started":
+		emit_signal("game_started")
