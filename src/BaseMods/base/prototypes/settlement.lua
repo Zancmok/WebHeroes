@@ -13,6 +13,7 @@ data:extend{
         display_name="City",
         sprite="__core__/images/empty.png",
         point_value=2,
-        resource_multiplier=2
+        resource_multiplier=2,
+        prerequisite_building="village"
     }
 }
