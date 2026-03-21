@@ -15,9 +15,9 @@ run/main_scene="res://screen.tscn"
 config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
+[network]
+tls/certificate_bundle_override="res://caddy_root.crt"
+
 [editor_plugins]
 
 enabled=PackedStringArray("res://addons/godot-socketio/plugin.cfg")
-
-[network]
-tls/certificate_bundle_override="res://caddy_root.crt"

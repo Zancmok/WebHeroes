@@ -22,6 +22,8 @@ public partial class LoginSignUpPage : Control
 		httpRequest.RequestCompleted -= OnRequestCompleted;
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		
+		MakePostRequest($"{realHttps}/ping", "{}");
+		
 		Button signUpSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/Submit");
 		signUpSubmit.Pressed += () => 
 		{
