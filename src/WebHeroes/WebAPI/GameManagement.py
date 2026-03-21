@@ -64,10 +64,17 @@ class GameManagement(StaticClass):
                 assigned_number=curr.assigned_number
             )
 
+        user_index: int = -1
+        for i, user in enumerate(lobby.game.users):
+            if user == user_session:
+                user_index = i
+
         GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
             fields=fields,
             prototypes=lobby.game.prototypes,
-            players=[lobby.game.players[player] for player in lobby.game.players]
+            players=[lobby.game.players[player] for player in lobby.game.players],
+            current_user_index=lobby.game.current_user_index,
+            my_index=user_index
         )))
 
     @staticmethod

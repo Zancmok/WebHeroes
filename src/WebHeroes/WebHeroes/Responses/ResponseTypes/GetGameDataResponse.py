@@ -12,3 +12,5 @@ class GetGameDataResponse(BaseResponseModel):
     fields: dict[str, FieldModel]
     prototypes: list[AbstractBasePrototype]
     players: list[Player]
+    current_user_index: int
+    my_index: int
