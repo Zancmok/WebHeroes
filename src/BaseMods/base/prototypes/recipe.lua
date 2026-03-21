@@ -50,5 +50,23 @@ data:extend{
                 amount=3
             }
         }
+    },
+    {
+        type="recipe",
+        name="build-road",
+        display_name="Build Road",
+        result=data:get_prototype("road", "road"),
+        ingredients={
+            {
+                type="ingredient",
+                resource=data:id(wood),
+                amount=1
+            },
+            {
+                type="ingredient",
+                resource=data:id(brick),
+                amount=1
+            }
+        }
     }
 }

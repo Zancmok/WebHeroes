@@ -98,20 +98,23 @@ class GameManagement(StaticClass):
 
     @staticmethod
     @socket_blueprint.on("build")
-    @FlaskUtil.verify_socket_arguments(socket_blueprint, recipe_id=str, location=list[int])
+    @FlaskUtil.verify_socket_arguments(socket_blueprint, recipe_id=str, location=list)
     def build(recipe_id: str, location: list[int]) -> None:
         user_session: Optional[UserSession] = SessionManager.get_user_session()
         if not user_session:
+            print("No user session!", flush=True)
             return
         user_session: UserSession
 
         lobby: Lobby = user_session.get_lobby()
 
         if not isinstance(lobby, OwnedLobby):
+            print("No lobby!", flush=True)
             return
         lobby: OwnedLobby
 
         if lobby.game.users[lobby.game.current_user_index].get_user_id() != user_session.get_user_id():
+            print("Not current user!", flush=True)
             return
 
         player: Player = lobby.game.players[user_session]
@@ -123,20 +126,24 @@ class GameManagement(StaticClass):
                 break
 
         if not actual_recipe:
+            print("Not an recipe!", flush=True)
             return
         actual_recipe: Recipe
 
         for ingredient in actual_recipe.ingredients:
             if player.resources[ingredient.resource] < ingredient.amount:
+                print("Not enough resources!", flush=True)
                 return
 
         actual_location: frozenset[tuple[int, int]]
         if isinstance(actual_recipe.result, RoadPrototype):
             if not len(location) == 4:
+                print("Malformed location!", flush=True)
                 return
 
             for coordinate in location:
                 if not isinstance(coordinate, int):
+                    print("Malformed location!", flush=True)
                     return
 
             actual_location = frozenset({
@@ -145,13 +152,16 @@ class GameManagement(StaticClass):
             })
 
             if not lobby.game.game_map.build_road(actual_location, player, actual_recipe.result):
+                print("Building failed!", flush=True)
                 return
         elif isinstance(actual_recipe.result, SettlementPrototype):
             if not len(location) == 6:
+                print("Malformed location!", flush=True)
                 return
 
             for coordinate in location:
                 if not isinstance(coordinate, int):
+                    print("Malformed location!", flush=True)
                     return
 
             actual_location = frozenset({
@@ -161,8 +171,10 @@ class GameManagement(StaticClass):
             })
 
             if not lobby.game.game_map.build_settlement(actual_location, player, actual_recipe.result):
+                print("Building failed!", flush=True)
                 return
         else:
+            print("Unknown result type!", flush=True)
             return
 
         for ingredient in actual_recipe.ingredients:

@@ -217,14 +217,19 @@ class Map:
         intersection: Optional[Intersection] = self.intersections.get(location)
 
         if not intersection:
+            print(f"No intersection!", flush=True)
+            print(self.intersections, flush=True)
+            print(location, flush=True)
             return False
         intersection: Intersection
 
         if settlement_prototype.prerequisite_building:
             if not intersection.settlement or settlement_prototype.prerequisite_building != intersection.settlement.settlement_type.name:
+                print(f"Building level too low to upgrade!", flush=True)
                 return False
         else:
             if intersection.settlement:
+                print(f"Building already present", flush=True)
                 return False
 
         player_settlement_count: int = sum(
@@ -242,6 +247,7 @@ class Map:
         )
 
         if too_close:
+            print(f"Another building too close!", flush=True)
             return False
 
         if player_settlement_count != 0:
@@ -251,6 +257,7 @@ class Map:
                 if conn_fields.issubset(location)
             )
             if not can_place:
+                print(f"Not connected by road!", flush=True)
                 return False
 
         intersection.settlement = Settlement(
