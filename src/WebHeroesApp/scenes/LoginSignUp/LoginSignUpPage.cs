@@ -5,24 +5,29 @@ using SilenkLibrary;
 using System.Net.Http.Headers;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json;
+using System.Collections.Generic;
 
 public partial class LoginSignUpPage : Control
 {
+	private record HttpRequestData(string Url, string Body, string[] Headers);
+	private Queue<HttpRequestData> requestQueue = new Queue<HttpRequestData>();
+	private bool isRequestInProgress = false;
+	
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
 	private string realHttps = "https://localhost";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
-		
+	
 	public override void _Ready()
 	{
 		userManagement = GetNode<UserManagement>("UserManagement");
 		httpRequest = GetNode<HttpRequest>("CallZancock");
-		httpRequest.RequestCompleted -= OnRequestCompleted;
+		// httpRequest.RequestCompleted -= OnRequestCompleted;
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		
-		MakePostRequest($"{realHttps}/ping", "{}");
+		//MakePostRequest($"{realHttps}/ping", "{}");
 		
 		Button signUpSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/Submit");
 		signUpSubmit.Pressed += () => 
@@ -45,7 +50,12 @@ public partial class LoginSignUpPage : Control
 		string json = Encoding.UTF8.GetString(body);
 		GD.Print("Response body: ", json);
 		
+		isRequestInProgress = false;
+		
+		if (string.IsNullOrEmpty(json)) return;
+		
 		var doc = JsonDocument.Parse(json).RootElement;
+		
 		if (doc.TryGetProperty("token", out var tokenProp))
 		{
 			currentUserToken = tokenProp.GetString();
@@ -56,11 +66,13 @@ public partial class LoginSignUpPage : Control
 			
 			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 		}
-		/*
-		string json = Encoding.UTF8.GetString(body);
-		GD.Print(json);
-		currentUserToken = JsonDocument.Parse(json).RootElement.GetProperty("token").GetString();
-		*/
+		else if (doc.TryGetProperty("object-type", out var typeProp) && typeProp.GetString() == "success-response" && responseCode == 201)
+		{
+			// if signing up is successful, login automatically
+			Login();
+		}
+		
+		ProcessQueue();
 	}
 	
 	private void SignUp()
@@ -85,6 +97,7 @@ public partial class LoginSignUpPage : Control
 			GD.Print(jsonString);
 
 			MakePostRequest($"{realHttps}/user-management/signup", jsonString);
+			MakePostRequest($"{realHttps}/user-management/login", jsonString);
 		}
 		else
 		{
@@ -114,16 +127,20 @@ public partial class LoginSignUpPage : Control
 	
 	private void MakePostRequest(string url, string body, string[] headers = null)
 	{
-		GD.Print("Requesting: ", url);
-		if (httpRequest.GetHttpClientStatus() != HttpClient.Status.Disconnected)
-			return; // already busy, ignore
-		
-		if (headers == null)
-		{
-			headers = ["Content-Type: application/json"];
-		}
-		
-		Error err = httpRequest.Request(url, headers, HttpClient.Method.Post, body);
+		headers ??= ["Content-type: application/json"];
+		requestQueue.Enqueue(new HttpRequestData(url, body, headers));
+		ProcessQueue();
+	}
+	
+	private void ProcessQueue()
+	{
+		if (isRequestInProgress || requestQueue.Count == 0) return;
+
+		var next = requestQueue.Dequeue();
+		isRequestInProgress = true;
+
+		GD.Print("Requesting: ", next.Url);
+		Error err = httpRequest.Request(next.Url, next.Headers, HttpClient.Method.Post, next.Body);
 		GD.Print("Request error code: ", err); // should print 0 (OK) if request started
 	}
 	

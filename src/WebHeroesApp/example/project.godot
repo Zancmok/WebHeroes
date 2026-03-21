@@ -16,6 +16,7 @@ config/features=PackedStringArray("4.3", "Forward Plus")
 config/icon="res://icon.svg"
 
 [network]
+
 tls/certificate_bundle_override="res://caddy_root.crt"
 
 [editor_plugins]
