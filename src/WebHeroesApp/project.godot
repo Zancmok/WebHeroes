@@ -32,10 +32,10 @@ project/assembly_name="WebHeroesApp"
 
 enabled=PackedStringArray("res://addons/godot-socketio/plugin.cfg")
 
-[rendering]
-
-textures/canvas_textures/default_texture_filter=0
-
 [network]
 
 tls/certificate_bundle_override="res://caddy_root.crt"
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0

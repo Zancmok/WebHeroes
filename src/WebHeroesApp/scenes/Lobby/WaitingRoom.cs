@@ -1,6 +1,95 @@
 using Godot;
 using System;
+using System.Net.Sockets;
 
 public partial class WaitingRoom : Control
 {
+	private Node socketIOLobby;
+	private Label lobbyNameLabel;
+	private Label lobbyOwnerLabel;
+	private VBoxContainer playerList;
+	private Button startButton;
+	private Button leaveButton;
+	
+	private string lobbyName = "";
+	
+	public override void _Ready()
+	{
+		socketIOLobby = GetNode<Node>("SocketIOLobby");
+		
+		lobbyNameLabel = GetNode<Label>("LobbyName");
+		lobbyOwnerLabel = GetNode<Label>("Owner");
+		playerList = GetNode<VBoxContainer>("PlayerList");
+		startButton = GetNode<Button>("StarButton");
+		leaveButton = GetNode<Button>("LeaveButton");
+
+		startButton.Visible = false;
+
+		startButton.Pressed += () => OnStartPressed();
+		leaveButton.Pressed += () => OnLeavePressed();
+
+		socketIOLobby.Connect("lobby_refresh_received", new Callable(this, nameof(OnLobbyRefresh)));
+		socketIOLobby.Connect("get_lobby_received", new Callable(this, nameof(OnGetLobby)));
+		socketIOLobby.Connect("game_started", new Callable(this, nameof(OnGameStarted)));
+
+		var gameState = GetNode<Node>("/root/GameState");
+		string token = gameState.Get("token").AsString();
+		string lobbyName = gameState.Get("lobby_name").AsString();
+
+		lobbyNameLabel.Text = lobbyName;
+
+		socketIOLobby.Call("connect_to_server", token);
+	}
+
+	private void OnLobbyRefresh(Variant data)
+	{
+		return;
+	}
+
+	private void OnGetLobby(Variant data)
+	{
+		var dict = data.AsGodotDictionary();
+		if (dict == null) return;
+
+		if (dict.TryGetValue("Owner", out var ownerVar))
+		{
+			var owner = ownerVar.AsGodotDictionary();
+			GD.Print(owner.ToString());
+			lobbyOwnerLabel.Text = $"Owner: {owner["member_name"].AsString()}";
+
+
+			startButton.Visible = true;
+		}
+
+		if(dict.TryGetValue("members", out var membersVar))
+		{
+			foreach (var child in playerList.GetChildren())
+			{
+				child.QueueFree();
+			}
+			foreach (var member in membersVar.AsGodotArray())
+			{
+				var m = member.AsGodotDictionary();
+				var lbl = new Label();
+				lbl.Text = m["member_name"].AsString();
+				playerList.AddChild(lbl);
+			}
+		}
+	}
+
+	private void OnGameStarted()
+	{
+		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn");
+	}
+
+	public void OnStartPressed()
+	{
+		startButton.Disabled = true;
+		socketIOLobby.Call("start_game");
+	}
+
+	public void OnLeavePressed()
+	{
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+	}
 }

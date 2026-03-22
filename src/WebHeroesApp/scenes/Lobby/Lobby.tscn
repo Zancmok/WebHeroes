@@ -42,7 +42,7 @@ script = ExtResource("1_lychb")
 [node name="ButtonCreateGame" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton"]
 layout_mode = 2
 size_flags_horizontal = 2
-text = "CREATE NEW GAME
+text = "CREATE NEW LOBBY
 "
 
 [node name="MarginContainerButton2" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
@@ -91,6 +91,9 @@ layout_mode = 2
 [node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline/HBoxContainer"]
 layout_mode = 2
 text = "PLAYERS ONLINE"
+
+[node name="LobbyList" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
 
 [node name="SocketIOLobby" type="Node" parent="."]
 script = ExtResource("4_ry2qp")

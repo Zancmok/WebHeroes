@@ -5,6 +5,7 @@ extends Node
 signal lobby_refresh_received(data)
 signal lobby_created(data)
 signal game_started()
+signal get_lobby_received(data)
 
 func _ready() -> void:
 	client.event_received.connect(_on_event_received)
@@ -26,6 +27,12 @@ func create_lobby(lobby_name: String) -> void:
 func join_lobby(lobby_name: String) -> void:
 	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
 
+func get_lobby() -> void:
+	client.emit("lobby-management:get-lobby")
+
+func start_game() -> void:
+	client.emit("lobby-management:start-game")
+
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("Event received: ", event, " data: ", data)
 	if event == "lobby-management:refresh":
@@ -34,3 +41,5 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 		emit_signal("lobby_created", data)
 	elif event == "lobby-management:game-started":
 		emit_signal("game_started")
+	elif event == "lobby-management:get-lobby":
+		emit_signal("get_lobby_received", data)

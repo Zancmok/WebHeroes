@@ -22,8 +22,10 @@ public partial class LobbyPage : Control
 
 	private void OnCreateNewGame()
 	{
-		// add popup later for naming of the lobby
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("lobby_name", "MyLobby"); // replace with popup
 		lobbyManager.CreateLobby("MyLobby");
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 	}
 
 	private void OnBack()
@@ -33,7 +35,56 @@ public partial class LobbyPage : Control
 
 	private void OnLobbyRefresh(Variant data)
 	{
-		GD.Print("Lobby list updated: ", data);
+
+		GD.Print("=== LOBBY REFRESH DATA ===");
+		GD.Print(data);
+		GD.Print("==========================");
+		
+		var dict = data.AsGodotDictionary();
+		if (dict == null) return;
+		
+		var lobbyList = GetNode<VBoxContainer>("BoxContainer/VBoxContainer/HBoxContainer3/LobbyList");
+
+		foreach (var child in lobbyList.GetChildren())
+		{
+			child.QueueFree();
+		}
+
+		if (!dict.TryGetValue("lobbies", out var lobbiesVar)) return;
+
+		foreach(var lobbyVar in lobbiesVar.AsGodotArray())
+		{
+			var lobby = lobbyVar.AsGodotDictionary();
+			string name = lobby["lobby_name"].AsString();
+			int players = lobby["members"].AsGodotArray().Count;
+
+			var row = new HBoxContainer();
+			var nameLabel = new Label();
+			var joinBtn = new Button();
+			var playlabel = new Label();
+
+			nameLabel.Text = name;
+			nameLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+			joinBtn.Text = "join";
+			playlabel.Text = players.ToString();
+			playlabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+
+			string capturedName = name;
+			joinBtn.Pressed += () =>
+			{
+				var gameState = GetNode<Node>("/root/GameState");
+				gameState.Set("lobby_name", capturedName);
+				lobbyManager.JoinLobby(capturedName);
+				GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
+			};
+
+			row.AddChild(nameLabel);
+			row.AddChild(joinBtn);
+			row.AddChild(playlabel);
+			lobbyList.AddChild(row);
+		}
+		
+		//if (dict.TryGetValue("")){return;}
 		// TODO: populate lobby list UI from the "data"	
 	}
 
