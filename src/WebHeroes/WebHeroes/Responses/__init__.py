@@ -45,7 +45,9 @@ def dictify(data: BaseDataModel | AlternateDataModel) -> dict:
         elif isinstance(attribute_value, BaseDataModel) or isinstance(attribute_value, AlternateDataModel):
             attribute_value = dictify(attribute_value)
         elif isinstance(attribute_value, list):
-            attribute_value = [dictify(v) for v in attribute_value]
+            for i, v in enumerate(attribute_value):
+                if isinstance(v, BaseDataModel) or isinstance(v, AlternateDataModel):
+                    attribute_value[i] = dictify(v)
         elif isinstance(attribute_value, dict):
             attribute_value = {k: dictify(v) for k, v in attribute_value.items()}
 
