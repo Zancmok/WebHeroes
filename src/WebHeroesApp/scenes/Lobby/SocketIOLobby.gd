@@ -1,6 +1,7 @@
 extends Node
 
 @onready var client: SocketIO = $SocketIO
+var is_ready: bool = false
 
 signal lobby_refresh_received(data)
 signal lobby_created(data)
@@ -8,20 +9,30 @@ signal game_started()
 signal get_lobby_received(data)
 
 func _ready() -> void:
+	print("SocketIOLobby _ready")
 	client.event_received.connect(_on_event_received)
 	client.socket_connected.connect(_on_connected)
+	client.namespace_connected.connect(_on_namespace_connected)
+
+func _on_namespace_connected(ns: String) -> void:
+	print("Namespace connected: ", ns)
 
 func connect_to_server(token: String) -> void:
+	print("connect_to_server callded with token: ", token)
 	client.connect_socket({ "token": token })
 
 func _on_connected() -> void:
 	print("Socket connected!")
+	is_ready = true
 	refresh()
 
 func refresh() -> void:
 	client.emit("lobby-management:refresh")
 
 func create_lobby(lobby_name: String) -> void:
+	if not is_ready:
+		push_error("Socket not ready yet!")
+		return
 	client.emit("lobby-management:create-lobby", { "lobby_name": lobby_name })
 
 func join_lobby(lobby_name: String) -> void:

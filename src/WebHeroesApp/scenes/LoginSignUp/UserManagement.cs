@@ -5,7 +5,7 @@ public partial class UserManagement : Node
 {
 	public override void _Ready()
 	{
-		Connect("message_received", new Callable(this, nameof(OnMessage)));
+		//Connect("message_received", new Callable(this, nameof(OnMessage)));
 		//Connect("connect_socket", new Callable(this, nameof(ConnectSocket)));
 	}
 	

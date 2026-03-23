@@ -18,6 +18,23 @@ public partial class LobbyPage : Control
 		GetNode<Node>("SocketIOLobby").Connect("lobby_refresh_received", new Callable(this, nameof(OnLobbyRefresh)));
 
 		GetNode<Node>("SocketIOLobby").Connect("game_started", new Callable(this, nameof(OnGameStarted)));
+
+		GetNode<Node>("SocketIOLobby").Connect("lobby_created", new Callable(this, nameof(OnLobbyCreated)));
+	}
+
+	private void OnLobbyCreated(Variant data)
+	{
+		var dict = data.AsGodotDictionary();
+		if (dict == null) return;
+
+		if (dict.TryGetValue("object_type", out var type) && type.AsString() == "success-response")
+		{
+			GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
+		}
+		else
+		{
+			GD.Print("Failed to create lobby: ", data);
+		}
 	}
 
 	private void OnCreateNewGame()
@@ -25,7 +42,6 @@ public partial class LobbyPage : Control
 		var gameState = GetNode<Node>("/root/GameState");
 		gameState.Set("lobby_name", "MyLobby"); // replace with popup
 		lobbyManager.CreateLobby("MyLobby");
-		GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 	}
 
 	private void OnBack()

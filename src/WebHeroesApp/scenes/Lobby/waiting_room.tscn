@@ -43,4 +43,5 @@ script = ExtResource("2_7ybcl")
 
 [node name="SocketIO" type="Node" parent="SocketIOLobby"]
 script = ExtResource("3_kaaxg")
+base_url = "http://localhost:5000"
 metadata/_custom_type_script = "uid://cuxf4hokgo2tf"

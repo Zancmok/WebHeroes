@@ -30,6 +30,7 @@ public partial class UserManagementLobby : Node
 	public void ConnectToServer(string token)
 	{
 		Token = token;
+		GD.Print("Calling connect_to_server with token: ", token);
 		socketIOLobby.Call("connect_to_server", token);
 	}
 

@@ -22,7 +22,7 @@ public partial class LoginSignUpPage : Control
 	
 	public override void _Ready()
 	{
-		userManagement = GetNode<UserManagement>("UserManagement");
+		//userManagement = GetNode<UserManagement>("UserManagement");
 		httpRequest = GetNode<HttpRequest>("CallZancock");
 		// httpRequest.RequestCompleted -= OnRequestCompleted;
 		httpRequest.RequestCompleted += OnRequestCompleted;
@@ -40,8 +40,6 @@ public partial class LoginSignUpPage : Control
 		{
 			Login();
 		};
-		
-		Send();
 	}
 	
 	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
