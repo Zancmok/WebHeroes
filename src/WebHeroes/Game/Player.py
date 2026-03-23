@@ -6,6 +6,7 @@ from WebHeroes.Responses.AlternateDataModel import AlternateDataModel
 class Player(AlternateDataModel):
     def __init__(self, color_type: PlayerColor, resource_prototypes: list[ResourcePrototype]) -> None:
         super().__init__()
+        self.object_type = "player-s_prototype"
 
         self.color_type: PlayerColor = color_type
 

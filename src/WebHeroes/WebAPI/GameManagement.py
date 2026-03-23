@@ -187,6 +187,8 @@ class GameManagement(StaticClass):
         for ingredient in actual_recipe.ingredients:
             player.resources[ingredient.resource] -= ingredient.amount
 
+        print("Rozle built something using skill issue", flush=True)
+
         GameManagement.socket_blueprint.emit("build", dictify(BuildResponse(
             building=actual_recipe.result,
             location=location,
