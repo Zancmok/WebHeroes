@@ -493,8 +493,13 @@
   const socket = io();
   window._gameSocket = socket; // expose so HTML layer can emit end-turn
 
-  // Cached game-level state (needed by HTML layer for resource/recipe panels)
-  let gameState = {};
+  // Cached game-level state — populated fresh on every get-game-data.
+  // myIndex is the authoritative identity; myColorName is a secondary check
+  // used by the build handler to match players by colour across reconnects.
+  let gameState = {
+    players: [], currentUserIndex: 0, myIndex: -1,
+    myColorName: null, myResources: {}, recipes: [],
+  };
 
   socket.on("connect", () => {
     console.log("[game.js] Socket connected, sid:", socket.id);
@@ -511,18 +516,21 @@
     console.log("[game.js] Received game data");
     render(data);
 
-    // Store state and surface it to the HTML layer via a CustomEvent
-    gameState = {
-      players:          data.players          ?? [],
-      currentUserIndex: data.current_user_index ?? 0,
-      myIndex:          data.my_index          ?? -1,
-      recipes:          data.prototypes?.filter(p => p.object_type === "recipe-s_prototype") ?? [],
-    };
-    // myResources = resources for the local player
-    const me = data.players?.[gameState.myIndex];
-    gameState.myResources = me?.resources ?? {};
+    // Always trust my_index from the server — set per-socket, never stale.
+    const myIndex    = data.my_index ?? -1;
+    const myColorName = data.players?.[myIndex]?.color_type?.name ?? null;
 
-    window.dispatchEvent(new CustomEvent("game:data", { detail: gameState }));
+    gameState = {
+      players:          data.players ?? [],
+      currentUserIndex: data.current_user_index ?? 0,
+      myIndex,
+      myColorName,
+      recipes:          data.prototypes?.filter(p => p.object_type === "recipe-s_prototype") ?? [],
+      myResources:      data.players?.[myIndex]?.resources ?? {},
+    };
+
+    console.log("[game.js] myIndex:", myIndex, "color:", myColorName);
+    window.dispatchEvent(new CustomEvent("game:data", { detail: { ...gameState } }));
   });
 
   // ── End-turn event from server ─────────────────────────────────────────────
@@ -537,8 +545,10 @@
 
     gameState.currentUserIndex = data.next_user_index;
     gameState.players          = data.players ?? gameState.players;
-    const me = data.players?.[gameState.myIndex];
-    gameState.myResources = me?.resources ?? gameState.myResources;
+    // myIndex is stable for the socket lifetime — server assigns it from
+    // the immutable lobby member list.
+    gameState.myResources = gameState.players[gameState.myIndex]?.resources
+                            ?? gameState.myResources;
 
     // Diff new vs old to derive gains per player
     const gains = {};
@@ -559,7 +569,7 @@
       spawnGainPopups(Number(playerIndexStr), playerGains, gameState.players);
     }
 
-    window.dispatchEvent(new CustomEvent("game:end-turn", { detail: {
+    const endTurnDetail = {
       rolledNumber:  data.rolled_number,
       nextUserIndex: data.next_user_index,
       myIndex:       gameState.myIndex,
@@ -567,7 +577,9 @@
       myResources:   gameState.myResources,
       recipes:       gameState.recipes,
       gains,
-    }}));
+    };
+    console.log("[game.js] end-turn detail myResources:", endTurnDetail.myResources);
+    window.dispatchEvent(new CustomEvent("game:end-turn", { detail: endTurnDetail }));
   });
 
   // ── Flash tiles matching the rolled number ─────────────────────────────────
@@ -644,14 +656,27 @@
     placedBuildings.push({ type: resultType, location, building, player });
     drawBuilding({ type: resultType, location, building, player });
 
-    // If this build was by the local player, update their resources and
-    // re-surface game state so the resource/recipe panels refresh.
-    if (data.player && gameState.myIndex >= 0) {
-      const localPlayer = gameState.players[gameState.myIndex];
-      if (localPlayer?.color_type?.name === data.player?.color_type?.name) {
-        gameState.myResources = data.player.resources ?? gameState.myResources;
-        gameState.players[gameState.myIndex] = data.player;
-        window.dispatchEvent(new CustomEvent("game:data", { detail: gameState }));
+    // Update the players array so everyone's state stays current.
+    // Identify which slot this player occupies by colour name — that is
+    // stable regardless of socket reconnects or index drift.
+    if (data.player?.color_type?.name) {
+      const idx = gameState.players.findIndex(
+        p => p?.color_type?.name === data.player.color_type.name
+      );
+      if (idx !== -1) {
+        gameState.players[idx] = data.player;
+        // If it was our build, refresh resources + panels
+        if (idx === gameState.myIndex) {
+          gameState.myResources = data.player.resources ?? gameState.myResources;
+          console.log("[game.js] build: updating myResources to", gameState.myResources);
+          // Spread after setting myResources so the detail has the new value
+          window.dispatchEvent(new CustomEvent("game:data", {
+            detail: {
+              ...gameState,
+              myResources: gameState.myResources,
+            }
+          }));
+        }
       }
     }
 

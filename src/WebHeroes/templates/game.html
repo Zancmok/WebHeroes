@@ -593,6 +593,7 @@
 
   // ── Resources panel ──────────────────────────────────────────────────
   function renderResources(resources) {
+    console.log("[game.html] renderResources called with:", resources);
     const grid = $("resources-grid");
     grid.innerHTML = "";
     if (!resources || !Object.keys(resources).length) {
@@ -678,7 +679,11 @@
   // ── End Turn button ──────────────────────────────────────────────────
   $("btn-end-turn").addEventListener("click", () => {
     const socket = window._gameSocket;
-    if (socket) socket.emit("game-management:end-turn");
+    if (!socket) return;
+    socket.emit("game-management:end-turn");
+    // Re-request game data so this client always sees the turn change,
+    // regardless of whether the room broadcast reaches it.
+    setTimeout(() => socket.emit("game-management:get-game-data"), 300);
   });
 
   // ── Hook into GameEvents from game.js ────────────────────────────────
