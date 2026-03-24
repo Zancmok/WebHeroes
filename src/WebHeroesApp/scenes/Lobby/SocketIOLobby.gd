@@ -44,6 +44,10 @@ func get_lobby() -> void:
 func start_game() -> void:
 	client.emit("lobby-management:start-game")
 
+func disconnect_from_server() -> void:
+	client.disconnect_socket()
+	is_ready = false
+
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("Event received: ", event, " data: ", data)
 	if event == "lobby-management:refresh":

@@ -9,11 +9,9 @@ public partial class LobbyPage : Control
 	{
 		lobbyManager = GetNode<UserManagementLobby>("UserManagementLobby");
 
-		GetNode<Button>("BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton/ButtonCreateGame")
-			.Pressed += OnCreateNewGame;
+		GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonCreateGame").Pressed += OnCreateNewGame;
+		GetNode<Button>("MarginContainer/VBoxContainer/HBoxContainer/ButtonBack").Pressed += OnBack;
 
-		GetNode<Button>("BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton2/ButtonBack")
-			.Pressed += OnBack;
 
 		GetNode<Node>("SocketIOLobby").Connect("lobby_refresh_received", new Callable(this, nameof(OnLobbyRefresh)));
 
@@ -43,7 +41,7 @@ public partial class LobbyPage : Control
 	private void OnCreateNewGame()
 	{
 		var gameState = GetNode<Node>("/root/GameState");
-		string username = gameState.Get("Username").AsString();
+		string username = gameState.Get("username").AsString();
 		string lobbyName = $"{username}'s Lobby";
 		
 		gameState.Set("lobby_name", lobbyName);
@@ -57,63 +55,67 @@ public partial class LobbyPage : Control
 		GetTree().ChangeSceneToFile("res://scenes/LoginSignUp/LoginRegisterMenu.tscn");
 	}
 
-	private void OnLobbyRefresh(Variant data)
+private void OnLobbyRefresh(Variant data)
+{	
+	var array = data.AsGodotArray();
+	if (array == null || array.Count == 0) return;
+	
+	var dict = array[0].AsGodotDictionary();
+	if (dict == null) return;
+
+	var lobbyList = GetNode<VBoxContainer>("MarginContainer/VBoxContainer/LobbyList");
+
+	foreach (var child in lobbyList.GetChildren())
+		child.QueueFree();
+
+	if (!dict.TryGetValue("lobbies", out var lobbiesVar)) return;
+
+	foreach (var lobbyVar in lobbiesVar.AsGodotArray())
 	{
+		var lobby = lobbyVar.AsGodotDictionary();
+		string name = lobby["lobby_name"].AsString();
+		int players = lobby["members"].AsGodotArray().Count;
 
-		GD.Print("=== LOBBY REFRESH DATA ===");
-		GD.Print(data);
-		GD.Print("==========================");
-		
-		var array = data.AsGodotArray();
-		if (array == null || array.Count == 0) return;
-		
-		var dict = array[0].AsGodotDictionary();
-		if(dict == null) return;
+		var row = new HBoxContainer();
+		row.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
 
-		var lobbyList = GetNode<VBoxContainer>("BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/LobbyList");
+		var nameLabel = new Label();
+		nameLabel.Text = name;
+		nameLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+		nameLabel.SizeFlagsStretchRatio = 3.0f;
+		nameLabel.ClipText = true;
 
-		foreach (var child in lobbyList.GetChildren())
+		var joinBtn = new Button();
+		joinBtn.Text = "join";
+		joinBtn.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+		joinBtn.SizeFlagsStretchRatio = 1.0f;
+
+		var descLabel = new Label();
+		descLabel.Text = "";  // placeholder — add game description field when server sends it
+		descLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+		descLabel.SizeFlagsStretchRatio = 3.0f;
+
+		var playersLabel = new Label();
+		playersLabel.Text = players.ToString();
+		playersLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
+		playersLabel.SizeFlagsStretchRatio = 1.0f;
+
+		string capturedName = name;
+		joinBtn.Pressed += () =>
 		{
-			child.QueueFree();
-		}
+			var gameState = GetNode<Node>("/root/GameState");
+			gameState.Set("lobby_name", capturedName);
+			lobbyManager.JoinLobby(capturedName);
+			GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
+		};
 
-		if (!dict.TryGetValue("lobbies", out var lobbiesVar)) return;
-
-		foreach(var lobbyVar in lobbiesVar.AsGodotArray())
-		{
-			var lobby = lobbyVar.AsGodotDictionary();
-			string name = lobby["lobby_name"].AsString();
-			int players = lobby["members"].AsGodotArray().Count;
-
-			var row = new HBoxContainer();
-			var nameLabel = new Label();
-			var joinBtn = new Button();
-			var playlabel = new Label();
-
-			nameLabel.Text = name;
-			nameLabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
-			joinBtn.Text = "join";
-			playlabel.Text = players.ToString();
-			playlabel.SizeFlagsHorizontal = Control.SizeFlags.Expand | Control.SizeFlags.Fill;
-
-			string capturedName = name;
-			joinBtn.Pressed += () =>
-			{
-				var gameState = GetNode<Node>("/root/GameState");
-				gameState.Set("lobby_name", capturedName);
-				lobbyManager.JoinLobby(capturedName);
-				GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
-			};
-
-			row.AddChild(nameLabel);
-			row.AddChild(joinBtn);
-			row.AddChild(playlabel);
-			lobbyList.AddChild(row);
-		}
-		
-		//if (dict.TryGetValue("")){return;}
-		// TODO: populate lobby list UI from the "data"	
+		row.AddChild(nameLabel);
+		row.AddChild(joinBtn);
+		row.AddChild(descLabel);
+		row.AddChild(playersLabel);
+		lobbyList.AddChild(row);
 	}
+}
 
 	private void OnGameStarted()
 	{

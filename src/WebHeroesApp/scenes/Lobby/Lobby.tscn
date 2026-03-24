@@ -1,9 +1,6 @@
-[gd_scene load_steps=8 format=3 uid="uid://1ajpqc57yl8q"]
+[gd_scene load_steps=5 format=3 uid="uid://1ajpqc57yl8q"]
 
 [ext_resource type="Script" uid="uid://bcif6l4wfeiud" path="res://scenes/Lobby/LobbyPage.cs" id="1_15t2a"]
-[ext_resource type="Script" uid="uid://csn6jfnoms7h" path="res://scenes/Lobby/MarginContainerPlayersOnline.cs" id="1_lqr06"]
-[ext_resource type="Script" uid="uid://cq7q2bpumtc0a" path="res://scenes/Lobby/MarginContainerButton.cs" id="1_lychb"]
-[ext_resource type="Script" uid="uid://dvcq0eq5vf0ls" path="res://scenes/Lobby/MarginContainerButton2.cs" id="2_v72lb"]
 [ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="4_oev3y"]
 [ext_resource type="Script" uid="uid://d00o3j3ku7fkk" path="res://scenes/Lobby/SocketIOLobby.gd" id="4_ry2qp"]
 [ext_resource type="Script" uid="uid://doetypyk324u3" path="res://scenes/Lobby/UserManagementLobby.cs" id="6_15t2a"]
@@ -17,93 +14,68 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_15t2a")
 
-[node name="BoxContainer" type="BoxContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/margin_left = 150
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 150
+theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="BoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
-[node name="MarginContainerButton" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
-script = ExtResource("1_lychb")
+size_flags_horizontal = 3
 
-[node name="ButtonCreateGame" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton"]
+[node name="ButtonCreateGame" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 2
 text = "CREATE NEW LOBBY"
 
-[node name="MarginContainerButton2" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-script = ExtResource("2_v72lb")
+size_flags_horizontal = 3
 
-[node name="ButtonBack" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton2"]
+[node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
-size_flags_horizontal = 10
 text = "BACK"
 
-[node name="HBoxContainer3" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="VBoxContainer2" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-
-[node name="HBoxContainer2" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-size_flags_horizontal = 6
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
 text = "HOST NAME"
 
-[node name="Label2" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 6
-text = "JOIN"
-
-[node name="Label3" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 6
-text = "GAME DESCRIPTION"
-
-[node name="Label4" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
-layout_mode = 2
-size_flags_horizontal = 6
-text = "PLAYERS"
-
-[node name="LobbyList" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
-size_flags_vertical = 3
+text = "JOIN"
 
-[node name="MarginContainer_PlayersOnline" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
-size_flags_vertical = 0
-script = ExtResource("1_lqr06")
+size_flags_horizontal = 3
+size_flags_stretch_ratio = 3.0
+text = "GAME DESCRIPTION"
 
-[node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline"]
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
 layout_mode = 2
+size_flags_horizontal = 3
+text = "PLAYERS"
 
-[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline/HBoxContainer"]
+[node name="LobbyList" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
 layout_mode = 2
-text = "PLAYERS ONLINE"
+size_flags_horizontal = 3
 
 [node name="SocketIOLobby" type="Node" parent="."]
 script = ExtResource("4_ry2qp")

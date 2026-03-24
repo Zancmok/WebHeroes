@@ -90,6 +90,7 @@ public partial class WaitingRoom : Control
 
 	public void OnLeavePressed()
 	{
+		socketIOLobby.Call("disconnect_from_server");
 		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 	}
 }
