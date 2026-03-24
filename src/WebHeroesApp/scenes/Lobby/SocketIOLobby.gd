@@ -21,8 +21,8 @@ func connect_to_server(token: String) -> void:
 	print("connect_to_server callded with token: ", token)
 	client.connect_socket({ "token": token })
 
-func _on_connected() -> void:
-	print("Socket connected!")
+func _on_connected(ns: String) -> void:
+	print("Socket connected!", ns)
 	is_ready = true
 	refresh()
 

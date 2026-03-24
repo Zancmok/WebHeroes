@@ -24,16 +24,19 @@ public partial class LobbyPage : Control
 
 	private void OnLobbyCreated(Variant data)
 	{
-		var dict = data.AsGodotDictionary();
+		var array = data.AsGodotDictionary();
+		if (array == null ||array.Count == 0) return;
+		
+		var dict = array[0].AsGodotDictionary();
 		if (dict == null) return;
-
+		
 		if (dict.TryGetValue("object_type", out var type) && type.AsString() == "success-response")
 		{
 			GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 		}
-		else
+		else if (dict.TryGetValue("reason", out var reason))
 		{
-			GD.Print("Failed to create lobby: ", data);
+			GD.Print("Failed to create lobby: ", reason.AsString());
 		}
 	}
 
