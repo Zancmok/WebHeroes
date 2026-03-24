@@ -101,7 +101,7 @@ class GameManagement(StaticClass):
             rolled_number=rolled_number,
             next_user_index=lobby.game.current_user_index,
             players=[lobby.game.players[player] for player in lobby.game.players]
-        )), to=lobby.game)
+        )), to=lobby.name)
 
     @staticmethod
     @socket_blueprint.on("build")
@@ -193,6 +193,6 @@ class GameManagement(StaticClass):
             building=actual_recipe.result,
             location=location,
             player=player
-        )), to=lobby.game)
+        )), to=lobby.name)
 
         # TODO: Add victory thingy!

@@ -681,9 +681,6 @@
     const socket = window._gameSocket;
     if (!socket) return;
     socket.emit("game-management:end-turn");
-    // Re-request game data so this client always sees the turn change,
-    // regardless of whether the room broadcast reaches it.
-    setTimeout(() => socket.emit("game-management:get-game-data"), 300);
   });
 
   // ── Hook into GameEvents from game.js ────────────────────────────────
