@@ -28,6 +28,7 @@ grow_vertical = 2
 [node name="VBoxContainer" type="VBoxContainer" parent="BoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
+size_flags_vertical = 3
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
 layout_mode = 2
@@ -42,8 +43,7 @@ script = ExtResource("1_lychb")
 [node name="ButtonCreateGame" type="Button" parent="BoxContainer/VBoxContainer/HBoxContainer/MarginContainerButton"]
 layout_mode = 2
 size_flags_horizontal = 2
-text = "CREATE NEW LOBBY
-"
+text = "CREATE NEW LOBBY"
 
 [node name="MarginContainerButton2" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer"]
 layout_mode = 2
@@ -56,33 +56,46 @@ text = "BACK"
 
 [node name="HBoxContainer3" type="HBoxContainer" parent="BoxContainer/VBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+[node name="VBoxContainer2" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
+[node name="HBoxContainer2" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+[node name="Label" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 6
 text = "HOST NAME"
 
-[node name="Label2" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+[node name="Label2" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 6
 text = "JOIN"
 
-[node name="Label3" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+[node name="Label3" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 6
-text = "GAME DISCRIPTION	"
+text = "GAME DESCRIPTION"
 
-[node name="Label4" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/HBoxContainer2"]
+[node name="Label4" type="Label" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/HBoxContainer2"]
 layout_mode = 2
 size_flags_horizontal = 6
 text = "PLAYERS"
 
+[node name="LobbyList" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+
 [node name="MarginContainer_PlayersOnline" type="MarginContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
 layout_mode = 2
+size_flags_vertical = 0
 script = ExtResource("1_lqr06")
 
 [node name="HBoxContainer" type="HBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3/MarginContainer_PlayersOnline"]
@@ -92,15 +105,12 @@ layout_mode = 2
 layout_mode = 2
 text = "PLAYERS ONLINE"
 
-[node name="LobbyList" type="VBoxContainer" parent="BoxContainer/VBoxContainer/HBoxContainer3"]
-layout_mode = 2
-
 [node name="SocketIOLobby" type="Node" parent="."]
 script = ExtResource("4_ry2qp")
 
 [node name="SocketIO" type="Node" parent="SocketIOLobby"]
 script = ExtResource("4_oev3y")
-base_url = "https://localhost"
+base_url = "https://webheroes.duckdns.org:9027"
 metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
 
 [node name="UserManagementLobby" type="Node" parent="."]

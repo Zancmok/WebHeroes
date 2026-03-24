@@ -15,7 +15,7 @@ public partial class LoginSignUpPage : Control
 	
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
-	private string realHttps = "https://localhost";
+	private string realHttps = "https://webheroes.duckdns.org:9027";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	public string currentUserToken;
@@ -85,6 +85,9 @@ public partial class LoginSignUpPage : Control
 		string repeatPasswordData = repeatPassword.Text;
 		if (passwordData == repeatPasswordData)
 		{
+			var gameState = GetNode<Node>("/root/GameState");
+			gameState.Set("username", usernameData);
+
 			var jsonData = new Godot.Collections.Dictionary
 			{
 				{"username", usernameData},
@@ -110,6 +113,9 @@ public partial class LoginSignUpPage : Control
 		
 		string usernameData = username.Text;
 		string passwordData = password.Text;
+		
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("username", usernameData);
 		
 		var jsonData = new Godot.Collections.Dictionary
 		{

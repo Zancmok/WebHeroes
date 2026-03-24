@@ -24,7 +24,7 @@ public partial class LobbyPage : Control
 
 	private void OnLobbyCreated(Variant data)
 	{
-		var array = data.AsGodotDictionary();
+		var array = data.AsGodotArray();
 		if (array == null ||array.Count == 0) return;
 		
 		var dict = array[0].AsGodotDictionary();
@@ -43,8 +43,13 @@ public partial class LobbyPage : Control
 	private void OnCreateNewGame()
 	{
 		var gameState = GetNode<Node>("/root/GameState");
-		gameState.Set("lobby_name", "MyLobby"); // replace with popup
-		lobbyManager.CreateLobby("MyLobby");
+		string username = gameState.Get("Username").AsString();
+		string lobbyName = $"{username}'s Lobby";
+		
+		gameState.Set("lobby_name", lobbyName);
+		GD.Print(gameState.Get("username"));
+		GD.Print(gameState.Get("lobby_name"));
+		lobbyManager.CreateLobby(lobbyName);
 	}
 
 	private void OnBack()
@@ -59,10 +64,13 @@ public partial class LobbyPage : Control
 		GD.Print(data);
 		GD.Print("==========================");
 		
-		var dict = data.AsGodotDictionary();
-		if (dict == null) return;
+		var array = data.AsGodotArray();
+		if (array == null || array.Count == 0) return;
 		
-		var lobbyList = GetNode<VBoxContainer>("BoxContainer/VBoxContainer/HBoxContainer3/LobbyList");
+		var dict = array[0].AsGodotDictionary();
+		if(dict == null) return;
+
+		var lobbyList = GetNode<VBoxContainer>("BoxContainer/VBoxContainer/HBoxContainer3/VBoxContainer2/LobbyList");
 
 		foreach (var child in lobbyList.GetChildren())
 		{

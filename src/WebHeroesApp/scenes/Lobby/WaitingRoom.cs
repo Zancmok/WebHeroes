@@ -17,11 +17,11 @@ public partial class WaitingRoom : Control
 	{
 		socketIOLobby = GetNode<Node>("SocketIOLobby");
 		
-		lobbyNameLabel = GetNode<Label>("LobbyName");
-		lobbyOwnerLabel = GetNode<Label>("Owner");
-		playerList = GetNode<VBoxContainer>("PlayerList");
-		startButton = GetNode<Button>("StarButton");
-		leaveButton = GetNode<Button>("LeaveButton");
+		lobbyNameLabel = GetNode<Label>("VBoxContainer/LobbyName");
+		lobbyOwnerLabel = GetNode<Label>("VBoxContainer/Owner");
+		playerList = GetNode<VBoxContainer>("VBoxContainer/PlayerList");
+		startButton = GetNode<Button>("VBoxContainer/StartButton");
+		leaveButton = GetNode<Button>("VBoxContainer/LeaveButton");
 
 		startButton.Visible = false;
 
