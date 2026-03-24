@@ -1,15 +1,20 @@
-localhost {
+webheroes.duckdns.org:9027 {
     reverse_proxy web_heroes_server:5000
-    tls internal
+    encode gzip
+    tls {
+        dns duckdns {env.DUCKDNS_TOKEN}
+    }
+    log {
+        output file /var/log/caddy/caddy.log
+        format console
+    }
+}
+
+http://localhost {
+    reverse_proxy web_heroes_server:5000
     encode gzip
     log {
         output file /var/log/caddy/caddy.log
         format console
     }
-
-    # automatic HTTP → HTTPS redirection
-    @http {
-        protocol http
-    }
-    redir @http https://{host}{uri} permanent
 }

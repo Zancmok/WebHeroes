@@ -507,7 +507,9 @@
     if (lobbyName) {
       socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
     }
+    if (!lastData) {
     socket.emit("game-management:get-game-data");
+  }
   });
 
   socket.on("connect_error", (err) => console.error("[game.js] Socket connect error:", err));
