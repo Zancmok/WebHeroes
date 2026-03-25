@@ -539,6 +539,7 @@
 
   socket.on("game-management:get-game-data", (data) => {
     console.log("[game.js] Received game data");
+    console.log(data);
     render(data);
 
     // Always trust my_index from the server — set per-socket, never stale.

@@ -70,7 +70,7 @@ class GameManagement(StaticClass):
             )
 
         settlements: dict[str, SettlementModel] = {}
-        for cords in lobby.game.game_map.connections:
+        for cords in lobby.game.game_map.intersections:
             curr_intersection: Intersection = lobby.game.game_map.connections[cords]
 
             curr: Settlement
