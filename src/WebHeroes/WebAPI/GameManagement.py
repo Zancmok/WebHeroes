@@ -4,12 +4,17 @@ from Game.Field import Field
 from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
 import random
-
 from Game.Player import Player
+from Game.Settlement import Settlement
+from Game.Road import Road
+from Game.Connection import Connection
+from Game.Intersection import Intersection
 from Prototype import Recipe, RoadPrototype, SettlementPrototype
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
+from WebHeroes.Responses.DataModels.SettlementModel import SettlementModel
+from WebHeroes.Responses.DataModels.RoadModel import RoadModel
 from WebHeroes.Responses.ResponseTypes.BuildResponse import BuildResponse
 from WebHeroes.Responses.ResponseTypes.EndTurnResponse import EndTurnResponse
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
@@ -64,6 +69,40 @@ class GameManagement(StaticClass):
                 assigned_number=curr.assigned_number
             )
 
+        settlements: dict[str, SettlementModel] = {}
+        for cords in lobby.game.game_map.connections:
+            curr_intersection: Intersection = lobby.game.game_map.connections[cords]
+
+            curr: Settlement
+            if not (curr := curr_intersection.settlement):
+                continue
+            
+            cord_set: list[int] = []
+            for cord in cords:
+                cord_set.extend(cord)
+
+            settlements['\0'.join(map(str, cord_set))] = SettlementModel(
+                settlement_type=curr.settlement_type,
+                owner=curr.owner
+            )
+        
+        roads: dict[str, RoadModel] = {}
+        for cords in lobby.game.game_map.connections:
+            curr_connection: Connection = lobby.game.game_map.connections[cords]
+
+            curr: Road
+            if not (curr := curr_connection.road):
+                continue
+
+            cord_set: list[int] = []
+            for cord in cords:
+                cord_set.extend(cord)
+
+            roads['\0'.join(map(str, cord_set))] = RoadModel(
+                road_type=curr.road_type,
+                owner=curr.owner
+            )
+
         user_index: int = -1
         for i, user in enumerate(lobby.game.users):
             if user == user_session:
@@ -73,6 +112,8 @@ class GameManagement(StaticClass):
             fields=fields,
             prototypes=lobby.game.prototypes,
             players=[lobby.game.players[player] for player in lobby.game.players],
+            settlements=settlements,
+            roads=roads,
             current_user_index=lobby.game.current_user_index,
             my_index=user_index
         )))
