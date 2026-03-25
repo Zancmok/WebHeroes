@@ -43,13 +43,14 @@
   }
 
   function resolveSprite(field) {
-    const sprite = field.field_type?.sprite;
-    if (sprite) {
-      return sprite
-        .replace(/^__|__(?=\/)/g, "")
-        .replace("graphics/", "images/");
-    }
-    return null;
+    return resolveRawSprite(field.field_type?.sprite);
+  }
+
+  function resolveRawSprite(sprite) {
+    if (!sprite) return null;
+    return sprite
+      .replace(/^__|__(?=\/)/g, "")
+      .replace("graphics/", "images/");
   }
 
   // ─── Geometry helpers ──────────────────────────────────────────────────────
@@ -335,31 +336,53 @@
       const [q1, r1, q2, r2, q3, r3] = location;
       const { x, y } = intersectionPoint(q1, r1, q2, r2, q3, r3);
 
-      const RADIUS = building?.point_value > 1 ? 10 : 7; // city vs settlement
+      const SIZE = building?.point_value > 1 ? 36 : 28; // city larger than village
+      const sprite = resolveRawSprite(building?.sprite);
 
-      // Shadow
-      svg.appendChild(svgEl("circle", {
-        cx: x, cy: y + 2, r: RADIUS + 1,
-        fill: "rgba(0,0,0,0.45)", "pointer-events": "none",
-      }));
-      // Body
-      svg.appendChild(svgEl("circle", {
-        cx: x, cy: y, r: RADIUS,
-        fill: color,
-        stroke: "rgba(0,0,0,0.7)", "stroke-width": "1.5",
-        "pointer-events": "none",
-      }));
-      // Initials / icon
-      const initial = svgEl("text", {
-        x, y,
-        "text-anchor": "middle", "dominant-baseline": "central",
-        fill: "rgba(0,0,0,0.75)",
-        "font-size": RADIUS > 8 ? "9" : "7",
-        "font-family": "Cinzel, serif", "font-weight": "bold",
-        "pointer-events": "none",
-      });
-      initial.textContent = building?.point_value > 1 ? "C" : "S";
-      svg.appendChild(initial);
+      if (sprite) {
+        // Dark outline ring for contrast, then player colour ring on top
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: y, r: SIZE + 4,
+          fill: "none",
+          stroke: "rgba(0,0,0,0.7)", "stroke-width": "5",
+          "pointer-events": "none",
+        }));
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: y, r: SIZE + 4,
+          fill: "none",
+          stroke: color, "stroke-width": "3",
+          "pointer-events": "none",
+        }));
+        svg.appendChild(svgEl("image", {
+          href: `${IMG_BASE}${sprite}`,
+          x: x - SIZE, y: y - SIZE,
+          width: SIZE * 2, height: SIZE * 2,
+          preserveAspectRatio: "xMidYMid meet",
+          "pointer-events": "none",
+        }));
+      } else {
+        // Fallback: plain coloured circle with letter
+        const RADIUS = building?.point_value > 1 ? 10 : 7;
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: y + 2, r: RADIUS + 1,
+          fill: "rgba(0,0,0,0.45)", "pointer-events": "none",
+        }));
+        svg.appendChild(svgEl("circle", {
+          cx: x, cy: y, r: RADIUS,
+          fill: color,
+          stroke: "rgba(0,0,0,0.7)", "stroke-width": "1.5",
+          "pointer-events": "none",
+        }));
+        const initial = svgEl("text", {
+          x, y, "text-anchor": "middle", "dominant-baseline": "central",
+          fill: "rgba(0,0,0,0.75)",
+          "font-size": RADIUS > 8 ? "9" : "7",
+          "font-family": "Cinzel, serif", "font-weight": "bold",
+          "pointer-events": "none",
+        });
+        initial.textContent = building?.point_value > 1 ? "C" : "S";
+        svg.appendChild(initial);
+      }
     }
   }
 

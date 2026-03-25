@@ -11,7 +11,7 @@ class Player(AlternateDataModel):
         self.color_type: PlayerColor = color_type
 
         self.resources: dict[str, int] = {
-            resource_prototype.name: 1
+            resource_prototype.name: 2
             for resource_prototype in resource_prototypes
         }
 
