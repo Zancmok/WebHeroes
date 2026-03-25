@@ -8,6 +8,7 @@ signal lobby_created(data)
 signal game_started()
 signal get_lobby_received(data)
 signal lobby_closed()
+signal socket_ready()
 
 func _ready() -> void:
 	print("SocketIOLobby _ready")
@@ -30,7 +31,7 @@ func connect_to_server(token: String) -> void:
 func _on_connected(ns: String) -> void:
 	print("Socket connected!", ns)
 	is_ready = true
-	refresh()
+	emit_signal("socket_ready")
 
 func refresh() -> void:
 	client.emit("lobby-management:refresh")

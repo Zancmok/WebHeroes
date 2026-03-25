@@ -83,3 +83,5 @@ script = ExtResource("4_ry2qp")
 script = ExtResource("4_oev3y")
 base_url = "https://webheroes.duckdns.org:9027"
 metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
+
+[node name="CallZancmok" type="HTTPRequest" parent="."]
