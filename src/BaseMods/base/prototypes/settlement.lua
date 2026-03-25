@@ -3,7 +3,7 @@ data:extend{
         type="settlement",
         name="village",
         display_name="Village",
-        sprite="__base__/graphics/field/village.webp",
+        sprite="__base__/graphics/settlement/village.webp",
         point_value=1,
         resource_multiplier=1
     },
