@@ -16,9 +16,14 @@ func _ready() -> void:
 
 func _on_namespace_connected(ns: String) -> void:
 	print("Namespace connected: ", ns)
-
+	
 func connect_to_server(token: String) -> void:
-	print("connect_to_server callded with token: ", token)
+	print("connect_to_server called, state=", client.state)
+	if client.state == client.State.CONNECTED:
+		print("Already connected, refreshing directly")
+		is_ready = true
+		refresh()
+		return
 	client.connect_socket({ "token": token })
 
 func _on_connected(ns: String) -> void:

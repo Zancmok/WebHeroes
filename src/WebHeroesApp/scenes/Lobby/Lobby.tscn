@@ -1,9 +1,8 @@
-[gd_scene load_steps=5 format=3 uid="uid://1ajpqc57yl8q"]
+[gd_scene load_steps=4 format=3 uid="uid://1ajpqc57yl8q"]
 
 [ext_resource type="Script" uid="uid://bcif6l4wfeiud" path="res://scenes/Lobby/LobbyPage.cs" id="1_15t2a"]
 [ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="4_oev3y"]
 [ext_resource type="Script" uid="uid://d00o3j3ku7fkk" path="res://scenes/Lobby/SocketIOLobby.gd" id="4_ry2qp"]
-[ext_resource type="Script" uid="uid://doetypyk324u3" path="res://scenes/Lobby/UserManagementLobby.cs" id="6_15t2a"]
 
 [node name="lobby" type="Control"]
 layout_mode = 3
@@ -84,6 +83,3 @@ script = ExtResource("4_ry2qp")
 script = ExtResource("4_oev3y")
 base_url = "https://webheroes.duckdns.org:9027"
 metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
-
-[node name="UserManagementLobby" type="Node" parent="."]
-script = ExtResource("6_15t2a")
