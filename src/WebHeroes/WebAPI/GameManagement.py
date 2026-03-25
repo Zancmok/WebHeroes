@@ -71,7 +71,7 @@ class GameManagement(StaticClass):
 
         settlements: dict[str, SettlementModel] = {}
         for cords in lobby.game.game_map.intersections:
-            curr_intersection: Intersection = lobby.game.game_map.connections[cords]
+            curr_intersection: Intersection = lobby.game.game_map.intersections[cords]
 
             curr: Settlement
             if not (curr := curr_intersection.settlement):

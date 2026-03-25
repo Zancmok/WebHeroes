@@ -46,11 +46,14 @@
     return resolveRawSprite(field.field_type?.sprite);
   }
 
+  // Strips __modname__/ wrapper to match BaseMods/<mod_id>/<path> on disk.
+  // e.g. __base__/graphics/settlement/village.webp → base/graphics/settlement/village.webp
   function resolveRawSprite(sprite) {
-    if (!sprite) return null;
-    return sprite
-      .replace(/^__|__(?=\/)/g, "")
-      .replace("graphics/", "images/");
+  if (!sprite) return null;
+
+  return sprite
+    .replace(/__([^_]+(?:_[^_]+)*)__\//, "$1/")
+    .replace(/\/graphics\//, "/images/");
   }
 
   // ─── Geometry helpers ──────────────────────────────────────────────────────
@@ -336,11 +339,11 @@
       const [q1, r1, q2, r2, q3, r3] = location;
       const { x, y } = intersectionPoint(q1, r1, q2, r2, q3, r3);
 
-      const SIZE = building?.point_value > 1 ? 36 : 28; // city larger than village
+      const SIZE = building?.point_value > 1 ? 36 : 28;
       const sprite = resolveRawSprite(building?.sprite);
 
       if (sprite) {
-        // Dark outline ring for contrast, then player colour ring on top
+        // Dark outline for contrast, then player colour ring on top
         svg.appendChild(svgEl("circle", {
           cx: x, cy: y, r: SIZE + 4,
           fill: "none",
@@ -539,11 +542,28 @@
 
   socket.on("game-management:get-game-data", (data) => {
     console.log("[game.js] Received game data");
-    console.log(data);
+
+    // Rebuild client-side building list from server state so refresh/reconnect
+    // shows all previously placed buildings immediately.
+    placedBuildings.length = 0;
+
+    for (const [key, s] of Object.entries(data.settlements ?? {})) {
+      const parts = key.split("\0").map(Number);
+      if (parts.length === 6) {
+        placedBuildings.push({ type: "settlement", location: parts, building: s.settlement_type, player: s.owner });
+      }
+    }
+    for (const [key, r] of Object.entries(data.roads ?? {})) {
+      const parts = key.split("\0").map(Number);
+      if (parts.length === 4) {
+        placedBuildings.push({ type: "road", location: parts, building: r.road_type, player: r.owner });
+      }
+    }
+
     render(data);
 
     // Always trust my_index from the server — set per-socket, never stale.
-    const myIndex    = data.my_index ?? -1;
+    const myIndex     = data.my_index ?? -1;
     const myColorName = data.players?.[myIndex]?.color_type?.name ?? null;
 
     gameState = {
