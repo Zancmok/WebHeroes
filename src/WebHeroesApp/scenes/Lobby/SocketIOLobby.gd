@@ -7,6 +7,7 @@ signal lobby_refresh_received(data)
 signal lobby_created(data)
 signal game_started()
 signal get_lobby_received(data)
+signal lobby_closed()
 
 func _ready() -> void:
 	print("SocketIOLobby _ready")
@@ -63,3 +64,5 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 		emit_signal("game_started")
 	elif event == "lobby-management:get-lobby":
 		emit_signal("get_lobby_received", data)
+	elif event == "lobby-management:lobby-closed":
+		emit_signal("lobby_closed")

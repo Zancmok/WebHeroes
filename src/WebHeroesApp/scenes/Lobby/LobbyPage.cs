@@ -120,4 +120,9 @@ public partial class LobbyPage : Control
 	{
 		GD.Print("Game started! Switching scenes...");
 	}
+
+	private void LogOut()
+	{
+		MakePostRequest($"https://webheroes.duckdns.org:9027/user-management/logout");
+	}
 }

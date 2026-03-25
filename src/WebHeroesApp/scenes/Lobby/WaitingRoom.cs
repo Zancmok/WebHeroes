@@ -31,6 +31,7 @@ public partial class WaitingRoom : Control
 		socketIOLobby.Connect("lobby_refresh_received", new Callable(this, nameof(OnLobbyRefresh)));
 		socketIOLobby.Connect("get_lobby_received", new Callable(this, nameof(OnGetLobby)));
 		socketIOLobby.Connect("game_started", new Callable(this, nameof(OnGameStarted)));
+		socketIOLobby.Connect("lobby_closed", new Callable(this, nameof(OnLobbyClosed)));
 
 		var gameState = GetNode<Node>("/root/GameState");
 		string token = gameState.Get("token").AsString();
@@ -90,7 +91,12 @@ public partial class WaitingRoom : Control
 
 	public void OnLeavePressed()
 	{
-		//socketIOLobby.Call("disconnect_from_server");
+		socketIOLobby.Call("disconnect_from_server");
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+	}
+	
+	public void OnLobbyClosed()
+	{
 		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 	}
 }
