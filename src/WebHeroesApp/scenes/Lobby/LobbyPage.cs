@@ -7,6 +7,7 @@ public partial class LobbyPage : Control
 	private Node socketIOLobby;
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
+	private bool _loggingOut = false;
  
 	private const string BaseUrl = "https://webheroes.duckdns.org:9027";
  
@@ -36,15 +37,21 @@ public partial class LobbyPage : Control
 	{
 		GD.Print("[LobbyPage] HTTP response: ", responseCode);
 		httpQueue.OnCompleted();
+
+		if (_loggingOut)
+		{
+			_loggingOut = false;
+			GetTree().ChangeSceneToFile("res://scenes/LoginSignUp/LoginRegisterMenu.tscn");	
+		}
 	}
  
 	private void LogOut()
 	{
+		_loggingOut = true;
+		socketIOLobby.Call("disconnect_from_server");
+
 		var gameState = GetNode<Node>("/root/GameState");
 		string token = gameState.Get("token").AsString();
- 
-		socketIOLobby.Call("disconnect_from_server");
- 
 		string body = string.IsNullOrEmpty(token)
 			? "{}"
 			: $"{{\"token\":\"{token}\"}}";
@@ -54,8 +61,6 @@ public partial class LobbyPage : Control
 		gameState.Set("token", "");
 		gameState.Set("username", "");
 		gameState.Set("lobby_name", "");
- 
-		GetTree().ChangeSceneToFile("res://scenes/LoginSignUp/LoginRegisterMenu.tscn");
 	}
  
 	private void OnLobbyCreated(Variant data)
