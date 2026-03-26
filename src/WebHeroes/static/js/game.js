@@ -26,7 +26,7 @@
   function hexCornerPoints(cx, cy, size) {
     const pts = [];
     for (let i = 0; i < 6; i++) {
-      const angle = (Math.PI / 180) * (60 * i + 30); // pointy-top
+      const angle = (Math.PI / 180) * (60 * i + 30);
       pts.push([cx + size * Math.cos(angle), cy + size * Math.sin(angle)]);
     }
     return pts;
@@ -46,33 +46,26 @@
     return resolveRawSprite(field.field_type?.sprite);
   }
 
-  // Strips __modname__/ wrapper to match BaseMods/<mod_id>/<path> on disk.
-  // e.g. __base__/graphics/settlement/village.webp → base/graphics/settlement/village.webp
   function resolveRawSprite(sprite) {
-  if (!sprite) return null;
-
-  return sprite
-    .replace(/__([^_]+(?:_[^_]+)*)__\//, "$1/")
-    .replace(/\/graphics\//, "/images/");
+    if (!sprite) return null;
+    return sprite
+      .replace(/__([^_]+(?:_[^_]+)*)__\//, "$1/")
+      .replace(/\/graphics\//, "/images/");
   }
 
   // ─── Geometry helpers ──────────────────────────────────────────────────────
-
-  // Given two hex coords, return the midpoint between their pixel centres —
-  // used as the visual midpoint of a road edge.
   function edgeMidpoint(q1, r1, q2, r2) {
-    const a = hexToPixel(q1, r1);
-    const b = hexToPixel(q2, r2);
+    const a = hexToPixel(q1, r1), b = hexToPixel(q2, r2);
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
   }
 
-  // The two pixel corners that are shared between hex A and hex B.
-  // Each hex has 6 corners; two adjacent hexes share exactly 2 of them.
   function sharedEdgeCorners(q1, r1, q2, r2) {
-    const ca = hexCornerPoints(...Object.values(hexToPixel(q1, r1)), HEX_SIZE - 1.5);
-    const cb = hexCornerPoints(...Object.values(hexToPixel(q2, r2)), HEX_SIZE - 1.5);
+    // Use full HEX_SIZE (not the visually-shrunk size) so that adjacent hex
+    // corners are mathematically coincident and epsilon matching works reliably.
+    const ca = hexCornerPoints(...Object.values(hexToPixel(q1, r1)), HEX_SIZE);
+    const cb = hexCornerPoints(...Object.values(hexToPixel(q2, r2)), HEX_SIZE);
 
-    const EPS = 2; // pixel tolerance for "same point"
+    const EPS = 0.5;
     const shared = [];
     for (const pa of ca) {
       for (const pb of cb) {
@@ -82,11 +75,9 @@
         }
       }
     }
-    return shared; // usually 2 points
+    return shared;
   }
 
-  // The pixel point that is the shared corner of three hexes.
-  // Average of their three centres' nearest matching corners.
   function intersectionPoint(q1, r1, q2, r2, q3, r3) {
     const centres = [[q1, r1], [q2, r2], [q3, r3]].map(([q, r]) => hexToPixel(q, r));
     return {
@@ -95,7 +86,7 @@
     };
   }
 
-  // ─── Player colour helper ─────────────────────────────────────────────────
+  // ─── Player colour helper ──────────────────────────────────────────────────
   function playerCSSColor(player) {
     const c = player?.color_type;
     if (!c) return "#ffffff";
@@ -110,16 +101,11 @@
   let showNumbers   = true;
   let showOuter     = true;
   let lastData      = null;
-  let hexPixelMap   = new Map(); // "q,r" → {x, y}
+  let hexPixelMap   = new Map();
 
-  // Placed buildings: stored client-side so we can redraw without a full
-  // round-trip.  Each entry: { type: "road"|"settlement", location: [...ints],
-  //                            building: {...}, player: {...} }
   const placedBuildings = [];
 
   // ─── Placement-mode state ──────────────────────────────────────────────────
-  // When the player clicks a recipe button we enter placement mode.
-  // placementMode: null | { recipeId, resultType: "road"|"settlement" }
   let placementMode = null;
 
   // ─── Render ────────────────────────────────────────────────────────────────
@@ -182,7 +168,7 @@
     }
     svg.appendChild(defs);
 
-    // Hex tiles
+    // Hex tiles — pointer-events none so they never block placement targets
     const seen = new Set();
     for (const { x, y, q, r, field } of parsed) {
       const typeName = field.field_type?.name || "";
@@ -194,9 +180,12 @@
       const pts    = hexCornerPoints(x, y, HEX_SIZE - 1.5);
       const pAttr  = pointsAttr(pts);
       const sprite = resolveSprite(field);
-      const g      = svgEl("g", { class: isOuter ? "hex-cell hex-outer" : "hex-cell" });
+      const g      = svgEl("g", {
+        class: isOuter ? "hex-cell hex-outer" : "hex-cell",
+        "pointer-events": "none",
+      });
 
-      g.appendChild(svgEl("polygon", { points: pAttr, fill: style.fill, stroke: "none" }));
+      g.appendChild(svgEl("polygon", { points: pAttr, fill: style.fill, stroke: "none", "pointer-events": "none" }));
 
       if (sprite) {
         const imgSize = HEX_SIZE * 2.05;
@@ -206,6 +195,7 @@
           width: imgSize, height: imgSize,
           preserveAspectRatio: "xMidYMid slice",
           "clip-path": `url(#clip-${q}-${r})`,
+          "pointer-events": "none",
         }));
       }
 
@@ -214,12 +204,14 @@
         stroke: isOuter ? "rgba(255,255,255,0.06)" : "rgba(0,0,0,0.45)",
         "stroke-width": isOuter ? "1" : "1.5",
         filter: isOuter ? "" : "url(#hex-shadow)",
+        "pointer-events": "none",
       }));
 
       if (!isOuter) {
         g.appendChild(svgEl("polygon", {
           points: pointsAttr(hexCornerPoints(x, y, HEX_SIZE * 0.78)),
           fill: "none", stroke: "rgba(255,255,255,0.12)", "stroke-width": "1",
+          "pointer-events": "none",
         }));
 
         if (showNumbers && field.assigned_number != null) {
@@ -228,11 +220,13 @@
             cx: x, cy: y, r: 16,
             fill: "rgba(245,234,208,0.93)",
             stroke: "rgba(0,0,0,0.35)", "stroke-width": "1.5",
+            "pointer-events": "none",
           }));
           const txt = svgEl("text", {
             x, y, "text-anchor": "middle", "dominant-baseline": "central",
             fill: numColor, "font-size": "14",
             "font-family": "Cinzel, serif", "font-weight": "bold",
+            "pointer-events": "none",
           });
           txt.textContent = field.assigned_number;
           g.appendChild(txt);
@@ -241,37 +235,52 @@
             x, y, "text-anchor": "middle", "dominant-baseline": "central",
             fill: "rgba(255,255,255,0.55)", "font-size": "9",
             "font-family": "Crimson Pro, serif", "letter-spacing": "0.05em",
+            "pointer-events": "none",
           });
           lbl.textContent = (style.label || field.field_type?.display_name || typeName).toUpperCase();
           g.appendChild(lbl);
         }
 
-        g.addEventListener("mousemove", (e) => {
-          const displayName = field.field_type?.display_name || style.label || typeName;
-          const resource    = field.field_type?.resource?.display_name || style.resource;
-          const lines = [`Type: ${displayName}`];
-          if (resource)              lines.push(`Resource: ${resource}`);
-          if (field.assigned_number) lines.push(`Number: ${field.assigned_number}`);
-          tooltip.textContent = lines.join("  ·  ");
-          tooltip.classList.add("visible");
-          tooltip.style.left = (e.clientX + 14) + "px";
-          tooltip.style.top  = (e.clientY - 28) + "px";
-        });
-        g.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
+        // Tooltip hit area — only active when NOT in placement mode
+        if (!placementMode) {
+          const hitPoly = svgEl("polygon", {
+            points: pAttr,
+            fill: "transparent",
+            stroke: "none",
+            "pointer-events": "all",
+          });
+          hitPoly.addEventListener("mousemove", (e) => {
+            const displayName = field.field_type?.display_name || style.label || typeName;
+            const resource    = field.field_type?.resource?.display_name || style.resource;
+            const lines = [`Type: ${displayName}`];
+            if (resource)              lines.push(`Resource: ${resource}`);
+            if (field.assigned_number) lines.push(`Number: ${field.assigned_number}`);
+            tooltip.textContent = lines.join("  ·  ");
+            tooltip.classList.add("visible");
+            tooltip.style.left = (e.clientX + 14) + "px";
+            tooltip.style.top  = (e.clientY - 28) + "px";
+          });
+          hitPoly.addEventListener("mouseleave", () => tooltip.classList.remove("visible"));
+          g.appendChild(hitPoly);
+        }
+
         if (!seen.has(typeName)) seen.add(typeName);
       }
 
       svg.appendChild(g);
     }
 
-    // Draw all buildings placed so far
+    // Draw all buildings placed so far (appended before placement layer)
     for (const b of placedBuildings) {
       drawBuilding(b);
     }
 
-    // Draw placement hit-targets if in placement mode
+    // Placement targets go into their own group, appended LAST so they are
+    // always on top of tiles AND buildings in the SVG z-order.
     if (placementMode) {
-      drawPlacementTargets(parsed);
+      const targetLayer = svgEl("g", { id: "placement-layer" });
+      svg.appendChild(targetLayer);
+      drawPlacementTargets(parsed, targetLayer);
     }
 
     // Legend
@@ -304,25 +313,14 @@
     const color = playerCSSColor(player);
 
     if (type === "road") {
-      // location = [q1,r1, q2,r2]
       const [q1, r1, q2, r2] = location;
       const corners = sharedEdgeCorners(q1, r1, q2, r2);
 
       if (corners.length < 2) {
-        // Fallback: draw from centre to centre
         const a = hexToPixel(q1, r1), b = hexToPixel(q2, r2);
         corners.push([a.x, a.y], [b.x, b.y]);
       }
 
-      const line = svgEl("line", {
-        x1: corners[0][0], y1: corners[0][1],
-        x2: corners[1][0], y2: corners[1][1],
-        stroke: color,
-        "stroke-width": "5",
-        "stroke-linecap": "round",
-        "pointer-events": "none",
-      });
-      // Thin dark outline for legibility
       const outline = svgEl("line", {
         x1: corners[0][0], y1: corners[0][1],
         x2: corners[1][0], y2: corners[1][1],
@@ -331,11 +329,18 @@
         "stroke-linecap": "round",
         "pointer-events": "none",
       });
+      const line = svgEl("line", {
+        x1: corners[0][0], y1: corners[0][1],
+        x2: corners[1][0], y2: corners[1][1],
+        stroke: color,
+        "stroke-width": "5",
+        "stroke-linecap": "round",
+        "pointer-events": "none",
+      });
       svg.appendChild(outline);
       svg.appendChild(line);
 
     } else if (type === "settlement") {
-      // location = [q1,r1, q2,r2, q3,r3]
       const [q1, r1, q2, r2, q3, r3] = location;
       const { x, y } = intersectionPoint(q1, r1, q2, r2, q3, r3);
 
@@ -343,7 +348,6 @@
       const sprite = resolveRawSprite(building?.sprite);
 
       if (sprite) {
-        // Dark outline for contrast, then player colour ring on top
         svg.appendChild(svgEl("circle", {
           cx: x, cy: y, r: SIZE + 4,
           fill: "none",
@@ -364,7 +368,6 @@
           "pointer-events": "none",
         }));
       } else {
-        // Fallback: plain coloured circle with letter
         const RADIUS = building?.point_value > 1 ? 10 : 7;
         svg.appendChild(svgEl("circle", {
           cx: x, cy: y + 2, r: RADIUS + 1,
@@ -390,15 +393,10 @@
   }
 
   // ─── Placement-mode hit targets ────────────────────────────────────────────
-  // We draw invisible clickable shapes over every valid edge (road) or corner
-  // (settlement).  The backend enforces legality; we just need the player to
-  // pick a spot.
-
-  function drawPlacementTargets(parsed) {
+  function drawPlacementTargets(parsed, container) {
     const { resultType } = placementMode;
 
     if (resultType === "road") {
-      // Build a set of unique inner-hex edges
       const drawn = new Set();
       for (const { q, r, field } of parsed) {
         if (field.field_type?.name?.includes("outer")) continue;
@@ -408,11 +406,10 @@
         ];
         for (const [nq, nr] of neighbours) {
           if (!hexPixelMap.has(`${nq},${nr}`)) continue;
-          const nField = lastData?.fields[`${nq}\0${nr}`] || lastData?.fields[Object.keys(lastData.fields).find(k => {
-            const parts = k.split("\u0000");
-            return Number(parts[0]) === nq && Number(parts[1]) === nr;
-          })];
-          if (nField?.field_type?.name?.includes("outer")) continue;
+
+          // Skip edges that border an outer-bound hex
+          const neighbourEntry = parsed.find(p => p.q === nq && p.r === nr);
+          if (!neighbourEntry || neighbourEntry.field.field_type?.name?.includes("outer")) continue;
 
           const edgeKey = [q, r, nq, nr].sort().join(",");
           if (drawn.has(edgeKey)) continue;
@@ -421,26 +418,40 @@
           const corners = sharedEdgeCorners(q, r, nq, nr);
           if (corners.length < 2) continue;
 
-          const hit = svgEl("line", {
+          // Invisible wide hit area (no pointer-events issues with fill=none lines)
+          const hitArea = svgEl("line", {
+            x1: corners[0][0], y1: corners[0][1],
+            x2: corners[1][0], y2: corners[1][1],
+            stroke: "rgba(0,0,0,0)",   // fully transparent but painted → hittable
+            "stroke-width": "18",
+            "stroke-linecap": "round",
+            "pointer-events": "stroke",
+            cursor: "pointer",
+          });
+
+          // Visible highlight on top of the hit area
+          const highlight = svgEl("line", {
             x1: corners[0][0], y1: corners[0][1],
             x2: corners[1][0], y2: corners[1][1],
             stroke: "rgba(255,255,100,0.35)",
-            "stroke-width": "10",
+            "stroke-width": "8",
             "stroke-linecap": "round",
-            cursor: "pointer",
+            "pointer-events": "none",
             class: "placement-target",
           });
-          hit.addEventListener("mouseenter", () => hit.setAttribute("stroke", "rgba(255,255,100,0.75)"));
-          hit.addEventListener("mouseleave", () => hit.setAttribute("stroke", "rgba(255,255,100,0.35)"));
-          hit.addEventListener("click", () => {
+
+          hitArea.addEventListener("mouseenter", () => highlight.setAttribute("stroke", "rgba(255,255,100,0.85)"));
+          hitArea.addEventListener("mouseleave", () => highlight.setAttribute("stroke", "rgba(255,255,100,0.35)"));
+          hitArea.addEventListener("click", () => {
             emitBuild(placementMode.recipeId, [q, r, nq, nr]);
           });
-          svg.appendChild(hit);
+
+          container.appendChild(highlight);
+          container.appendChild(hitArea);  // hitArea on top so it captures events
         }
       }
 
     } else if (resultType === "settlement") {
-      // Build a set of unique inner-hex corners (each corner = 3 hexes)
       const drawn = new Set();
       const directions = [
         [+1, 0], [+1, -1], [0, -1],
@@ -464,9 +475,10 @@
           const { x, y } = intersectionPoint(a0, a1, b0, b1, c0, c1);
 
           const hit = svgEl("circle", {
-            cx: x, cy: y, r: 9,
+            cx: x, cy: y, r: 11,
             fill: "rgba(255,255,100,0.35)",
             stroke: "rgba(255,255,100,0.7)", "stroke-width": "1.5",
+            "pointer-events": "all",
             cursor: "pointer",
             class: "placement-target",
           });
@@ -475,7 +487,7 @@
           hit.addEventListener("click", () => {
             emitBuild(placementMode.recipeId, [a0, a1, b0, b1, c0, c1]);
           });
-          svg.appendChild(hit);
+          container.appendChild(hit);
         }
       }
     }
@@ -491,10 +503,8 @@
   function enterPlacementMode(recipeId, resultType) {
     placementMode = { recipeId, resultType };
     console.log("[game.js] Entering placement mode:", placementMode);
-    // Re-render to show targets
     if (lastData) render(lastData);
 
-    // Update UI hint
     const hint = document.getElementById("placement-hint");
     if (hint) {
       hint.textContent = resultType === "road"
@@ -517,11 +527,8 @@
 
   // ─── Socket ────────────────────────────────────────────────────────────────
   const socket = io();
-  window._gameSocket = socket; // expose so HTML layer can emit end-turn
+  window._gameSocket = socket;
 
-  // Cached game-level state — populated fresh on every get-game-data.
-  // myIndex is the authoritative identity; myColorName is a secondary check
-  // used by the build handler to match players by colour across reconnects.
   let gameState = {
     players: [], currentUserIndex: 0, myIndex: -1,
     myColorName: null, myResources: {}, recipes: [],
@@ -534,8 +541,8 @@
       socket.emit("lobby-management:join-lobby", { lobby_name: lobbyName });
     }
     if (!lastData) {
-    socket.emit("game-management:get-game-data");
-  }
+      socket.emit("game-management:get-game-data");
+    }
   });
 
   socket.on("connect_error", (err) => console.error("[game.js] Socket connect error:", err));
@@ -543,8 +550,6 @@
   socket.on("game-management:get-game-data", (data) => {
     console.log("[game.js] Received game data");
 
-    // Rebuild client-side building list from server state so refresh/reconnect
-    // shows all previously placed buildings immediately.
     placedBuildings.length = 0;
 
     for (const [key, s] of Object.entries(data.settlements ?? {})) {
@@ -562,7 +567,6 @@
 
     render(data);
 
-    // Always trust my_index from the server — set per-socket, never stale.
     const myIndex     = data.my_index ?? -1;
     const myColorName = data.players?.[myIndex]?.color_type?.name ?? null;
 
@@ -579,24 +583,18 @@
     window.dispatchEvent(new CustomEvent("game:data", { detail: { ...gameState } }));
   });
 
-  // ── End-turn event from server ─────────────────────────────────────────────
   socket.on("game-management:end-turn", (data) => {
     console.log("[game.js] Received end-turn:", data);
-    // data: { rolled_number, next_user_index, players }
 
-    // Snapshot old resource totals before we overwrite state
     const oldResources = gameState.players.map(p =>
       p?.resources ? { ...p.resources } : {}
     );
 
     gameState.currentUserIndex = data.next_user_index;
     gameState.players          = data.players ?? gameState.players;
-    // myIndex is stable for the socket lifetime — server assigns it from
-    // the immutable lobby member list.
     gameState.myResources = gameState.players[gameState.myIndex]?.resources
                             ?? gameState.myResources;
 
-    // Diff new vs old to derive gains per player
     const gains = {};
     gameState.players.forEach((player, i) => {
       if (!player?.resources) return;
@@ -628,13 +626,11 @@
     window.dispatchEvent(new CustomEvent("game:end-turn", { detail: endTurnDetail }));
   });
 
-  // ── Flash tiles matching the rolled number ─────────────────────────────────
   function flashMatchingTiles(rolledNumber) {
     if (!lastData?.fields) return;
     for (const [key, field] of Object.entries(lastData.fields)) {
       if (field.assigned_number !== rolledNumber) continue;
 
-      // Find the pixel coords for this field
       const cleanKey = key.replace(/^"|"$/g, "");
       let parts = cleanKey.split("\u0000");
       if (parts.length !== 2) parts = cleanKey.split("\x00");
@@ -645,7 +641,6 @@
       const { x, y } = hexToPixel(q, r);
       const pts = hexCornerPoints(x, y, HEX_SIZE - 1.5);
 
-      // Bright overlay polygon that fades out
       const flash = svgEl("polygon", {
         points: pointsAttr(pts),
         fill: "rgba(255, 230, 80, 0.55)",
@@ -658,15 +653,12 @@
     }
   }
 
-  // ── Floating "+N Resource" popups ──────────────────────────────────────────
   function spawnGainPopups(playerIndex, gains, players) {
-    // Anchor to the board container so they float above the SVG
     const container = document.getElementById("board-area") || document.body;
 
     const player = players?.[playerIndex];
     const color  = player ? playerCSSColor(player) : "#fff";
 
-    // Stack multiple resources vertically with a small delay each
     const entries = Object.entries(gains);
     entries.forEach(([resource, amount], i) => {
       const el = document.createElement("div");
@@ -692,7 +684,6 @@
     });
   }
 
-  // ── Build event from server ────────────────────────────────────────────────
   socket.on("game-management:build", (data) => {
     console.log("[game.js] Received build event:", data);
 
@@ -700,22 +691,19 @@
     const resultType = location.length === 4 ? "road" : "settlement";
 
     placedBuildings.push({ type: resultType, location, building, player });
-    drawBuilding({ type: resultType, location, building, player });
 
-    // Update the players array so everyone's state stays current.
-    // Identify which slot this player occupies by colour name — that is
-    // stable regardless of socket reconnects or index drift.
+    // Re-render everything so the placement layer (if still active) stays on top
+    if (lastData) render(lastData);
+
     if (data.player?.color_type?.name) {
       const idx = gameState.players.findIndex(
         p => p?.color_type?.name === data.player.color_type.name
       );
       if (idx !== -1) {
         gameState.players[idx] = data.player;
-        // If it was our build, refresh resources + panels
         if (idx === gameState.myIndex) {
           gameState.myResources = data.player.resources ?? gameState.myResources;
           console.log("[game.js] build: updating myResources to", gameState.myResources);
-          // Spread after setting myResources so the detail has the new value
           window.dispatchEvent(new CustomEvent("game:data", {
             detail: {
               ...gameState,
@@ -746,15 +734,6 @@
     if (lastData) render(lastData);
   });
 
-  // ─── Recipe buttons ────────────────────────────────────────────────────────
-  // Call this from your UI layer when a player clicks "Build Road" / 
-  // "Build Settlement" / "Build City".  Pass the recipe name (e.g. "road")
-  // and the result prototype type ("road" or "settlement").
-  //
-  // Example (wire up after get-game-data):
-  //   window.GameUI.startBuild("road",       "road");
-  //   window.GameUI.startBuild("settlement", "settlement");
-  //   window.GameUI.startBuild("city",       "settlement");
   window.GameUI = {
     startBuild(recipeId, resultType) {
       if (placementMode) exitPlacementMode();
