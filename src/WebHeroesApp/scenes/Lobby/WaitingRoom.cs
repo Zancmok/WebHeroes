@@ -21,7 +21,8 @@ public partial class WaitingRoom : Control
 		leaveButton 	= GetNode<Button>("VBoxContainer/LeaveButton");
  
 		startButton.Visible = false;
- 
+		leaveButton.Visible = false;
+
 		startButton.Pressed += () => OnStartPressed();
 		leaveButton.Pressed += () => OnLeavePressed();
  

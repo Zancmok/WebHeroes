@@ -31,6 +31,9 @@ public partial class LobbyPage : Control
 		string token = gameState.Get("token").AsString();
 		socketIOLobby.Connect("socket_ready", new Callable(this, nameof(OnSocketReady)));
 		socketIOLobby.Call("connect_to_server", token);
+
+
+
 	}
  
 	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
@@ -57,6 +60,12 @@ public partial class LobbyPage : Control
 			: $"{{\"token\":\"{token}\"}}";
  
 		httpQueue.Enqueue($"{BaseUrl}/user-management/logout", body);
+
+		GD.Print(
+			gameState.Get("token").AsString() + "; " +
+			gameState.Get("username").AsString() + "; " +
+			gameState.Get("lobby_name").AsString()
+			);
  
 		gameState.Set("token", "");
 		gameState.Set("username", "");
@@ -83,13 +92,42 @@ public partial class LobbyPage : Control
  
 	private void OnCreateNewGame()
 	{
-		var gameState = GetNode<Node>("/root/GameState");
-		string username = gameState.Get("username").AsString();
-		string lobbyName = $"{username}'s Lobby";
-		gameState.Set("lobby_name", lobbyName);
-		socketIOLobby.Call("create_lobby", lobbyName);
+		ShowLobbyNameDialog();
+		//var gameState = GetNode<Node>("/root/GameState");
+		//string username = gameState.Get("username").AsString();
+		//string lobbyName = $"{username}'s Lobby";
+		//gameState.Set("lobby_name", lobbyName);
+		//socketIOLobby.Call("create_lobby", lobbyName);
 	}
  
+	private void ShowLobbyNameDialog()
+	{
+		var lobbyNameDialog = new ConfirmationDialog();
+		lobbyNameDialog.Title = "Creating lobby...";
+		lobbyNameDialog.OkButtonText = "Create";
+
+		var LineEdit = new LineEdit();
+		LineEdit.PlaceholderText = "Enter lobby name...";
+		lobbyNameDialog.AddChild(LineEdit);
+
+		AddChild(lobbyNameDialog);
+		lobbyNameDialog.PopupCentered();
+
+		lobbyNameDialog.Confirmed += () =>
+		{
+			string lobbyName = LineEdit.Text.Trim();
+			if (!string.IsNullOrEmpty(lobbyName))
+			{
+				var gameState = GetNode<Node>("/root/GameState");
+				gameState.Set("lobby_name", lobbyName);
+				socketIOLobby.Call("create_lobby", lobbyName);
+			}
+			lobbyNameDialog.QueueFree();
+		};
+
+		lobbyNameDialog.Canceled += () => lobbyNameDialog.QueueFree();
+	} 
+
 	private void OnBack()
 	{
 		LogOut();
