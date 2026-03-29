@@ -15,6 +15,8 @@ public partial class LoginSignUpPage : Control
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;
+	private Node _socketIOLobby;
+	private bool _debugMode = false;
  
 	public override void _Ready()
 	{
@@ -33,36 +35,62 @@ public partial class LoginSignUpPage : Control
 		{
 			Login();
 		};
+
+
+		// --- DEBUG BUTTON ---
+		// Grab the SocketIO node that's already in the scene
+		_socketIOLobby = GetNode<Node>("SocketIO");  // already in scene as UserManagement
+
+		var debugBtn = new Button();
+		debugBtn.Text = "DEBUG: Login + Start Game";
+		debugBtn.Position = new Vector2(20, 20);
+		debugBtn.AddThemeColorOverride("font_color", new Color(1, 0.3f, 0.3f));
+		AddChild(debugBtn);
+		debugBtn.Pressed += OnDebugStart;
 	}
  
-	private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
-	{
-		GD.Print("Response code: ", responseCode);
-		string json = Encoding.UTF8.GetString(body);
-		GD.Print("Response body: ", json);
- 
-		httpQueue.OnCompleted();
- 
-		if (string.IsNullOrEmpty(json)) return;
- 
-		var doc = JsonDocument.Parse(json).RootElement;
- 
-		if (doc.TryGetProperty("token", out var tokenProp))
-		{
-			currentUserToken = tokenProp.GetString();
-			GD.Print("Token saved: ", currentUserToken);
- 
-			var gameState = GetNode<Node>("/root/GameState");
-			gameState.Set("token", currentUserToken);
- 
-			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
-		}
-		else if (doc.TryGetProperty("object_type", out var typeProp) && typeProp.GetString() == "success-response" && responseCode == 201)
-		{
-			// if signing up is successful, login automatically
-			Login();
-		}
-	}
+private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
+{
+    GD.Print("Response code: ", responseCode);
+    string json = Encoding.UTF8.GetString(body);
+    GD.Print("Response body: ", json);
+
+    httpQueue.OnCompleted();
+
+    if (string.IsNullOrEmpty(json)) return;
+
+    var doc = JsonDocument.Parse(json).RootElement;
+
+    if (doc.TryGetProperty("token", out var tokenProp))
+    {
+        currentUserToken = tokenProp.GetString();
+        GD.Print("Token saved: ", currentUserToken);
+
+        var gameState = GetNode<Node>("/root/GameState");
+        gameState.Set("token", currentUserToken);
+
+        if (_debugMode)
+        {
+            _debugMode = false;
+            // Connect socket and fire debug_create_and_start
+            _socketIOLobby.Connect("socket_ready",
+                new Callable(this, nameof(OnDebugSocketReady)), (uint)ConnectFlags.OneShot);
+            _socketIOLobby.Connect("debug_game_ready",
+                new Callable(this, nameof(OnDebugGameReady)), (uint)ConnectFlags.OneShot);
+            _socketIOLobby.Call("connect_to_server", currentUserToken);
+        }
+        else
+        {
+            GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+        }
+    }
+    else if (doc.TryGetProperty("object_type", out var typeProp) 
+             && typeProp.GetString() == "success-response" 
+             && responseCode == 201)
+    {
+        Login();
+    }
+}
  
 	private void SignUp()
 	{
@@ -121,6 +149,32 @@ public partial class LoginSignUpPage : Control
 		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 	}
  
+	private void OnDebugStart()
+	{
+		// Step 1: login with hardcoded creds
+		var jsonData = new Godot.Collections.Dictionary
+		{
+			{ "username", "silenk" },
+			{ "password", "123" }
+		};
+		string jsonString = Json.Stringify(jsonData);
+		_debugMode = true;
+		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
+	}
+
+	private void OnDebugSocketReady()
+	{
+		var gameState = GetNode<Node>("/root/GameState");
+		string lobbyName = "debug-lobby-" + Time.GetTicksMsec();
+		gameState.Set("lobby_name", lobbyName);
+		_socketIOLobby.Call("debug_create_and_start", lobbyName);
+	}
+
+	private void OnDebugGameReady()
+	{
+		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn");
+	}
+
 	private void Send()
 	{
 		userManagement.SendMessage("Hello World!");
