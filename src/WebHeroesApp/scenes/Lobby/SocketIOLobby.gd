@@ -2,6 +2,7 @@ extends Node
 
 @onready var client: SocketIO = $SocketIO
 var is_ready: bool = false
+var pending_lobby_name: String = ""
 
 signal lobby_refresh_received(data)
 signal lobby_created(data)
@@ -32,13 +33,16 @@ func _on_connected(ns: String) -> void:
 	print("Socket connected!", ns)
 	is_ready = true
 	emit_signal("socket_ready")
+	if pending_lobby_name != "":
+		create_lobby(pending_lobby_name)
+		pending_lobby_name = ""
 
 func refresh() -> void:
 	client.emit("lobby-management:refresh")
 
 func create_lobby(lobby_name: String) -> void:
 	if not is_ready:
-		push_error("Socket not ready yet!")
+		pending_lobby_name = lobby_name
 		return
 	client.emit("lobby-management:create-lobby", { "lobby_name": lobby_name })
 

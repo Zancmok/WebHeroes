@@ -10,7 +10,7 @@ public partial class LoginSignUpPage : Control
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
 	private string realHttps = "https://webheroes.duckdns.org:9027";
-	private string testLink = "https://localhost";
+	private string testLink = "http://localhost";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
@@ -57,7 +57,7 @@ public partial class LoginSignUpPage : Control
  
 			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 		}
-		else if (doc.TryGetProperty("object-type", out var typeProp) && typeProp.GetString() == "success-response" && responseCode == 201)
+		else if (doc.TryGetProperty("object_type", out var typeProp) && typeProp.GetString() == "success-response" && responseCode == 201)
 		{
 			// if signing up is successful, login automatically
 			Login();
@@ -89,8 +89,8 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
  
-			httpQueue.Enqueue($"{testLink}/user-management/signup", jsonString);
-			httpQueue.Enqueue($"{testLink}/user-management/login", jsonString);
+			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
+			httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 		}
 		else
 		{
@@ -118,7 +118,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
  
-		httpQueue.Enqueue($"{testLink}/user-management/login", jsonString);
+		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 	}
  
 	private void Send()
@@ -132,7 +132,7 @@ public partial class LoginSignUpPage : Control
 		{
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
-				GD.Print($"{testLink}");
+				GD.Print($"{realHttps}");
 				GD.Print($"{testHttpResult}");
 				GD.Print(currentUserToken);
 			}

@@ -15,10 +15,14 @@ public partial class GamePage : Node2D
 		_socketIOGame.Connect("get_game_data_received", new Callable(this, nameof(OnGameDataReceived)));
 		_socketIOGame.Connect("end_turn_received",      new Callable(this, nameof(OnEndTurnReceived)));
 		_socketIOGame.Connect("build_received",         new Callable(this, nameof(OnBuildReceived)));
-
+		
 		var gameState = GetNode<Node>("/root/GameState");
 		string token  = gameState.Get("token").AsString();
 		_socketIOGame.Call("connect_to_server", token);
+
+		// TEMP: fake game state for testing
+		gameState.Set("token", "your_actual_token_here");
+		gameState.Set("lobby_name", "your_actual_lobby_name_here");
 	}
 
 	private void OnSocketReady()
