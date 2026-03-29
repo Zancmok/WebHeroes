@@ -154,7 +154,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 		// Step 1: login with hardcoded creds
 		var jsonData = new Godot.Collections.Dictionary
 		{
-			{ "username", "silenk" },
+			{ "username", "rapor" },
 			{ "password", "123" }
 		};
 		string jsonString = Json.Stringify(jsonData);

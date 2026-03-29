@@ -81,14 +81,16 @@ public partial class LobbyPage : Control
 		var dict = array[0].AsGodotDictionary();
 		if (dict == null) return;
  
-		if (dict.TryGetValue("object_type", out var type) && type.AsString() == "success-response")
-		{
-			GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
-		}
-		else if (dict.TryGetValue("reason", out var reason))
+		//if (dict.TryGetValue("object_type", out var type) && type.AsString() == "success-response")
+		//{
+		//	GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
+		//}
+		if (dict.TryGetValue("reason", out var reason))
 		{
 			GD.Print("[LobbyPage] Failed to create lobby: ", reason.AsString());
 		}
+		
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 	}
  
 	private void OnCreateNewGame()

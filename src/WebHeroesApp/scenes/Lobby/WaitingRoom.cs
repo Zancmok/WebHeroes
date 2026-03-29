@@ -21,7 +21,7 @@ public partial class WaitingRoom : Control
 		leaveButton 	= GetNode<Button>("VBoxContainer/LeaveButton");
  
 		startButton.Visible = false;
-		leaveButton.Visible = false;
+		leaveButton.Visible = true;
 
 		startButton.Pressed += () => OnStartPressed();
 		leaveButton.Pressed += () => OnLeavePressed();
@@ -47,7 +47,11 @@ public partial class WaitingRoom : Control
  
 	private void OnGetLobby(Variant data)
 	{
-		var dict = data.AsGodotDictionary();
+		// Unwrap array wrapper
+		var array = data.AsGodotArray();
+		if (array == null || array.Count == 0) return;
+		
+		var dict = array[0].AsGodotDictionary();
 		if (dict == null) return;
 
 		if (dict.TryGetValue("owner", out var ownerVar))
@@ -55,16 +59,14 @@ public partial class WaitingRoom : Control
 			var owner = ownerVar.AsGodotDictionary();
 			GD.Print(owner.ToString());
 			lobbyOwnerLabel.Text = $"Owner: {owner["member_name"].AsString()}";
- 
 			startButton.Visible = true;
 		}
- 
+
 		if (dict.TryGetValue("members", out var membersVar))
 		{
 			foreach (var child in playerList.GetChildren())
-			{
 				child.QueueFree();
-			}
+
 			foreach (var member in membersVar.AsGodotArray())
 			{
 				var m = member.AsGodotDictionary();
@@ -73,6 +75,8 @@ public partial class WaitingRoom : Control
 				playerList.AddChild(lbl);
 			}
 		}
+
+		leaveButton.Visible = true;
 	}
  
 	private void OnGameStarted()
