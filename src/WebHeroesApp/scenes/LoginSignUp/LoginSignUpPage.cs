@@ -39,7 +39,7 @@ public partial class LoginSignUpPage : Control
 
 		// --- DEBUG BUTTON ---
 		// Grab the SocketIO node that's already in the scene
-		_socketIOLobby = GetNode<Node>("SocketIO");  // already in scene as UserManagement
+		_socketIOLobby = GetNode<Node>("SocketIOLobby");  // already in scene as UserManagement
 
 		var debugBtn = new Button();
 		debugBtn.Text = "DEBUG: Login + Start Game";

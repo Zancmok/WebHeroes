@@ -72,7 +72,6 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 		emit_signal("lobby_refresh_received", data)
 	elif event == "lobby-management:create-lobby":
 		emit_signal("lobby_created", data)
-		# NEW: if this was a debug start, fire start-game immediately after
 		if _pending_debug_start:
 			_pending_debug_start = false
 			client.emit("lobby-management:start-game")
