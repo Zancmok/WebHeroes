@@ -10,6 +10,7 @@ public partial class LobbyPage : Control
 	private bool _loggingOut = false;
  
 	private const string BaseUrl = "https://webheroes.duckdns.org:9027";
+	private const string testLink = "https://localhost";
  
 	public override void _Ready()
 	{
@@ -59,7 +60,7 @@ public partial class LobbyPage : Control
 			? "{}"
 			: $"{{\"token\":\"{token}\"}}";
  
-		httpQueue.Enqueue($"{BaseUrl}/user-management/logout", body);
+		httpQueue.Enqueue($"{testLink}/user-management/logout", body);
 
 		GD.Print(
 			gameState.Get("token").AsString() + "; " +

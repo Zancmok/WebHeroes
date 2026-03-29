@@ -10,6 +10,7 @@ public partial class LoginSignUpPage : Control
 	private UtilityClass utilityClass;
 	private UserManagement userManagement;
 	private string realHttps = "https://webheroes.duckdns.org:9027";
+	private string testLink = "https://localhost";
 	private string testHttpResult;
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
@@ -88,8 +89,8 @@ public partial class LoginSignUpPage : Control
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
  
-			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
-			httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
+			httpQueue.Enqueue($"{testLink}/user-management/signup", jsonString);
+			httpQueue.Enqueue($"{testLink}/user-management/login", jsonString);
 		}
 		else
 		{
@@ -117,7 +118,7 @@ public partial class LoginSignUpPage : Control
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
  
-		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
+		httpQueue.Enqueue($"{testLink}/user-management/login", jsonString);
 	}
  
 	private void Send()
@@ -131,7 +132,7 @@ public partial class LoginSignUpPage : Control
 		{
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
-				GD.Print($"{realHttps}");
+				GD.Print($"{testLink}");
 				GD.Print($"{testHttpResult}");
 				GD.Print(currentUserToken);
 			}
