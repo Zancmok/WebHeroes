@@ -68,5 +68,28 @@ data:extend{
                 amount=1
             }
         }
+    },
+    {
+        type="recipe",
+        name="build-village-alternative",
+        display_name="Build Village",
+        result=data:get_prototype("settlement", "village"),
+        ingredients={
+            {
+                type="ingredient",
+                resource=data:id(wood),
+                amount=1
+            },
+            {
+                type="ingredient",
+                resource=data:id(brick),
+                amount=1
+            },
+            {
+                type="ingredient",
+                resource=data:id(cow),
+                amount=2
+            }
+        }
     }
 }

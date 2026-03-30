@@ -31,4 +31,20 @@ data:extend{
         g=255,
         b=255
     },
+    {
+        type="player-color",
+        name="black",
+        display_name="Black",
+        r=0,
+        g=0,
+        b=0
+    },
+    {
+        type="player-color",
+        name="magenta",
+        display_name="Magenta",
+        r=255,
+        g=0,
+        b=144
+    }
 }
