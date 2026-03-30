@@ -70,7 +70,6 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 			emit_signal("lobby_created", data)
 		"lobby-management:game-started":
 			emit_signal("game_started")
-			emit_signal("debug_game_ready")
 		"lobby-management:get-lobby":
 			emit_signal("get_lobby_received", data)
 		"lobby-management:lobby-closed":
