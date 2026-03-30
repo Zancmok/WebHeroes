@@ -36,7 +36,8 @@ public partial class WaitingRoom : Control
 		string savedName	= gameState.Get("lobby_name").AsString();
  
 		lobbyNameLabel.Text = savedName;
- 
+
+		socketIOLobby.Connect("socket_ready", new Callable(this, nameof(OnSocketReady)));
 		socketIOLobby.Call("connect_to_server", token);
 	}
  
@@ -78,7 +79,12 @@ public partial class WaitingRoom : Control
 
 		leaveButton.Visible = true;
 	}
- 
+
+	private void OnSocketReady()
+	{
+		socketIOLobby.Call("get_lobby");
+	}
+	
 	private void OnGameStarted()
 	{
 		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn");

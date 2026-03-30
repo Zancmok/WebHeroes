@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://bg6yrh20i7qnd"]
+[gd_scene load_steps=5 format=3 uid="uid://bg6yrh20i7qnd"]
 
 [ext_resource type="Script" uid="uid://crm3gt5ix8q2k" path="res://scenes/Game/Game.cs" id="1_2k76m"]
 [ext_resource type="Script" uid="uid://t5b7pahu1v2p" path="res://scenes/Game/SocketIOGame.gd" id="2_1asa3"]
 [ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="2_tt4u6"]
+[ext_resource type="Script" uid="uid://hqmlpbeln38w" path="res://scenes/Game/HexBoard.gd" id="4_1asa3"]
 
 [node name="Game" type="Node2D"]
 script = ExtResource("1_2k76m")
@@ -17,3 +18,7 @@ metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
 [node name="DebugLabel" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 23.0
+text = "YESSSSSSSSSSSSSSSSS"
+
+[node name="HexBoard" type="Node2D" parent="."]
+script = ExtResource("4_1asa3")

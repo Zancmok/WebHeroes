@@ -61,35 +61,39 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 
     var doc = JsonDocument.Parse(json).RootElement;
 
-    if (doc.TryGetProperty("token", out var tokenProp))
+if (doc.TryGetProperty("token", out var tokenProp))
+{
+    currentUserToken = tokenProp.GetString();
+    GD.Print("Token saved: ", currentUserToken);
+
+    var gameState = GetNode<Node>("/root/GameState");
+    gameState.Set("token", currentUserToken);
+
+    if (_debugMode)
     {
-        currentUserToken = tokenProp.GetString();
-        GD.Print("Token saved: ", currentUserToken);
+        _debugMode = false;
 
-        var gameState = GetNode<Node>("/root/GameState");
-        gameState.Set("token", currentUserToken);
-
-        if (_debugMode)
-        {
-            _debugMode = false;
-            // Connect socket and fire debug_create_and_start
+        if (!_socketIOLobby.IsConnected("socket_ready", new Callable(this, nameof(OnDebugSocketReady))))
             _socketIOLobby.Connect("socket_ready",
                 new Callable(this, nameof(OnDebugSocketReady)), (uint)ConnectFlags.OneShot);
+
+        if (!_socketIOLobby.IsConnected("debug_game_ready", new Callable(this, nameof(OnDebugGameReady))))
             _socketIOLobby.Connect("debug_game_ready",
                 new Callable(this, nameof(OnDebugGameReady)), (uint)ConnectFlags.OneShot);
-            _socketIOLobby.Call("connect_to_server", currentUserToken);
-        }
-        else
-        {
-            GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
-        }
+
+        _socketIOLobby.Call("connect_to_server", currentUserToken);
     }
-    else if (doc.TryGetProperty("object_type", out var typeProp) 
-             && typeProp.GetString() == "success-response" 
-             && responseCode == 201)
+    else
     {
-        Login();
+        GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
     }
+}
+else if (doc.TryGetProperty("object_type", out var typeProp) 
+         && typeProp.GetString() == "success-response" 
+         && responseCode == 201)
+{
+    Login();
+}
 }
  
 	private void SignUp()

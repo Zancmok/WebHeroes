@@ -35,16 +35,14 @@ public partial class Game : Node2D
 
 	private void OnGameDataReceived(Variant raw)
 	{
-		// data arrives wrapped in a single-element Array — unwrap it
 		Dictionary data;
 		if (raw.AsGodotArray() is { Count: > 0 } arr)
 			data = arr[0].AsGodotDictionary();
 		else
 			data = raw.AsGodotDictionary();
 
-		GD.Print("[GamePage] Game data received: ", data);
-		_debugLabel.Text = "Game data received! Fields: " + 
-			(data.TryGetValue("fields", out var f) ? f.AsGodotDictionary().Count.ToString() : "?");
+		var hexBoard = GetNode<Node2D>("HexBoard");
+		hexBoard.Call("load_game_data", data);
 	}
 
 	private void OnEndTurnReceived(Variant raw)
