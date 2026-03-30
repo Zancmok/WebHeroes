@@ -4,14 +4,14 @@ extends CanvasLayer
 @onready var turn_banner: Label = $Header/HBoxContainer/TurnBanner
 @onready var players_list: VBoxContainer = $LeftPanel/VBoxContainer/ScrollContainer/PlayersList
 @onready var dice_value: Label = $LeftPanel/VBoxContainer/DiceSection/DiceValue
-@onready var resources_grid: GridContainer = $RightPanel/VBoxContainer/ResourcesSection/ResourcesGrid
+@onready var resources_grid: GridContainer = $RightPanel/VBoxContainer/ResourceSection/ResourcesGrid
 @onready var recipes_list: VBoxContainer = $RightPanel/VBoxContainer/RecipesSection/RecipesList
 @onready var end_turn_btn: Button = $RightPanel/VBoxContainer/EndTurnButton
 
 signal end_turn_pressed
 signal build_pressed(recipe_name: String, result_type: String)
 
-func update_players(players: Array, current_index: int, my_index: int) -> void:
+func update_players(players: Array, current_index: int, _my_index: int) -> void:
 	for child in players_list.get_children():
 		child.queue_free()
 
@@ -112,8 +112,8 @@ func update_turn_banner(players: Array, current_index: int, my_index: int) -> vo
 	if current_index == my_index:
 		turn_banner.text = "Your Turn"
 	else:
-		var name = players[current_index].get("color_type", {}).get("display_name", "Player %d" % (current_index + 1))
-		turn_banner.text = "%s's Turn" % name
+		var _name = players[current_index].get("color_type", {}).get("display_name", "Player %d" % (current_index + 1))
+		turn_banner.text = "%s's Turn" % _name
 
 func set_end_turn_enabled(enabled: bool) -> void:
 	end_turn_btn.disabled = not enabled

@@ -82,6 +82,7 @@ layout_mode = 2
 layout_mode = 2
 
 [node name="EndTurnButton" type="Button" parent="RightPanel/VBoxContainer"]
-[connection signal="pressed" from="RightPannel/VBoxContainer/EndTurnButton" to="." method="_on_end_turn_pressed"]
 layout_mode = 2
 text = "End Turn"
+
+[connection signal="pressed" from="RightPanel/VBoxContainer/EndTurnButton" to="." method="_on_end_turn_pressed"]
