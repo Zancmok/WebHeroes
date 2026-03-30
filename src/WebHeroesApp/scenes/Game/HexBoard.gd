@@ -15,9 +15,14 @@ const FIELD_COLORS = {
 
 const HOT_NUMBERS = [6, 8]
 
-var fields: Dictionary = {}   # "q,r" -> field data
+var fields: Dictionary = {}
 var settlements: Dictionary = {}
 var roads: Dictionary = {}
+
+var _placement_type: String = ""  # "road" or "settlement", empty = no placement
+var _placement_targets: Array = []  # Array of {location: Array, points: PackedVector2Array}
+
+signal placement_selected(location: Array)
 
 func load_game_data(data: Dictionary) -> void:
 	fields.clear()
@@ -52,6 +57,97 @@ func hex_corner_points(center: Vector2, size: float) -> PackedVector2Array:
 		pts.append(center + Vector2(cos(angle), sin(angle)) * size)
 	return pts
 
+func enter_placement_mode(type: String) -> void:
+	_placement_type = type
+	_build_placement_targets()
+	queue_redraw()
+
+func exit_placement_mode() -> void:
+	_placement_type = ""
+	_placement_targets.clear()
+	queue_redraw()
+
+func _build_placement_targets() -> void:
+	_placement_targets.clear()
+
+	var inner_fields: Array = []
+	for key in fields:
+		var type_name: String = fields[key].get("field_type", {}).get("name", "")
+		if not ("outer" in type_name):
+			inner_fields.append(key)
+
+	if _placement_type == "road":
+		var drawn: Dictionary = {}
+		var directions = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]]
+		for key in inner_fields:
+			var parts = key.split(",")
+			var q = int(parts[0])
+			var r = int(parts[1])
+			for dir in directions:
+				var nq = q + dir[0]
+				var nr = r + dir[1]
+				var nkey = "%d,%d" % [nq, nr]
+				if not fields.has(nkey):
+					continue
+				var n_type: String = fields[nkey].get("field_type", {}).get("name", "")
+				if "outer" in n_type:
+					continue
+				var edge_key = _sorted_edge_key(q, r, nq, nr)
+				if drawn.has(edge_key):
+					continue
+				drawn[edge_key] = true
+				var corners = _shared_edge_corners(q, r, nq, nr)
+				if corners.size() < 2:
+					continue
+				_placement_targets.append({
+					"location": [q, r, nq, nr],
+					"points": PackedVector2Array([corners[0], corners[1]])
+				})
+
+	elif _placement_type == "settlement":
+		var drawn: Dictionary = {}
+		var directions = [[1,0],[1,-1],[0,-1],[-1,0],[-1,1],[0,1]]
+		for key in inner_fields:
+			var parts = key.split(",")
+			var q = int(parts[0])
+			var r = int(parts[1])
+			for i in range(6):
+				var d1 = directions[i]
+				var d2 = directions[(i + 1) % 6]
+				var n1q = q + d1[0]; var n1r = r + d1[1]
+				var n2q = q + d2[0]; var n2r = r + d2[1]
+				if not fields.has("%d,%d" % [n1q, n1r]) or not fields.has("%d,%d" % [n2q, n2r]):
+					continue
+				var coords = [[q, r], [n1q, n1r], [n2q, n2r]]
+				coords.sort()
+				var ikey = "%d,%d|%d,%d|%d,%d" % [coords[0][0], coords[0][1], coords[1][0], coords[1][1], coords[2][0], coords[2][1]]
+				if drawn.has(ikey):
+					continue
+				drawn[ikey] = true
+				var center = (hex_to_pixel(coords[0][0], coords[0][1]) +
+							  hex_to_pixel(coords[1][0], coords[1][1]) +
+							  hex_to_pixel(coords[2][0], coords[2][1])) / 3.0
+				_placement_targets.append({
+					"location": [coords[0][0], coords[0][1], coords[1][0], coords[1][1], coords[2][0], coords[2][1]],
+					"center": center
+				})
+
+func _sorted_edge_key(q1: int, r1: int, q2: int, r2: int) -> String:
+	if q1 < q2 or (q1 == q2 and r1 < r2):
+		return "%d,%d-%d,%d" % [q1, r1, q2, r2]
+	return "%d,%d-%d,%d" % [q2, r2, q1, r1]
+
+func _shared_edge_corners(q1: int, r1: int, q2: int, r2: int) -> Array:
+	var ca = hex_corner_points(hex_to_pixel(q1, r1), HEX_SIZE)
+	var cb = hex_corner_points(hex_to_pixel(q2, r2), HEX_SIZE)
+	var shared: Array = []
+	const EPS = 0.5
+	for pa in ca:
+		for pb in cb:
+			if pa.distance_to(pb) < EPS:
+				shared.append((pa + pb) / 2.0)
+	return shared
+
 func _draw() -> void:
 	if fields.is_empty():
 		return
@@ -82,6 +178,52 @@ func _draw() -> void:
 				14,
 				num_color
 			)
+
+	# Draw placement targets on top
+	if _placement_type == "road":
+		for target in _placement_targets:
+			var pts: PackedVector2Array = target["points"]
+			draw_line(pts[0], pts[1], Color(1, 1, 0.4, 0.4), 8.0, true)
+			draw_line(pts[0], pts[1], Color(1, 1, 0.4, 0.85), 4.0, true)
+
+	elif _placement_type == "settlement":
+		for target in _placement_targets:
+			var c: Vector2 = target["center"]
+			draw_circle(c, 10.0, Color(1, 1, 0.4, 0.4))
+			draw_arc(c, 10.0, 0, TAU, 24, Color(1, 1, 0.4, 0.85), 1.5)
+
+func _unhandled_input(event: InputEvent) -> void:
+	if _placement_type == "" or _placement_targets.is_empty():
+		return
+
+	if event is InputEventMouseButton and event.pressed and event.button_index == MOUSE_BUTTON_LEFT:
+		var local_pos = to_local(get_global_mouse_position())
+
+		if _placement_type == "road":
+			var best_dist = INF
+			var best_target = null
+			for target in _placement_targets:
+				var pts: PackedVector2Array = target["points"]
+				var mid = (pts[0] + pts[1]) / 2.0
+				var dist = local_pos.distance_to(mid)
+				if dist < best_dist:
+					best_dist = dist
+					best_target = target
+			if best_dist < 20.0 and best_target != null:
+				get_viewport().set_input_as_handled()
+				emit_signal("placement_selected", best_target["location"])
+
+		elif _placement_type == "settlement":
+			var best_dist = INF
+			var best_target = null
+			for target in _placement_targets:
+				var dist = local_pos.distance_to(target["center"])
+				if dist < best_dist:
+					best_dist = dist
+					best_target = target
+			if best_dist < 18.0 and best_target != null:
+				get_viewport().set_input_as_handled()
+				emit_signal("placement_selected", best_target["location"])
 
 func get_board_bounds() -> Array:
 	if fields.is_empty():

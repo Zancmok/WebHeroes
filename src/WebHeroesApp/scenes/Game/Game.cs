@@ -12,16 +12,18 @@ public partial class Game : Node2D
 	private int _currentIndex = 0;
 	private Array _recipes = new Array();
 	private Dictionary _myResources = new Dictionary();
+	private string _pendingRecipeName = "";
 
 	public override void _Ready()
 	{
 		_socketIOGame = GetNode<Node>("SocketIOGame");
 		_debugLabel   = GetNode<Label>("DebugLabel");
 
-		_socketIOGame.Connect("socket_ready",           new Callable(this, nameof(OnSocketReady)));
-		_socketIOGame.Connect("get_game_data_received", new Callable(this, nameof(OnGameDataReceived)));
-		_socketIOGame.Connect("end_turn_received",      new Callable(this, nameof(OnEndTurnReceived)));
-		_socketIOGame.Connect("build_received",         new Callable(this, nameof(OnBuildReceived)));
+		_socketIOGame.Connect("socket_ready",           			new Callable(this, nameof(OnSocketReady)));
+		_socketIOGame.Connect("get_game_data_received", 			new Callable(this, nameof(OnGameDataReceived)));
+		_socketIOGame.Connect("end_turn_received",      			new Callable(this, nameof(OnEndTurnReceived)));
+		_socketIOGame.Connect("build_received",         			new Callable(this, nameof(OnBuildReceived)));
+		GetNode<Node2D>("HexBoard").Connect("placement_selected", 	new Callable(this, nameof(OnPlacementSelected)));
 		
 		var gameState = GetNode<Node>("/root/GameState");
 		// TEMP: fake game state for testing
@@ -133,8 +135,31 @@ private void OnGameDataReceived(Variant raw)
 	private void OnBuildPressed(string recipeName, string resultType)
 	{
 		GD.Print("[Game] Build pressed: ", recipeName, " ", resultType);
-		// placement mode coming next
+		_pendingRecipeName = recipeName;
+		var hexBoard = GetNode<Node2D>("HexBoard");
+		hexBoard.Call("enter_placement_mode", resultType);
 	}
 
+	private void OnPlacementSelected(Array location)
+	{
+		if (string.IsNullOrEmpty(_pendingRecipeName)) return;
+		GD.Print("[Game] Placement selected: ", _pendingRecipeName, " at ", location);
+		var socketIOGame = GetNode<Node>("SocketIOGame");
+		socketIOGame.Call("emit_build", _pendingRecipeName, location);
+		_pendingRecipeName = "";
+		GetNode<Node2D>("HexBoard").Call("exit_placement_mode");
+	}
+
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event is InputEventKey key && key.Pressed && key.Keycode == Key.Escape)
+		{
+			if (!string.IsNullOrEmpty(_pendingRecipeName))
+			{
+				_pendingRecipeName = "";
+				GetNode<Node2D>("HexBoard").Call("exit_placement_mode");
+			}
+		}
+	}
 	
 }
