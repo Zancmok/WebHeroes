@@ -193,10 +193,9 @@ public partial class LobbyPage : Control
 		socketIOLobby.Call("refresh");
 	}
  
-	private async Task OnGameStarted()
+	private async void OnGameStarted()
 	{
 		GD.Print("[LobbyPage] Game started!");
-		socketIOLobby.Call("disconnect_from_server");
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn"); 
 	}

@@ -28,8 +28,6 @@ func _on_connected(_ns: String) -> void:
 	# Rejoin the lobby room first, then ask for game data
 	var lobby_name = GameState.lobby_name
 	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
-
-	_request_game_data()
 	emit_signal("socket_ready")
 
 func _request_game_data() -> void:
@@ -44,6 +42,8 @@ func emit_build(recipe_id: String, location: Array) -> void:
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	match event:
+		"lobby-management:join-lobby":
+			_request_game_data()
 		"game-management:get-game-data":
 			emit_signal("get_game_data_received", data)
 		"game-management:end-turn":
