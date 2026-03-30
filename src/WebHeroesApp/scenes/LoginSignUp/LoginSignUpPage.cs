@@ -15,8 +15,6 @@ public partial class LoginSignUpPage : Control
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;
-	private Node _socketIOLobby;
-	private bool _debugMode = false;
  
 	public override void _Ready()
 	{
@@ -49,39 +47,22 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 
     var doc = JsonDocument.Parse(json).RootElement;
 
-if (doc.TryGetProperty("token", out var tokenProp))
-{
-    currentUserToken = tokenProp.GetString();
-    GD.Print("Token saved: ", currentUserToken);
-
-    var gameState = GetNode<Node>("/root/GameState");
-    gameState.Set("token", currentUserToken);
-
-    if (_debugMode)
+    if (doc.TryGetProperty("token", out var tokenProp))
     {
-        _debugMode = false;
+        currentUserToken = tokenProp.GetString();
+        GD.Print("Token saved: ", currentUserToken);
 
-        if (!_socketIOLobby.IsConnected("socket_ready", new Callable(this, nameof(OnDebugSocketReady))))
-            _socketIOLobby.Connect("socket_ready",
-                new Callable(this, nameof(OnDebugSocketReady)), (uint)ConnectFlags.OneShot);
+        var gameState = GetNode<Node>("/root/GameState");
+        gameState.Set("token", currentUserToken);
 
-        if (!_socketIOLobby.IsConnected("debug_game_ready", new Callable(this, nameof(OnDebugGameReady))))
-            _socketIOLobby.Connect("debug_game_ready",
-                new Callable(this, nameof(OnDebugGameReady)), (uint)ConnectFlags.OneShot);
-
-        _socketIOLobby.Call("connect_to_server", currentUserToken);
-		}
-		else
-		{
-			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
-		}
-	}
-	else if (doc.TryGetProperty("object_type", out var typeProp) 
-			&& typeProp.GetString() == "success-response" 
-			&& responseCode == 201)
-	{
-		Login();
-	}
+        GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+    }
+    else if (doc.TryGetProperty("object_type", out var typeProp)
+             && typeProp.GetString() == "success-response"
+             && responseCode == 201)
+    {
+        Login();
+    }
 }
  
 	private void SignUp()
@@ -139,19 +120,6 @@ if (doc.TryGetProperty("token", out var tokenProp))
 		GD.Print(jsonString);
  
 		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
-	}
-
-	private void OnDebugSocketReady()
-	{
-		var gameState = GetNode<Node>("/root/GameState");
-		string lobbyName = "debug-lobby-" + Time.GetTicksMsec();
-		gameState.Set("lobby_name", lobbyName);
-		_socketIOLobby.Call("debug_create_and_start", lobbyName);
-	}
-
-	private void OnDebugGameReady()
-	{
-		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn");
 	}
 
 	private void Send()
