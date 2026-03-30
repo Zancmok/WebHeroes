@@ -8,10 +8,8 @@ public partial class LobbyPage : Control
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	private bool _loggingOut = false;
- 
 	private const string BaseUrl = "https://webheroes.duckdns.org:9027";
-	private const string testLink = "http://localhost";
- 
+	
 	public override void _Ready()
 	{
 		httpRequest = GetNode<HttpRequest>("CallZancmok");

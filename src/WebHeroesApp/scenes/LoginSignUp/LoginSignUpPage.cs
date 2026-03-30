@@ -8,10 +8,7 @@ using System.Collections.Generic;
 public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
-	private UserManagement userManagement;
 	private string realHttps = "https://webheroes.duckdns.org:9027";
-	private string testLink = "http://localhost";
-	private string testHttpResult;
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;
@@ -37,32 +34,32 @@ public partial class LoginSignUpPage : Control
  
 private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
 {
-    GD.Print("Response code: ", responseCode);
-    string json = Encoding.UTF8.GetString(body);
-    GD.Print("Response body: ", json);
+	GD.Print("Response code: ", responseCode);
+	string json = Encoding.UTF8.GetString(body);
+	GD.Print("Response body: ", json);
 
-    httpQueue.OnCompleted();
+	httpQueue.OnCompleted();
 
-    if (string.IsNullOrEmpty(json)) return;
+	if (string.IsNullOrEmpty(json)) return;
 
-    var doc = JsonDocument.Parse(json).RootElement;
+	var doc = JsonDocument.Parse(json).RootElement;
 
-    if (doc.TryGetProperty("token", out var tokenProp))
-    {
-        currentUserToken = tokenProp.GetString();
-        GD.Print("Token saved: ", currentUserToken);
+	if (doc.TryGetProperty("token", out var tokenProp))
+	{
+		currentUserToken = tokenProp.GetString();
+		GD.Print("Token saved: ", currentUserToken);
 
-        var gameState = GetNode<Node>("/root/GameState");
-        gameState.Set("token", currentUserToken);
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("token", currentUserToken);
 
-        GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
-    }
-    else if (doc.TryGetProperty("object_type", out var typeProp)
-             && typeProp.GetString() == "success-response"
-             && responseCode == 201)
-    {
-        Login();
-    }
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+	}
+	else if (doc.TryGetProperty("object_type", out var typeProp)
+			 && typeProp.GetString() == "success-response"
+			 && responseCode == 201)
+	{
+		Login();
+	}
 }
  
 	private void SignUp()
@@ -121,11 +118,6 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
  
 		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 	}
-
-	private void Send()
-	{
-		userManagement.SendMessage("Hello World!");
-	}
  
 	public override void _UnhandledInput(InputEvent @event)
 	{
@@ -134,7 +126,6 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
 				GD.Print($"{realHttps}");
-				GD.Print($"{testHttpResult}");
 				GD.Print(currentUserToken);
 			}
 		}

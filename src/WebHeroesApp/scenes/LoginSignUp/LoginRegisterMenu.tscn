@@ -1,12 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://cjeqi5byhfp8h"]
+[gd_scene load_steps=6 format=3 uid="uid://cjeqi5byhfp8h"]
 
 [ext_resource type="Script" uid="uid://c5hndfbo1pmua" path="res://scenes/LoginSignUp/LoginSignUpPage.cs" id="1_v4cxy"]
 [ext_resource type="Script" uid="uid://bl11ndbl547b" path="res://scenes/LoginSignUp/SignUpVisuals.cs" id="2_4vdtq"]
 [ext_resource type="Script" uid="uid://dx8xq1jqur0cn" path="res://scenes/LoginSignUp/TabsWork.cs" id="2_6b5og"]
 [ext_resource type="Script" uid="uid://cv6nnpppq4214" path="res://scenes/LoginSignUp/LoginVisuals.cs" id="2_vo05e"]
 [ext_resource type="Script" uid="uid://dvnho6kdkw8oq" path="res://scenes/LoginSignUp/UserManagement.cs" id="5_yhkbl"]
-[ext_resource type="Script" uid="uid://d00o3j3ku7fkk" path="res://scenes/Lobby/SocketIOLobby.gd" id="6_n445p"]
-[ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="7_yu3f0"]
 
 [node name="Control_Base" type="Control"]
 layout_mode = 3
