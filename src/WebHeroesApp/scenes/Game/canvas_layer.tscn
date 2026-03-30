@@ -22,34 +22,34 @@ text = "WebHeroes"
 layout_mode = 2
 size_flags_horizontal = 6
 
-[node name="LeftPannel" type="PanelContainer" parent="."]
+[node name="LeftPanel" type="PanelContainer" parent="."]
 offset_right = 40.0
 offset_bottom = 40.0
 size_flags_horizontal = 0
 
-[node name="VBoxContainer" type="VBoxContainer" parent="LeftPannel"]
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftPanel"]
 layout_mode = 2
 
-[node name="Players" type="Label" parent="LeftPannel/VBoxContainer"]
+[node name="Players" type="Label" parent="LeftPanel/VBoxContainer"]
 layout_mode = 2
 text = "Players
 "
 
-[node name="ScrollContainer" type="ScrollContainer" parent="LeftPannel"]
+[node name="ScrollContainer" type="ScrollContainer" parent="LeftPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="PlayersList" type="VBoxContainer" parent="LeftPannel/ScrollContainer"]
+[node name="PlayersList" type="VBoxContainer" parent="LeftPanel/VBoxContainer/ScrollContainer"]
 layout_mode = 2
 
-[node name="LastRoll" type="Label" parent="LeftPannel"]
+[node name="LastRoll" type="Label" parent="LeftPanel/VBoxContainer"]
 layout_mode = 2
 text = "Last Roll
 "
 
-[node name="DiceSection" type="VBoxContainer" parent="LeftPannel"]
+[node name="DiceSection" type="VBoxContainer" parent="LeftPanel/VBoxContainer"]
 layout_mode = 2
 
-[node name="DiceValue" type="Label" parent="LeftPannel/DiceSection"]
+[node name="DiceValue" type="Label" parent="LeftPanel/VBoxContainer/DiceSection"]
 layout_mode = 2
 text = "-"
 
