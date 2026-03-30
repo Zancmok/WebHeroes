@@ -14,6 +14,9 @@ func _ready() -> void:
 	client.event_received.connect(_on_event_received)
 	client.socket_connected.connect(_on_connected)  # fixed
 
+	print("[SocketIOGame] client node: ", client)
+	print("[SocketIOGame] event_received connected: ", client.event_received.get_connections())
+
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
@@ -29,8 +32,11 @@ func _on_connected(_ns: String) -> void:
 	var lobby_name = GameState.lobby_name
 	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
 	emit_signal("socket_ready")
+	await get_tree().create_timer(0.5).timeout
+	_request_game_data()
 
 func _request_game_data() -> void:
+	print("[SocketIOGame] Requesting game data NOW")
 	client.emit("game-management:get-game-data")
 
 func emit_end_turn() -> void:
@@ -42,8 +48,6 @@ func emit_build(recipe_id: String, location: Array) -> void:
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	match event:
-		"lobby-management:join-lobby":
-			_request_game_data()
 		"game-management:get-game-data":
 			emit_signal("get_game_data_received", data)
 		"game-management:end-turn":

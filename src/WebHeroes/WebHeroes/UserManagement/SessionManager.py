@@ -62,16 +62,21 @@ class SessionManager(StaticClass):
                 token=token,
                 lobby=lobby
             )
-
             lobby.join_member(new_user_session.get_user_id())
             join_room(lobby.name)
-
             SessionManager._socket_connections[socket_id] = new_user_session
         else:
+            # Remove old socket binding and replace with new one
+            old_socket_id = None
+            for sid, session in SessionManager._socket_connections.items():
+                if session is old_session:
+                    old_socket_id = sid
+                    break
+            if old_socket_id:
+                del SessionManager._socket_connections[old_socket_id]
+            
             lobby: Lobby = old_session.get_lobby()
-
             join_room(lobby.name)
-
             SessionManager._socket_connections[socket_id] = old_session
 
     @staticmethod
