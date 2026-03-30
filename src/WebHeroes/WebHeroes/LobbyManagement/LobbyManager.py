@@ -33,5 +33,12 @@ class LobbyManager(StaticClass):
         user_session.join_lobby(LobbyManager._player_lobbies[-1])
 
     @staticmethod
+    def delete_lobby(lobby: OwnedLobby) -> None:
+        for member in lobby.member_ids:
+            SessionManager.get_user_session_by_user_id(member).join_lobby(LobbyManager.online_lobby)
+
+        LobbyManager._player_lobbies.remove(lobby)
+
+    @staticmethod
     def get_lobbies() -> list[OwnedLobby]:
         return LobbyManager._player_lobbies

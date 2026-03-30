@@ -1,5 +1,7 @@
 from typing import Optional
 from os import path
+
+from Game import Map
 from Game.Field import Field
 from flask import Blueprint, Response, send_file
 import WebHeroes.config as config
@@ -10,6 +12,7 @@ from Game.Road import Road
 from Game.Connection import Connection
 from Game.Intersection import Intersection
 from Prototype import Recipe, RoadPrototype, SettlementPrototype
+from WebHeroes.LobbyManagement.LobbyManager import LobbyManager
 from WebHeroes.LobbyManagement.OwnedLobby import OwnedLobby
 from WebHeroes.LobbyManagement.Lobby import Lobby
 from WebHeroes.Responses.DataModels.FieldModel import FieldModel
@@ -17,6 +20,7 @@ from WebHeroes.Responses.DataModels.SettlementModel import SettlementModel
 from WebHeroes.Responses.DataModels.RoadModel import RoadModel
 from WebHeroes.Responses.ResponseTypes.BuildResponse import BuildResponse
 from WebHeroes.Responses.ResponseTypes.EndTurnResponse import EndTurnResponse
+from WebHeroes.Responses.ResponseTypes.GameOverResponse import GameOverResponse
 from WebHeroes.Responses.ResponseTypes.GetGameDataResponse import GetGameDataResponse
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement.UserSession import UserSession
@@ -236,6 +240,20 @@ class GameManagement(StaticClass):
             player=player
         )), to=lobby.name)
 
-        # TODO: Add victory thingy!
+        curr_player_points: int = 0
+        if lobby.game.game_map:
+            for intersection in lobby.game.game_map.intersections.values():
+                if not intersection.settlement:
+                    continue
 
+                if intersection.settlement.owner != player:
+                    continue
 
+                curr_player_points += intersection.settlement.settlement_type.point_value
+
+        if curr_player_points >= lobby.game.game_map.settings_type.point_requirement:
+            GameManagement.socket_blueprint.emit("game-over", dictify(GameOverResponse(
+                winner=player
+            )))
+
+            LobbyManager.delete_lobby(lobby)

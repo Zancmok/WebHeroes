@@ -50,6 +50,7 @@ class Map:
 
     def __init__(self, field_types: list[FieldPrototype], settings_type: SettingsPrototype) -> None:
         self.initial_field: Field
+        self.settings_type: SettingsPrototype = settings_type
 
         self.outer_bound_field_type: FieldPrototype
         for field in field_types:
