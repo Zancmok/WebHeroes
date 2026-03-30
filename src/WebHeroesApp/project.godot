@@ -12,9 +12,9 @@ config_version=5
 
 config/name="WebHeroesApp"
 run/main_scene="uid://cjeqi5byhfp8h"
+config/quit_on_go_back=false
 config/features=PackedStringArray("4.5", "C#", "Forward Plus")
 config/icon="res://icon.svg"
-config/quit_on_go_back=false
 
 [autoload]
 

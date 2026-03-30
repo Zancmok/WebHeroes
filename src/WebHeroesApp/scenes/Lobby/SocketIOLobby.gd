@@ -35,14 +35,16 @@ func connect_to_server(token: String) -> void:
 func _on_connected(ns: String) -> void:
 	print("Socket connected!", ns)
 	is_ready = true
-	emit_signal("socket_ready")
-
+	
 	var saved_lobby = GameState.lobby_name
 	if saved_lobby != "":
 		join_lobby(saved_lobby)
+
 	if pending_lobby_name != "":
 		create_lobby(pending_lobby_name)
 		pending_lobby_name = ""
+
+	emit_signal("socket_ready")
 
 func refresh() -> void:
 	client.emit("lobby-management:refresh")
