@@ -26,9 +26,6 @@ public partial class Game : Node2D
 		GetNode<Node2D>("HexBoard").Connect("placement_selected", 	new Callable(this, nameof(OnPlacementSelected)));
 		
 		var gameState = GetNode<Node>("/root/GameState");
-		// TEMP: fake game state for testing
-		gameState.Set("token", "SlJioOHc-_lZtcBEQ9V_yLPHKZoXNj9-4BiJ4nxLLIQ");
-		gameState.Set("lobby_name", "nigger2");
 		
 		string token  = gameState.Get("token").AsString();
 		_socketIOGame.Call("connect_to_server", token);

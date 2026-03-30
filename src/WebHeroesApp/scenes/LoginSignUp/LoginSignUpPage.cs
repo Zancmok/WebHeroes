@@ -35,18 +35,6 @@ public partial class LoginSignUpPage : Control
 		{
 			Login();
 		};
-
-
-		// --- DEBUG BUTTON ---
-		// Grab the SocketIO node that's already in the scene
-		_socketIOLobby = GetNode<Node>("SocketIOLobby");  // already in scene as UserManagement
-
-		var debugBtn = new Button();
-		debugBtn.Text = "DEBUG: Login + Start Game";
-		debugBtn.Position = new Vector2(20, 20);
-		debugBtn.AddThemeColorOverride("font_color", new Color(1, 0.3f, 0.3f));
-		AddChild(debugBtn);
-		debugBtn.Pressed += OnDebugStart;
 	}
  
 private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
@@ -82,18 +70,18 @@ if (doc.TryGetProperty("token", out var tokenProp))
                 new Callable(this, nameof(OnDebugGameReady)), (uint)ConnectFlags.OneShot);
 
         _socketIOLobby.Call("connect_to_server", currentUserToken);
-    }
-    else
-    {
-        GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
-    }
-}
-else if (doc.TryGetProperty("object_type", out var typeProp) 
-         && typeProp.GetString() == "success-response" 
-         && responseCode == 201)
-{
-    Login();
-}
+		}
+		else
+		{
+			GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+		}
+	}
+	else if (doc.TryGetProperty("object_type", out var typeProp) 
+			&& typeProp.GetString() == "success-response" 
+			&& responseCode == 201)
+	{
+		Login();
+	}
 }
  
 	private void SignUp()
@@ -150,19 +138,6 @@ else if (doc.TryGetProperty("object_type", out var typeProp)
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
  
-		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
-	}
- 
-	private void OnDebugStart()
-	{
-		// Step 1: login with hardcoded creds
-		var jsonData = new Godot.Collections.Dictionary
-		{
-			{ "username", "rapor" },
-			{ "password", "123" }
-		};
-		string jsonString = Json.Stringify(jsonData);
-		_debugMode = true;
 		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 	}
 

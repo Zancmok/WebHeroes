@@ -3,7 +3,6 @@ extends Node
 @onready var client: SocketIO = $SocketIO
 var is_ready: bool = false
 var pending_lobby_name: String = ""
-var _pending_debug_start: bool = false
 
 signal lobby_refresh_received(data)
 signal lobby_created(data)
@@ -11,7 +10,6 @@ signal game_started()
 signal get_lobby_received(data)
 signal lobby_closed()
 signal socket_ready()
-signal debug_game_ready()
 
 func _ready() -> void:
 	print("SocketIOLobby _ready")
@@ -63,10 +61,6 @@ func disconnect_from_server() -> void:
 	client.disconnect_socket()
 	is_ready = false
 
-func debug_create_and_start(lobby_name: String) -> void:
-	_pending_debug_start = true
-	create_lobby(lobby_name)
-
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("Event received: ", event, " data: ", data)
 	match event:
@@ -74,9 +68,6 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 			emit_signal("lobby_refresh_received", data)
 		"lobby-management:create-lobby":
 			emit_signal("lobby_created", data)
-			if _pending_debug_start:
-				_pending_debug_start = false
-				client.emit("lobby-management:start-game")
 		"lobby-management:game-started":
 			emit_signal("game_started")
 			emit_signal("debug_game_ready")

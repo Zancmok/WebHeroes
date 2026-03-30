@@ -153,11 +153,3 @@ text = "Submit
 [node name="SocketIO" type="Node" parent="."]
 script = ExtResource("5_yhkbl")
 metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
-
-[node name="SocketIOLobby" type="Node" parent="."]
-script = ExtResource("6_n445p")
-
-[node name="SocketIO" type="Node" parent="SocketIOLobby"]
-script = ExtResource("7_yu3f0")
-base_url = "https://webheroes.duckdns.org:9027"
-metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
