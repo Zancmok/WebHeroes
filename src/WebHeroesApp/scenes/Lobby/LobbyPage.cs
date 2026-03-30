@@ -1,7 +1,8 @@
 using Godot;
 using System;
 using System.Collections.Generic;
- 
+using System.Threading.Tasks;
+
 public partial class LobbyPage : Control
 {
 	private Node socketIOLobby;
@@ -9,7 +10,7 @@ public partial class LobbyPage : Control
 	private HttpQueue httpQueue;
 	private bool _loggingOut = false;
 	private const string BaseUrl = "https://webheroes.duckdns.org:9027";
-	
+
 	public override void _Ready()
 	{
 		httpRequest = GetNode<HttpRequest>("CallZancmok");
@@ -192,8 +193,11 @@ public partial class LobbyPage : Control
 		socketIOLobby.Call("refresh");
 	}
  
-	private void OnGameStarted()
+	private async Task OnGameStarted()
 	{
 		GD.Print("[LobbyPage] Game started!");
+		socketIOLobby.Call("disconnect_from_server");
+		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
+		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn"); 
 	}
 }

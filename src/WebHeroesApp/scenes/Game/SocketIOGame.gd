@@ -29,7 +29,6 @@ func _on_connected(_ns: String) -> void:
 	var lobby_name = GameState.lobby_name
 	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
 
-	await get_tree().create_timer(0.5).timeout
 	_request_game_data()
 	emit_signal("socket_ready")
 
