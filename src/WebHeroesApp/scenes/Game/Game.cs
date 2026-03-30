@@ -61,10 +61,19 @@ private void OnGameDataReceived(Variant raw)
 	_myIndex = data.TryGetValue("my_index", out var mi) ? mi.AsInt32() : -1;
 	_currentIndex = data.TryGetValue("current_user_index", out var ci) ? ci.AsInt32() : 0;
 	_players = data.TryGetValue("players", out var pl) ? pl.AsGodotArray() : new Array();
-	_recipes = data.TryGetValue("prototypes", out var pr) 
-		? pr.AsGodotArray().Where(p => p.AsGodotDictionary().TryGetValue("object_type", out var ot) 
-			&& ot.AsString() == "recipe-s_prototype").ToGodotArray()
-		: new Array();
+	if (data.TryGetValue("prototypes", out var pr))
+	{
+		_recipes = new Array();
+		foreach (var p in pr.AsGodotArray())
+		{
+			if (p.AsGodotDictionary().TryGetValue("object_type", out var ot) && ot.AsString() == "recipe-s_prototype")
+				_recipes.Add(p);
+		}
+	}
+	else
+	{
+		_recipes = new Array();
+	}
 
 	if (_myIndex >= 0 && _myIndex < _players.Count)
 		_myResources = _players[_myIndex].AsGodotDictionary()

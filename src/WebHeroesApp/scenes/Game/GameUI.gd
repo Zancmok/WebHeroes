@@ -1,12 +1,12 @@
 extends CanvasLayer
 
 # Node references
-@onready var turn_banner: Label = $Header/TurnBanner
-@onready var players_list: VBoxContainer = $LeftPanel/ScrollContainer/PlayersList
-@onready var dice_value: Label = $LeftPanel/DiceSection/DiceValue
-@onready var resources_grid: GridContainer = $RightPanel/ResourcesSection/ResourcesGrid
-@onready var recipes_list: VBoxContainer = $RightPanel/RecipesSection/RecipesList
-@onready var end_turn_btn: Button = $RightPanel/EndTurnButton
+@onready var turn_banner: Label = $Header/HBoxContainer/TurnBanner
+@onready var players_list: VBoxContainer = $LeftPanel/VBoxContainer/ScrollContainer/PlayersList
+@onready var dice_value: Label = $LeftPanel/VBoxContainer/DiceSection/DiceValue
+@onready var resources_grid: GridContainer = $RightPanel/VBoxContainer/ResourcesSection/ResourcesGrid
+@onready var recipes_list: VBoxContainer = $RightPanel/VBoxContainer/RecipesSection/RecipesList
+@onready var end_turn_btn: Button = $RightPanel/VBoxContainer/EndTurnButton
 
 signal end_turn_pressed
 signal build_pressed(recipe_name: String, result_type: String)
