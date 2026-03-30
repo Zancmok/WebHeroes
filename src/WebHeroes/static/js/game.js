@@ -1,5 +1,5 @@
 (function () {
-  // ─── Field style config ────────────────────────────────────────────────────
+  // Field style config
   const FIELD_STYLES = {
     "forest":      { fill: "#2d5a1b", label: "Forest",    resource: "Lumber" },
     "hill":        { fill: "#8b3a0f", label: "Hills",     resource: "Brick"  },
@@ -11,11 +11,11 @@
     "outer_bound": { fill: "#1a3a5c", label: "Ocean",     resource: null     },
   };
 
-  const IMG_BASE      = "/game-management/img/";
+  const IMG_BASE = "/game-management/img/";
   const NUMBER_COLORS = { 6: "#e05c2e", 8: "#e05c2e" };
-  const HEX_SIZE      = 48;
+  const HEX_SIZE = 48;
 
-  // ─── Hex math ──────────────────────────────────────────────────────────────
+  // Hex math
   function hexToPixel(q, r) {
     return {
       x: HEX_SIZE * (Math.sqrt(3) * q + Math.sqrt(3) / 2 * r),
@@ -53,7 +53,7 @@
       .replace(/\/graphics\//, "/images/");
   }
 
-  // ─── Geometry helpers ──────────────────────────────────────────────────────
+  // Geometry helpers
   function edgeMidpoint(q1, r1, q2, r2) {
     const a = hexToPixel(q1, r1), b = hexToPixel(q2, r2);
     return { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 };
@@ -86,14 +86,14 @@
     };
   }
 
-  // ─── Player colour helper ──────────────────────────────────────────────────
+  // Player colour helper
   function playerCSSColor(player) {
     const c = player?.color_type;
     if (!c) return "#ffffff";
     return `rgb(${c.r},${c.g},${c.b})`;
   }
 
-  // ─── State ─────────────────────────────────────────────────────────────────
+  // State
   const svg     = document.getElementById("board-svg");
   const tooltip = document.getElementById("tooltip");
   const legend  = document.getElementById("legend");
@@ -105,10 +105,10 @@
 
   const placedBuildings = [];
 
-  // ─── Placement-mode state ──────────────────────────────────────────────────
+  // Placement-mode state
   let placementMode = null;
 
-  // ─── Render ────────────────────────────────────────────────────────────────
+  // Render
   function render(data) {
     console.log("[game.js] render() called");
     lastData = data;
@@ -308,7 +308,7 @@
     }
   }
 
-  // ─── Draw a single placed building / road ──────────────────────────────────
+  // Draw a single placed building / road
   function drawBuilding({ type, location, building, player }) {
     const color = playerCSSColor(player);
 
@@ -344,20 +344,22 @@
       const [q1, r1, q2, r2, q3, r3] = location;
       const { x, y } = intersectionPoint(q1, r1, q2, r2, q3, r3);
 
-      const SIZE = building?.point_value > 1 ? 36 : 28;
+      // Village (settlement): SIZE=16, City (town): SIZE=22
+      // The coloured ring is SIZE+2, image fills SIZE*2 — ring sits snugly over sprite
+      const SIZE = building?.point_value > 1 ? 22 : 16;
       const sprite = resolveRawSprite(building?.sprite);
 
       if (sprite) {
         svg.appendChild(svgEl("circle", {
-          cx: x, cy: y, r: SIZE + 4,
+          cx: x, cy: y, r: SIZE + 2,
           fill: "none",
-          stroke: "rgba(0,0,0,0.7)", "stroke-width": "5",
+          stroke: "rgba(0,0,0,0.7)", "stroke-width": "4",
           "pointer-events": "none",
         }));
         svg.appendChild(svgEl("circle", {
-          cx: x, cy: y, r: SIZE + 4,
+          cx: x, cy: y, r: SIZE + 2,
           fill: "none",
-          stroke: color, "stroke-width": "3",
+          stroke: color, "stroke-width": "2.5",
           "pointer-events": "none",
         }));
         svg.appendChild(svgEl("image", {
@@ -368,7 +370,7 @@
           "pointer-events": "none",
         }));
       } else {
-        const RADIUS = building?.point_value > 1 ? 10 : 7;
+        const RADIUS = building?.point_value > 1 ? 8 : 5;
         svg.appendChild(svgEl("circle", {
           cx: x, cy: y + 2, r: RADIUS + 1,
           fill: "rgba(0,0,0,0.45)", "pointer-events": "none",
@@ -382,7 +384,7 @@
         const initial = svgEl("text", {
           x, y, "text-anchor": "middle", "dominant-baseline": "central",
           fill: "rgba(0,0,0,0.75)",
-          "font-size": RADIUS > 8 ? "9" : "7",
+          "font-size": RADIUS > 6 ? "8" : "6",
           "font-family": "Cinzel, serif", "font-weight": "bold",
           "pointer-events": "none",
         });
@@ -392,7 +394,7 @@
     }
   }
 
-  // ─── Placement-mode hit targets ────────────────────────────────────────────
+  // Placement-mode hit targets
   function drawPlacementTargets(parsed, container) {
     const { resultType } = placementMode;
 
@@ -493,7 +495,7 @@
     }
   }
 
-  // ─── Emit build + leave placement mode ─────────────────────────────────────
+  // Emit build + leave placement mode
   function emitBuild(recipeId, location) {
     console.log("[game.js] Emitting build:", recipeId, location);
     socket.emit("game-management:build", { recipe_id: recipeId, location });
@@ -525,7 +527,7 @@
     if (e.key === "Escape" && placementMode) exitPlacementMode();
   });
 
-  // ─── Socket ────────────────────────────────────────────────────────────────
+  //Socket
   const socket = io();
   window._gameSocket = socket;
 
@@ -723,7 +725,7 @@
     _onevent(packet);
   };
 
-  // ─── Controls ──────────────────────────────────────────────────────────────
+  //Controls
   document.getElementById("btn-toggle-numbers")?.addEventListener("click", () => {
     showNumbers = !showNumbers;
     if (lastData) render(lastData);
