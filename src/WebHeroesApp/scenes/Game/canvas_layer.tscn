@@ -1,0 +1,86 @@
+[gd_scene load_steps=2 format=3 uid="uid://cmrc316t4ddej"]
+
+[ext_resource type="Script" uid="uid://dgljj5gwehmin" path="res://scenes/Game/GameUI.gd" id="1_7b0yd"]
+
+[node name="CanvasLayer" type="CanvasLayer"]
+script = ExtResource("1_7b0yd")
+
+[node name="Header" type="PanelContainer" parent="."]
+anchors_preset = 10
+anchor_right = 1.0
+grow_horizontal = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="Header"]
+layout_mode = 2
+
+[node name="Title" type="Label" parent="Header/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+text = "WebHeroes"
+
+[node name="TurnBanner" type="Label" parent="Header/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 6
+
+[node name="LeftPannel" type="PanelContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+size_flags_horizontal = 0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="LeftPannel"]
+layout_mode = 2
+
+[node name="Players" type="Label" parent="LeftPannel/VBoxContainer"]
+layout_mode = 2
+text = "Players
+"
+
+[node name="ScrollContainer" type="ScrollContainer" parent="LeftPannel"]
+layout_mode = 2
+
+[node name="PlayersList" type="VBoxContainer" parent="LeftPannel/ScrollContainer"]
+layout_mode = 2
+
+[node name="LastRoll" type="Label" parent="LeftPannel"]
+layout_mode = 2
+text = "Last Roll
+"
+
+[node name="DiceSection" type="VBoxContainer" parent="LeftPannel"]
+layout_mode = 2
+
+[node name="DiceValue" type="Label" parent="LeftPannel/DiceSection"]
+layout_mode = 2
+text = "-"
+
+[node name="RightPannel" type="PanelContainer" parent="."]
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="RightPannel"]
+layout_mode = 2
+
+[node name="Resources" type="Label" parent="RightPannel/VBoxContainer"]
+layout_mode = 2
+text = "My Resources"
+
+[node name="ResourceSection" type="VBoxContainer" parent="RightPannel/VBoxContainer"]
+layout_mode = 2
+
+[node name="ResourcesGrid" type="GridContainer" parent="RightPannel/VBoxContainer/ResourceSection"]
+layout_mode = 2
+columns = 2
+
+[node name="Build" type="Label" parent="RightPannel/VBoxContainer"]
+layout_mode = 2
+text = "Build"
+
+[node name="RecipesSection" type="ScrollContainer" parent="RightPannel/VBoxContainer"]
+layout_mode = 2
+
+[node name="RecipesList" type="VBoxContainer" parent="RightPannel/VBoxContainer/RecipesSection"]
+layout_mode = 2
+
+[node name="EndTurnButton" type="Button" parent="RightPannel/VBoxContainer"]
+layout_mode = 2
+text = "End Turn"

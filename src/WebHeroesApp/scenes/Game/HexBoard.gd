@@ -82,3 +82,20 @@ func _draw() -> void:
 				14,
 				num_color
 			)
+
+func get_board_bounds() -> Array:
+	if fields.is_empty():
+		return [Vector2.ZERO, Vector2.ZERO]
+
+	var min_x = INF; var min_y = INF
+	var max_x = -INF; var max_y = -INF
+
+	for key in fields:
+		var parts = key.split(",")
+		var pos = hex_to_pixel(int(parts[0]), int(parts[1]))
+		min_x = min(min_x, pos.x - HEX_SIZE)
+		min_y = min(min_y, pos.y - HEX_SIZE)
+		max_x = max(max_x, pos.x + HEX_SIZE)
+		max_y = max(max_y, pos.y + HEX_SIZE)
+
+	return [Vector2(min_x, min_y), Vector2(max_x, max_y)]
