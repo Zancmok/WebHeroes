@@ -116,6 +116,8 @@ class LobbyManagement(StaticClass):
 
                 break
 
+        LobbyManagement.socket_blueprint.emit("join-lobby", dictify(SuccessResponse()))
+
     @staticmethod
     @socket_blueprint.on("start-game")
     def start_game() -> None:
