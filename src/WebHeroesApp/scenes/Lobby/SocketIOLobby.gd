@@ -3,8 +3,7 @@ extends Node
 @onready var client: SocketIO = $SocketIO
 var is_ready: bool = false
 var pending_lobby_name: String = ""
-var _pending_debug_start: bool = false  # NEW
-var _waiting_to_start: bool = false
+var _pending_debug_start: bool = false
 
 signal lobby_refresh_received(data)
 signal lobby_created(data)
@@ -12,7 +11,7 @@ signal game_started()
 signal get_lobby_received(data)
 signal lobby_closed()
 signal socket_ready()
-signal debug_game_ready()  # NEW
+signal debug_game_ready()
 
 func _ready() -> void:
 	print("SocketIOLobby _ready")
@@ -35,10 +34,6 @@ func connect_to_server(token: String) -> void:
 func _on_connected(ns: String) -> void:
 	print("Socket connected!", ns)
 	is_ready = true
-	
-	var saved_lobby = GameState.lobby_name
-	if saved_lobby != "":
-		join_lobby(saved_lobby)
 
 	if pending_lobby_name != "":
 		create_lobby(pending_lobby_name)
@@ -68,38 +63,24 @@ func disconnect_from_server() -> void:
 	client.disconnect_socket()
 	is_ready = false
 
-# NEW: creates lobby then immediately starts the game
 func debug_create_and_start(lobby_name: String) -> void:
 	_pending_debug_start = true
 	create_lobby(lobby_name)
 
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("Event received: ", event, " data: ", data)
-	if event == "lobby-management:refresh":
-		emit_signal("lobby_refresh_received", data)
-	elif event == "lobby-management:create-lobby":
-		emit_signal("lobby_created", data)
-		if _pending_debug_start:
-			_pending_debug_start = false
-			var response = data
-			if response is Array and response.size() > 0:
-				response = response[0]
-			if response is Dictionary and response.get("object_type") == "failed-response":
-				# Lobby already exists — join it first, then start on join confirmation
-				_waiting_to_start = true
-				var lobby_name = GameState.lobby_name
-				client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
-			else:
-				# Lobby created fresh — start immediately
+	match event:
+		"lobby-management:refresh":
+			emit_signal("lobby_refresh_received", data)
+		"lobby-management:create-lobby":
+			emit_signal("lobby_created", data)
+			if _pending_debug_start:
+				_pending_debug_start = false
 				client.emit("lobby-management:start-game")
-	elif event == "lobby-management:join-lobby":
-		if _waiting_to_start:
-			_waiting_to_start = false
-			client.emit("lobby-management:start-game")
-	elif event == "lobby-management:game-started":
-		emit_signal("game_started")
-		emit_signal("debug_game_ready")
-	elif event == "lobby-management:get-lobby":
-		emit_signal("get_lobby_received", data)
-	elif event == "lobby-management:lobby-closed":
-		emit_signal("lobby_closed")
+		"lobby-management:game-started":
+			emit_signal("game_started")
+			emit_signal("debug_game_ready")
+		"lobby-management:get-lobby":
+			emit_signal("get_lobby_received", data)
+		"lobby-management:lobby-closed":
+			emit_signal("lobby_closed")
