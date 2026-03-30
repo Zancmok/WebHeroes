@@ -1,3 +1,4 @@
+import random
 from typing import Optional
 from WebHeroes.UserManagement.UserSession import UserSession
 from WebHeroes.UserManagement.SessionManager import SessionManager
@@ -63,6 +64,7 @@ class Game:
             self.players[user] = Player(player_colors[i], resources)
 
     def end_turn(self, rolled_number: int) -> None:
+        # Grant standard resources
         for intersection in self.game_map.intersections:
             settlement: Settlement = self.game_map.intersections[intersection].settlement
             if not settlement:
@@ -76,5 +78,15 @@ class Game:
 
                 settlement.owner.resources[field.field_type.resource] += settlement.settlement_type.resource_multiplier
 
+        # Special rare case bonus resource give
+        if rolled_number in (2, 12):
+            for user_session in self.players:
+                player: Player = self.players[user_session]
+
+                random_free_resource: str = random.choice(list(player.resources.keys()))
+
+                player.resources[random_free_resource] += 1
+
+        # Pass the turn to the next player
         self.current_user_index += 1
         self.current_user_index %= len(self.users)

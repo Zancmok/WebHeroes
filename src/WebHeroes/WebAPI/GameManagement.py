@@ -237,3 +237,5 @@ class GameManagement(StaticClass):
         )), to=lobby.name)
 
         # TODO: Add victory thingy!
+
+

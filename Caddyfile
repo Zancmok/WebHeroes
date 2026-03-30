@@ -10,7 +10,7 @@ webheroes.duckdns.org:9027 {
     }
 }
 
-http://localhost {
+localhost:80 {
     reverse_proxy web_heroes_server:5000
     encode gzip
     log {
