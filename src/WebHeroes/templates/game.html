@@ -4,479 +4,13 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Catan</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700;900&family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../static/css/game.css">
   <script src="https://cdn.socket.io/4.5.1/socket.io.min.js"></script>
-  <style>
-    /* ── Reset & tokens ────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    :root {
-      --ink:        #1a120a;
-      --parchment:  #f5ead8;
-      --parchment2: #ede0c4;
-      --gold:       #c9922a;
-      --gold-light: #e8bb6a;
-      --crimson:    #7a1c1c;
-      --sea:        #1a3a5c;
-      --sea-light:  #2a5480;
-      --panel:      rgba(26, 18, 10, 0.88);
-      --border:     rgba(201, 146, 42, 0.35);
-      --radius:     6px;
-      --transition: 0.18s ease;
-    }
-
-    html, body {
-      height: 100%;
-      background: var(--sea);
-      color: var(--parchment);
-      font-family: 'Crimson Pro', Georgia, serif;
-      overflow: hidden;
-    }
-
-    /* Subtle parchment grain overlay on the whole page */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.06'/%3E%3C/svg%3E");
-      pointer-events: none;
-    }
-
-    /* ── Layout shell ──────────────────────────────────────────────────── */
-    #app {
-      position: relative; z-index: 1;
-      display: grid;
-      grid-template-columns: 240px 1fr 240px;
-      grid-template-rows: 48px 1fr;
-      grid-template-areas:
-        "header header header"
-        "left   board  right";
-      height: 100vh;
-      gap: 0;
-    }
-
-    /* ── Header ────────────────────────────────────────────────────────── */
-    #game-header {
-      grid-area: header;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 20px;
-      background: var(--panel);
-      border-bottom: 1px solid var(--border);
-      backdrop-filter: blur(6px);
-    }
-
-    #game-header h1 {
-      font-family: 'Cinzel', serif;
-      font-size: 1.05rem;
-      font-weight: 700;
-      letter-spacing: 0.18em;
-      color: var(--gold-light);
-      text-transform: uppercase;
-    }
-
-    #turn-banner {
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      font-weight: 600;
-      letter-spacing: 0.12em;
-      color: var(--parchment2);
-      opacity: 0.85;
-    }
-
-    .header-controls {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-sm {
-      font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      padding: 5px 10px;
-      background: transparent;
-      color: var(--parchment2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: background var(--transition), color var(--transition), border-color var(--transition);
-    }
-    .btn-sm:hover {
-      background: rgba(201,146,42,0.15);
-      border-color: var(--gold);
-      color: var(--gold-light);
-    }
-
-    /* ── Sidebar panels ────────────────────────────────────────────────── */
-    .sidebar {
-      background: var(--panel);
-      border-right: 1px solid var(--border);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      backdrop-filter: blur(6px);
-    }
-    #sidebar-right {
-      border-right: none;
-      border-left: 1px solid var(--border);
-    }
-
-    .sidebar-section {
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(201,146,42,0.15);
-    }
-
-    .sidebar-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.58rem;
-      font-weight: 700;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--gold);
-      margin-bottom: 10px;
-      opacity: 0.9;
-    }
-
-    /* ── Players list ──────────────────────────────────────────────────── */
-    #players-list {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .player-card {
-      display: flex;
-      align-items: center;
-      gap: 9px;
-      padding: 7px 9px;
-      border-radius: var(--radius);
-      border: 1px solid transparent;
-      transition: border-color var(--transition), background var(--transition);
-    }
-    .player-card.active {
-      border-color: var(--gold);
-      background: rgba(201,146,42,0.08);
-    }
-    .player-card.mine {
-      /* subtle self-indicator */
-    }
-
-    .player-swatch {
-      width: 12px; height: 12px;
-      border-radius: 50%;
-      flex-shrink: 0;
-      border: 1.5px solid rgba(255,255,255,0.3);
-    }
-
-    .player-name {
-      font-family: 'Cinzel', serif;
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      color: var(--parchment);
-      flex: 1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .player-pts {
-      font-family: 'Cinzel', serif;
-      font-size: 0.62rem;
-      color: var(--gold-light);
-    }
-
-    .turn-pip {
-      width: 7px; height: 7px;
-      border-radius: 50%;
-      background: var(--gold);
-      flex-shrink: 0;
-      box-shadow: 0 0 6px var(--gold);
-      animation: pulse 1.4s ease-in-out infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50%       { opacity: 0.5; transform: scale(0.75); }
-    }
-
-    /* ── Resources ─────────────────────────────────────────────────────── */
-    #resources-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 5px;
-    }
-
-    .resource-chip {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 5px 8px;
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius);
-      font-size: 0.72rem;
-    }
-    .resource-name {
-      color: var(--parchment2);
-      font-style: italic;
-      opacity: 0.8;
-      font-size: 0.68rem;
-    }
-    .resource-amount {
-      font-family: 'Cinzel', serif;
-      font-size: 0.78rem;
-      font-weight: 700;
-      color: var(--gold-light);
-    }
-
-    /* ── Recipes (build actions) ───────────────────────────────────────── */
-    #recipes-list {
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
-    }
-
-    .recipe-btn {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      gap: 3px;
-      padding: 9px 11px;
-      background: rgba(201,146,42,0.06);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      cursor: pointer;
-      text-align: left;
-      transition: background var(--transition), border-color var(--transition), transform var(--transition);
-      color: var(--parchment);
-    }
-    .recipe-btn:hover:not(:disabled) {
-      background: rgba(201,146,42,0.16);
-      border-color: var(--gold);
-      transform: translateX(2px);
-    }
-    .recipe-btn:disabled {
-      opacity: 0.38;
-      cursor: not-allowed;
-    }
-    .recipe-btn.active-placement {
-      border-color: #ffff66;
-      background: rgba(255,255,100,0.1);
-      box-shadow: 0 0 8px rgba(255,255,100,0.3);
-    }
-
-    .recipe-title {
-      font-family: 'Cinzel', serif;
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      color: var(--gold-light);
-    }
-    .recipe-cost {
-      font-size: 0.63rem;
-      color: var(--parchment2);
-      opacity: 0.7;
-      font-style: italic;
-    }
-
-    /* ── Rolled number display ─────────────────────────────────────────── */
-    #dice-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
-      padding: 10px 0 4px;
-    }
-    #dice-label {
-      font-family: 'Cinzel', serif;
-      font-size: 0.58rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--gold);
-      opacity: 0.75;
-    }
-    #dice-value {
-      font-family: 'Cinzel', serif;
-      font-size: 2rem;
-      font-weight: 900;
-      color: var(--parchment);
-      line-height: 1;
-      min-height: 2.2rem;
-      transition: color 0.3s;
-    }
-    #dice-value.hot { color: #e05c2e; }
-
-    /* ── End Turn button ───────────────────────────────────────────────── */
-    #btn-end-turn {
-      width: calc(100% - 32px);
-      margin: 12px 16px 16px;
-      padding: 10px;
-      font-family: 'Cinzel', serif;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      background: linear-gradient(135deg, var(--crimson), #5a1010);
-      color: var(--parchment);
-      border: 1px solid rgba(255,100,100,0.3);
-      border-radius: var(--radius);
-      cursor: pointer;
-      transition: filter var(--transition), transform var(--transition);
-    }
-    #btn-end-turn:hover:not(:disabled) {
-      filter: brightness(1.2);
-      transform: translateY(-1px);
-    }
-    #btn-end-turn:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      transform: none;
-    }
-
-    /* ── Legend ────────────────────────────────────────────────────────── */
-    #legend {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      padding: 10px 16px;
-      overflow-y: auto;
-    }
-    .legend-item {
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      font-size: 0.65rem;
-      color: var(--parchment2);
-      font-style: italic;
-    }
-    .legend-swatch {
-      width: 11px; height: 11px;
-      border-radius: 2px;
-      flex-shrink: 0;
-      border: 1px solid rgba(255,255,255,0.2);
-    }
-
-    /* ── Board ─────────────────────────────────────────────────────────── */
-    #board-area {
-      grid-area: board;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      overflow: hidden;
-    }
-
-    #board-container {
-      overflow: auto;
-      max-width: 100%;
-      max-height: 100%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      scrollbar-width: thin;
-      scrollbar-color: var(--border) transparent;
-    }
-
-    #board-svg {
-      display: block;
-    }
-
-    /* ── Placement hint banner ─────────────────────────────────────────── */
-    #placement-hint {
-      display: none;
-      position: absolute;
-      top: 12px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(26,18,10,0.92);
-      border: 1px solid #ffff66;
-      border-radius: var(--radius);
-      padding: 8px 18px;
-      font-family: 'Cinzel', serif;
-      font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.08em;
-      color: #ffff88;
-      white-space: nowrap;
-      box-shadow: 0 0 16px rgba(255,255,100,0.25);
-      z-index: 10;
-      animation: fadeIn 0.2s ease;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateX(-50%) translateY(-4px); }
-      to   { opacity: 1; transform: translateX(-50%) translateY(0); }
-    }
-
-    /* ── Tooltip ───────────────────────────────────────────────────────── */
-    .tooltip {
-      position: fixed;
-      z-index: 100;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 6px 12px;
-      font-size: 0.75rem;
-      color: var(--parchment);
-      pointer-events: none;
-      white-space: nowrap;
-      opacity: 0;
-      transition: opacity 0.1s;
-      backdrop-filter: blur(4px);
-    }
-    .tooltip.visible { opacity: 1; }
-
-    /* ── Scrollbar ─────────────────────────────────────────────────────── */
-    ::-webkit-scrollbar { width: 5px; height: 5px; }
-    ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
-
-    /* ── Tile flash animation ────────────────────────────────────────────── */
-    @keyframes hexFlash {
-      0%   { opacity: 1; }
-      60%  { opacity: 0.7; }
-      100% { opacity: 0; }
-    }
-
-    /* ── Floating gain popup ─────────────────────────────────────────────── */
-    @keyframes floatUp {
-      0%   { opacity: 0;   transform: translate(-50%, -50%); }
-      15%  { opacity: 1;   transform: translate(-50%, -60%); }
-      80%  { opacity: 1;   transform: translate(-50%, -130%); }
-      100% { opacity: 0;   transform: translate(-50%, -150%); }
-    }
-
-    /* ── Gain log ────────────────────────────────────────────────────────── */
-    #gain-log {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      max-height: 120px;
-      overflow-y: auto;
-    }
-    .gain-entry {
-      font-size: 0.68rem;
-      color: var(--parchment2);
-      font-style: italic;
-      opacity: 0;
-      animation: fadeIn 0.3s ease forwards;
-    }
-    .gain-entry .gain-who {
-      font-style: normal;
-      font-family: 'Cinzel', serif;
-      font-size: 0.6rem;
-      font-weight: 600;
-    }
-  </style>
 </head>
 <body>
 <div id="app">
 
-  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <!--Header-->
   <header id="game-header">
     <h1>Catan</h1>
     <span id="turn-banner">Waiting for game data…</span>
@@ -486,7 +20,7 @@
     </div>
   </header>
 
-  <!-- ── Left sidebar: players + dice ──────────────────────────────────── -->
+  <!-- Left sidebar: players + dice-->
   <aside class="sidebar" id="sidebar-left">
     <div class="sidebar-section">
       <div class="sidebar-label">Players</div>
@@ -516,7 +50,7 @@
     </div>
   </aside>
 
-  <!-- ── Board ──────────────────────────────────────────────────────────── -->
+  <!--Board-->
   <main id="board-area">
     <div id="board-container">
       <svg id="board-svg"></svg>
@@ -524,7 +58,7 @@
     <div id="placement-hint"></div>
   </main>
 
-  <!-- ── Right sidebar: resources + recipes ────────────────────────────── -->
+  <!--Right sidebar: resources + recipes  -->
   <aside class="sidebar" id="sidebar-right">
     <div class="sidebar-section">
       <div class="sidebar-label">My Resources</div>
@@ -547,19 +81,30 @@
 
 <div class="tooltip" id="tooltip"></div>
 
+<!--Game Over / Victory Overlay -->
+<div id="game-over-overlay" role="dialog" aria-modal="true" aria-labelledby="game-over-headline">
+  <canvas id="game-over-particles"></canvas>
+  <div class="game-over-card">
+    <div class="game-over-medallion" id="game-over-medallion">⚔️</div>
+    <div class="game-over-eyebrow" id="game-over-eyebrow">Campaign Ended</div>
+    <div class="game-over-headline" id="game-over-headline">Game Over</div>
+    <div class="game-over-divider"></div>
+    <div class="game-over-winner-name" id="game-over-winner-name"></div>
+    <div class="game-over-sub"    id="game-over-sub"></div>
+    <div class="game-over-actions">
+      <button class="btn-return-lobbies" id="btn-return-lobbies">
+        ⚑ Return to Lobbies
+      </button>
+    </div>
+    <div class="game-over-seal">✦ Web Heroes ✦</div>
+  </div>
+</div>
+
 <script src="../static/js/game.js"></script>
 <script>
-  // ── UI wiring — runs after game.js is loaded ──────────────────────────
-  // game.js exposes:  window.GameState  (live data)
-  //                   window.GameUI.startBuild(recipeId, resultType)
-  //                   window.GameUI.cancelBuild()
-  //                   window.GameEvents  (event emitter-lite)
-  //
-  // This script only touches the DOM; all socket/game logic stays in game.js.
-
   const $ = id => document.getElementById(id);
 
-  // ── Players panel ────────────────────────────────────────────────────
+  //Players panel
   function renderPlayers(players, currentIndex, myIndex) {
     const list = $("players-list");
     list.innerHTML = "";
@@ -591,7 +136,7 @@
     });
   }
 
-  // ── Resources panel ──────────────────────────────────────────────────
+  //Resources panel
   function renderResources(resources) {
     console.log("[game.html] renderResources called with:", resources);
     const grid = $("resources-grid");
@@ -608,7 +153,7 @@
     }
   }
 
-  // ── Recipes panel ────────────────────────────────────────────────────
+  //Recipes panel
   let _activeRecipeBtn = null;
 
   function renderRecipes(recipes, myResources, isMyTurn) {
@@ -658,14 +203,14 @@
     }
   }
 
-  // ── Dice display ─────────────────────────────────────────────────────
+  //Dice display
   function showDice(num) {
     const el = $("dice-value");
     el.textContent = num ?? "—";
     el.className = (num === 6 || num === 8) ? "hot" : "";
   }
 
-  // ── Turn banner ──────────────────────────────────────────────────────
+  //Turn banner
   function updateTurnBanner(players, currentIndex, myIndex) {
     const banner = $("turn-banner");
     if (!players?.length) { banner.textContent = "Waiting…"; return; }
@@ -676,14 +221,14 @@
       : `${name}'s Turn`;
   }
 
-  // ── End Turn button ──────────────────────────────────────────────────
+  //End Turn button 
   $("btn-end-turn").addEventListener("click", () => {
     const socket = window._gameSocket;
     if (!socket) return;
     socket.emit("game-management:end-turn");
   });
 
-  // ── Hook into GameEvents from game.js ────────────────────────────────
+  // ── Hook into GameEvents from game.js
   // game.js dispatches CustomEvents on window so this file stays decoupled.
   window.addEventListener("game:data", (e) => {
     const { players, currentUserIndex, myIndex, recipes, myResources } = e.detail;

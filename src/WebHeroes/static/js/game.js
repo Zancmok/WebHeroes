@@ -746,4 +746,144 @@
     },
   };
 
+  // Game Over 
+  socket.on("game-management:game-over", (data) => {
+    console.log("[game.js] Received game-over:", data);
+    showGameOverOverlay(data?.winner ?? null);
+  });
+
+  function showGameOverOverlay(winner) {
+    const overlay    = document.getElementById("game-over-overlay");
+    const medallion  = document.getElementById("game-over-medallion");
+    const eyebrow    = document.getElementById("game-over-eyebrow");
+    const headline   = document.getElementById("game-over-headline");
+    const winnerName = document.getElementById("game-over-winner-name");
+    const sub        = document.getElementById("game-over-sub");
+
+    const myPlayer   = gameState.players?.[gameState.myIndex] ?? null;
+    const winnerColor = winner?.color_type ?? null;
+
+    // Determine if the local player is the winner
+    const isMyVictory = winnerColor && myPlayer?.color_type &&
+      winnerColor.name === myPlayer.color_type.name;
+
+    if (isMyVictory) {
+      medallion.textContent  = "👑";
+      eyebrow.textContent    = "Victory";
+      headline.textContent   = "You Have Conquered!";
+      headline.classList.add("is-winner");
+      sub.textContent        = "Your settlement stands supreme. The realm is yours.";
+    } else if (winner) {
+      medallion.textContent  = "⚔️";
+      eyebrow.textContent    = "Defeat";
+      headline.textContent   = "Campaign Ended";
+      headline.classList.remove("is-winner");
+      sub.textContent        = "Another settler has claimed the land.";
+    } else {
+      medallion.textContent  = "⚔️";
+      eyebrow.textContent    = "Campaign Ended";
+      headline.textContent   = "Game Over";
+      headline.classList.remove("is-winner");
+      sub.textContent        = "The campaign has come to a close.";
+    }
+
+    // Winner name + colour swatch
+    if (winner && winnerColor) {
+      const colorCSS = `rgb(${winnerColor.r},${winnerColor.g},${winnerColor.b})`;
+      winnerName.innerHTML =
+        `<span class="game-over-winner-swatch" style="background:${colorCSS}"></span>` +
+        (isMyVictory ? "You" : (winnerColor.display_name || "Unknown"));
+    } else {
+      winnerName.textContent = "";
+    }
+
+    overlay.classList.add("visible");
+
+    // Start particle confetti (gold coins/stars)
+    startGameOverParticles(isMyVictory);
+
+    // Disable End Turn so nobody accidentally acts post-game
+    const endTurnBtn = document.getElementById("btn-end-turn");
+    if (endTurnBtn) endTurnBtn.disabled = true;
+  }
+
+  document.getElementById("btn-return-lobbies")?.addEventListener("click", () => {
+    sessionStorage.removeItem("currentLobbyName");
+    window.location.href = "/online-lobbies";
+  });
+
+  // Lightweight canvas particle system
+  function startGameOverParticles(isVictory) {
+    const canvas = document.getElementById("game-over-particles");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    const count   = isVictory ? 90 : 30;
+    const palette = isVictory
+      ? ["#c9922a", "#e8bb6a", "#f5ead8", "#fff8dc", "#ffd700"]
+      : ["#5a6a7a", "#8a9aaa", "#c0ccd8", "#7a6a5a"];
+
+    const particles = Array.from({ length: count }, () => ({
+      x:    Math.random() * canvas.width,
+      y:    Math.random() * canvas.height - canvas.height,
+      vx:   (Math.random() - 0.5) * 1.6,
+      vy:   1.2 + Math.random() * 2.4,
+      r:    2.5 + Math.random() * 4,
+      rot:  Math.random() * Math.PI * 2,
+      rotV: (Math.random() - 0.5) * 0.12,
+      col:  palette[Math.floor(Math.random() * palette.length)],
+      shape: Math.random() < 0.5 ? "rect" : "star",
+      alpha: 0.7 + Math.random() * 0.3,
+    }));
+
+    let rafId;
+    function tick() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of particles) {
+        p.x   += p.vx;
+        p.y   += p.vy;
+        p.rot += p.rotV;
+        if (p.y > canvas.height + 20) {
+          p.y  = -20;
+          p.x  = Math.random() * canvas.width;
+        }
+        ctx.save();
+        ctx.globalAlpha = p.alpha;
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot);
+        ctx.fillStyle = p.col;
+        if (p.shape === "rect") {
+          ctx.fillRect(-p.r, -p.r * 0.5, p.r * 2, p.r);
+        } else {
+          // simple 4-point star
+          ctx.beginPath();
+          for (let i = 0; i < 8; i++) {
+            const angle = (i * Math.PI) / 4;
+            const rad   = i % 2 === 0 ? p.r : p.r * 0.42;
+            i === 0 ? ctx.moveTo(Math.cos(angle) * rad, Math.sin(angle) * rad)
+                    : ctx.lineTo(Math.cos(angle) * rad, Math.sin(angle) * rad);
+          }
+          ctx.closePath();
+          ctx.fill();
+        }
+        ctx.restore();
+      }
+      rafId = requestAnimationFrame(tick);
+    }
+
+    // Stop particles after 8 s
+    rafId = requestAnimationFrame(tick);
+    setTimeout(() => {
+      cancelAnimationFrame(rafId);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }, 8000);
+  }
+
 })();
