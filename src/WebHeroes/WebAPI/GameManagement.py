@@ -64,6 +64,9 @@ class GameManagement(StaticClass):
         # TODO: Write this thingy bettah
         lobby: OwnedLobby = user_session.get_lobby()
 
+        if not lobby.game.running:
+            return
+
         fields: dict[str, FieldModel] = {}
         for cords in lobby.game.game_map.fields:
             curr: Field = lobby.game.game_map.fields[cords]
@@ -254,6 +257,6 @@ class GameManagement(StaticClass):
         if curr_player_points >= lobby.game.game_map.settings_type.point_requirement:
             GameManagement.socket_blueprint.emit("game-over", dictify(GameOverResponse(
                 winner=player
-            )))
+            )), to=lobby.name)
 
             LobbyManager.delete_lobby(lobby)

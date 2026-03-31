@@ -1,5 +1,5 @@
 local settings = data:get_prototype("settings", "settings")
-settings.point_requirement = 25
+settings.point_requirement = 20
 settings.map_size = 9
 
 require "prototypes.resource"

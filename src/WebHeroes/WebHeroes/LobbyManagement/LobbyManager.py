@@ -1,5 +1,3 @@
-from typing import Optional
-
 from WebHeroes.UserManagement.SessionManager import SessionManager
 from WebHeroes.UserManagement import UserSession
 from ZancmokLib.StaticClass import StaticClass
@@ -34,7 +32,9 @@ class LobbyManager(StaticClass):
 
     @staticmethod
     def delete_lobby(lobby: OwnedLobby) -> None:
-        for member in lobby.member_ids:
+        lobby_member_ids: list[int] = [member_id for member_id in lobby.member_ids]
+
+        for member in lobby_member_ids:
             SessionManager.get_user_session_by_user_id(member).join_lobby(LobbyManager.online_lobby)
 
         LobbyManager._player_lobbies.remove(lobby)
