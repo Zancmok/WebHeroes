@@ -55,9 +55,6 @@ class SessionManager(StaticClass):
 
     @staticmethod
     def bind_socket_connection(socket_id: str, token: str, lobby: Lobby) -> None:
-        user_session: Optional[UserSession] = SessionManager._socket_connections.get(socket_id)
-        if not user_session:
-            return
         print(f"Socket {socket_id} disconnected, session preserved for user {user_session.get_user_id()}", flush=True)
         old_session: Optional[UserSession] = SessionManager.get_user_session_by_user_id(SessionManager.get_user_id(token))
         if not old_session:
@@ -85,12 +82,10 @@ class SessionManager(StaticClass):
 
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
-        user_session: UserSession = SessionManager._socket_connections.get(socket_id)
-
-        lobby: Lobby = user_session.get_lobby()
-
-        # lobby.leave_member(user_session.get_user_id())
-        # leave_room(lobby.name)
+        user_session: Optional[UserSession] = SessionManager._socket_connections.get(socket_id)
+        if not user_session:
+            return
+        print(f"Socket {socket_id} disconnected, session preserved for user {user_session.get_user_id()}", flush=True)
 
     @staticmethod
     def get_user_session(socket_id: Optional[str] = None) -> Optional[UserSession]:
