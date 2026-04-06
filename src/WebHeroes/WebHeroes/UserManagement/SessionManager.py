@@ -77,6 +77,7 @@ class SessionManager(StaticClass):
             current_lobby: Lobby = old_session.get_lobby()
             join_room(current_lobby.name)
             SessionManager._socket_connections[socket_id] = old_session
+            print(f"Rebound existing session for user {old_session.get_user_id()} to socket {socket_id}", flush = True)
 
     @staticmethod
     def unbind_socket_connection(socket_id: str) -> None:
