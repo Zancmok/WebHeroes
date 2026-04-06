@@ -511,7 +511,7 @@
     if (hint) {
       hint.textContent = resultType === "road"
         ? "Click a highlighted edge to place your road.  [Esc to cancel]"
-        : "Click a highlighted corner to place your settlement.  [Esc to cancel]";
+        : "Click a highlighted corner to place your settlement or a settlemente to build a city.  [Esc to cancel]";
       hint.style.display = "block";
     }
   }
