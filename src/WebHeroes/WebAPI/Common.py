@@ -40,10 +40,7 @@ class Common(StaticClass):
             raise ConnectionRefusedError("unauthorized")
         user_id: int
 
-        try:
-            SessionManager.bind_socket_connection(socket_id=request.sid, token=token, lobby=LobbyManager.online_lobby)
-        except SessionAlreadyBoundError:
-            raise ConnectionRefusedError("Session already bound to another connection!")
+        SessionManager.bind_socket_connection(socket_id=request.sid, token=token, lobby=LobbyManager.online_lobby)
 
         print(f"Client connected: {request.sid}", flush=True)
 

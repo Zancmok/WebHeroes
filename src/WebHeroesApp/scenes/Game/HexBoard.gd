@@ -19,8 +19,8 @@ var fields: Dictionary = {}
 var settlements: Dictionary = {}
 var roads: Dictionary = {}
 
-var _placement_type: String = ""  # "road" or "settlement", empty = no placement
-var _placement_targets: Array = []  # Array of {location: Array, points: PackedVector2Array}
+var _placement_type: String = ""
+var _placement_targets: Array = []
 
 signal placement_selected(location: Array)
 
@@ -45,6 +45,17 @@ func load_game_data(data: Dictionary) -> void:
 
 	queue_redraw()
 
+func add_building_from_build(location: Array, building_data: Dictionary, owner_data: Dictionary) -> void:
+	var parts: PackedStringArray = PackedStringArray()
+	for v in location:
+		parts.append(str(int(v)))
+	var key = "\u0000".join(parts)
+	if location.size() == 4:
+		roads[key] = {"road_type": building_data, "owner": owner_data}
+	elif location.size() == 6:
+		settlements[key] = {"settlement_type": building_data, "owner": owner_data}
+	queue_redraw()
+
 func hex_to_pixel(q: int, r: int) -> Vector2:
 	var x = HEX_SIZE * (sqrt(3.0) * q + sqrt(3.0) / 2.0 * r)
 	var y = HEX_SIZE * (3.0 / 2.0 * r)
@@ -56,6 +67,16 @@ func hex_corner_points(center: Vector2, size: float) -> PackedVector2Array:
 		var angle = deg_to_rad(60.0 * i + 30.0)
 		pts.append(center + Vector2(cos(angle), sin(angle)) * size)
 	return pts
+
+func _get_player_color(owner_data: Dictionary) -> Color:
+	var color_type = owner_data.get("color_type", {})
+	if color_type.is_empty():
+		return Color.WHITE
+	return Color(
+		color_type.get("r", 255) / 255.0,
+		color_type.get("g", 255) / 255.0,
+		color_type.get("b", 255) / 255.0
+	)
 
 func enter_placement_mode(type: String) -> void:
 	_placement_type = type
@@ -152,6 +173,7 @@ func _draw() -> void:
 	if fields.is_empty():
 		return
 
+	# Draw hex tiles
 	for key in fields:
 		var parts = key.split(",")
 		var q = int(parts[0])
@@ -178,6 +200,54 @@ func _draw() -> void:
 				14,
 				num_color
 			)
+
+	# Draw roads
+	for key in roads:
+		var parts = key.split("\u0000")
+		if parts.size() != 4:
+			continue
+		var q1 = int(parts[0]); var r1 = int(parts[1])
+		var q2 = int(parts[2]); var r2 = int(parts[3])
+		var corners = _shared_edge_corners(q1, r1, q2, r2)
+		if corners.size() < 2:
+			continue
+		var road_data = roads[key]
+		var road_owner = road_data.get("owner", {})
+		var player_color = _get_player_color(road_owner)
+		draw_line(corners[0], corners[1], Color(0, 0, 0, 0.55), 7.0, true)
+		draw_line(corners[0], corners[1], player_color, 5.0, true)
+
+	# Draw settlements
+	for key in settlements:
+		var parts = key.split("\u0000")
+		if parts.size() != 6:
+			continue
+		var q1 = int(parts[0]); var r1 = int(parts[1])
+		var q2 = int(parts[2]); var r2 = int(parts[3])
+		var q3 = int(parts[4]); var r3 = int(parts[5])
+		var center = (hex_to_pixel(q1, r1) + hex_to_pixel(q2, r2) + hex_to_pixel(q3, r3)) / 3.0
+		var settlement_data = settlements[key]
+		var settlement_owner = settlement_data.get("owner", {})
+		var player_color = _get_player_color(settlement_owner)
+		var settlement_type = settlement_data.get("settlement_type", {})
+		var point_value = settlement_type.get("point_value", 1)
+		var radius = 8.0 if point_value > 1 else 5.0
+		# Shadow
+		draw_circle(center + Vector2(0, 2), radius + 1, Color(0, 0, 0, 0.45))
+		# Fill
+		draw_circle(center, radius, player_color)
+		# Outline
+		draw_arc(center, radius, 0, TAU, 16, Color(0, 0, 0, 0.7), 1.5)
+		# C for city, S for settlement
+		draw_string(
+			ThemeDB.fallback_font,
+			center - Vector2(4, -4),
+			"C" if point_value > 1 else "S",
+			HORIZONTAL_ALIGNMENT_CENTER,
+			-1,
+			int(radius) + 2,
+			Color(0, 0, 0, 0.75)
+		)
 
 	# Draw placement targets on top
 	if _placement_type == "road":

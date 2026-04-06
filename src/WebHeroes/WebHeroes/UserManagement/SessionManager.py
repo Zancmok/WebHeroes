@@ -55,6 +55,10 @@ class SessionManager(StaticClass):
 
     @staticmethod
     def bind_socket_connection(socket_id: str, token: str, lobby: Lobby) -> None:
+        user_session: Optional[UserSession] = SessionManager._socket_connections.get(socket_id)
+        if not user_session:
+            return
+        print(f"Socket {socket_id} disconnected, session preserved for user {user_session.get_user_id()}", flush=True)
         old_session: Optional[UserSession] = SessionManager.get_user_session_by_user_id(SessionManager.get_user_id(token))
         if not old_session:
             new_user_session: UserSession = UserSession(
