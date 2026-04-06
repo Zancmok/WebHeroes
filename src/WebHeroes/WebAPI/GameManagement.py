@@ -64,6 +64,10 @@ class GameManagement(StaticClass):
         # TODO: Write this thingy bettah
         lobby: OwnedLobby = user_session.get_lobby()
 
+        if not isinstance(lobby, OwnedLobby):
+            return
+        lobby: OwnedLobby
+
         if not lobby.game.running:
             return
 
