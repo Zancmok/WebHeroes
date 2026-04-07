@@ -119,23 +119,16 @@ class GameManagement(StaticClass):
             if user == user_session:
                 user_index = i
 
-
-        print(f"Building game data response, user_index={user_index}, fields={len(fields)}, running={lobby.game.running}", flush=True)
-        try:
-            GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
-                fields=fields,
-                prototypes=lobby.game.prototypes,
-                players=[lobby.game.players[player] for player in lobby.game.players],
-                settlements=settlements,
-                roads=roads,
-                current_user_index=lobby.game.current_user_index,
-                my_index=user_index
-            )))
-            print("get-game-data emitted successfully", flush=True)
-        except Exception as e:
-            import traceback
-            print(f"get-game-data failed: {e}", flush=True)
-            traceback.print_exc()       
+        GameManagement.socket_blueprint.emit("get-game-data", dictify(GetGameDataResponse(
+            fields=fields,
+            prototypes=lobby.game.prototypes,
+            players=[lobby.game.players[player] for player in lobby.game.players],
+            settlements=settlements,
+            roads=roads,
+            current_user_index=lobby.game.current_user_index,
+            my_index=user_index
+        )))
+        print("get-game-data emitted successfully", flush=True)   
 
     @staticmethod
     @socket_blueprint.on("end-turn")
