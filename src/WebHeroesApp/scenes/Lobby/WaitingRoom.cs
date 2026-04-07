@@ -87,7 +87,6 @@ public partial class WaitingRoom : Control
 	
 	private async void OnGameStarted()
 	{
-		socketIOLobby.Call("disconnect_from_server");
 		await ToSignal(GetTree(), SceneTree.SignalName.ProcessFrame);
 		GetTree().ChangeSceneToFile("res://scenes/Game/Game.tscn");
 	}

@@ -66,7 +66,7 @@ public partial class Game : Node2D
 			foreach (var p in pr.AsGodotArray())
 			{
 				if (p.AsGodotDictionary().TryGetValue("object_type", out var ot) &&
-				    ot.AsString() == "recipe-s_prototype")
+					ot.AsString() == "recipe-s_prototype")
 					_recipes.Add(p);
 			}
 		}
