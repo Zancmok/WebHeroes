@@ -21,7 +21,8 @@ func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
 		is_ready = true
-		_request_game_data()
+		var lobby_name = GameState.lobby_name
+		client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
 		return
 	client.connect_socket({ "token": token })
 
@@ -44,6 +45,7 @@ func emit_build(recipe_id: String, location: Array) -> void:
 
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
+	print("[SocketIOGame] RAW event: '", event, "'")
 	match event:
 		"lobby-management:join-lobby":
 			emit_signal("socket_ready")
