@@ -3,6 +3,7 @@ extends Node
 var token: String = ""
 var username: String = ""
 var lobby_name: String = ""
+var socket: SocketIO = null
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_WM_CLOSE_REQUEST:
@@ -28,3 +29,8 @@ func _logout_and_quit() -> void:
 
 	if err != OK:
 		get_tree().quit()
+
+func _ready() -> void:
+	socket = SocketIO.new()
+	socket.base_url = "https://webheroes.duckdns.org:9027"
+	add_child(socket)

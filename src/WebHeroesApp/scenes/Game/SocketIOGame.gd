@@ -1,7 +1,7 @@
 # SocketIOGame.gd
 extends Node
 
-@onready var client: SocketIO = $SocketIO
+@onready var client: SocketIO = GameState.socket
 var is_ready: bool = false
 
 signal get_game_data_received(data)
@@ -21,21 +21,22 @@ func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
 		is_ready = true
-		var lobby_name = GameState.lobby_name
-		client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
+		_request_game_data()
+		#var lobby_name = GameState.lobby_name
+		#client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
 		return
 	client.connect_socket({ "token": token })
 
 func _on_connected(_ns: String) -> void:
 	print("[SocketIOGame] Socket connected")
 	is_ready = true
-	# Rejoin the lobby room first, then ask for game data
-	var lobby_name = GameState.lobby_name
-	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
+	_request_game_data()
+	emit_signal("socket_ready")
+	#client.emit("lobby-management:join-lobby")
 
 func _request_game_data() -> void:
 	print("[SocketIOGame] Requesting game data NOW")
-	client.emit("game-management:get-game-data", {})
+	client.emit("game-management:get-game-data")
 
 func emit_end_turn() -> void:
 	client.emit("game-management:end-turn", {})

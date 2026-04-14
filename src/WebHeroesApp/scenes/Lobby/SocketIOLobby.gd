@@ -1,6 +1,6 @@
 extends Node
 
-@onready var client: SocketIO = $SocketIO
+@onready var client: SocketIO = GameState.socket
 var is_ready: bool = false
 var pending_lobby_name: String = ""
 
