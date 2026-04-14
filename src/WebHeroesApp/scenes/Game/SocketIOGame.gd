@@ -31,9 +31,6 @@ func _on_connected(_ns: String) -> void:
 	# Rejoin the lobby room first, then ask for game data
 	var lobby_name = GameState.lobby_name
 	client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
-	emit_signal("socket_ready")
-	#await get_tree().create_timer(0.5).timeout
-	#_request_game_data()
 
 func _request_game_data() -> void:
 	print("[SocketIOGame] Requesting game data NOW")
@@ -49,6 +46,7 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	match event:
 		"lobby-management:join-lobby":
+			emit_signal("socket_ready")
 			_request_game_data()  # Request game data after joining the lobby
 		"game-management:get-game-data":
 			emit_signal("get_game_data_received", data)
