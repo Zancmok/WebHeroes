@@ -44,6 +44,10 @@ func emit_end_turn() -> void:
 func emit_build(recipe_id: String, location: Array) -> void:
 	client.emit("game-management:build", { "recipe_id": recipe_id, "location": location })
 
+func _extit_tree() -> void:
+	client.event_received.disconnect(_on_event_received)
+	client.socket_connected.disconnect(_on_connected)
+
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	print("[SocketIOGame] RAW event: '", event, "'")
