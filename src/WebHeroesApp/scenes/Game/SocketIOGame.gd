@@ -37,7 +37,7 @@ func _on_connected(_ns: String) -> void:
 
 func _request_game_data() -> void:
 	print("[SocketIOGame] Requesting game data NOW")
-	emit_signal("game-management:get-game-data")
+	client.emit("game-management:get-game-data", {})
 
 func emit_end_turn() -> void:
 	client.emit("game-management:end-turn", {})
