@@ -44,7 +44,7 @@ func emit_end_turn() -> void:
 func emit_build(recipe_id: String, location: Array) -> void:
 	client.emit("game-management:build", { "recipe_id": recipe_id, "location": location })
 
-func _extit_tree() -> void:
+func _exit_tree() -> void:
 	client.event_received.disconnect(_on_event_received)
 	client.socket_connected.disconnect(_on_connected)
 

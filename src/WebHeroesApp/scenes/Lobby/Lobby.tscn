@@ -79,9 +79,4 @@ size_flags_horizontal = 3
 [node name="SocketIOLobby" type="Node" parent="."]
 script = ExtResource("4_ry2qp")
 
-[node name="SocketIO" type="Node" parent="SocketIOLobby"]
-script = ExtResource("4_oev3y")
-base_url = "https://webheroes.duckdns.org:9027"
-metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
-
 [node name="CallZancmok" type="HTTPRequest" parent="."]

@@ -13,11 +13,6 @@ script = ExtResource("1_2k76m")
 [node name="SocketIOGame" type="Node" parent="."]
 script = ExtResource("2_1asa3")
 
-[node name="SocketIO" type="Node" parent="SocketIOGame"]
-script = ExtResource("2_tt4u6")
-base_url = "https://webheroes.duckdns.org:9027"
-metadata/_custom_type_script = "uid://cuxf4hokgo2tf"
-
 [node name="DebugLabel" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 23.0
