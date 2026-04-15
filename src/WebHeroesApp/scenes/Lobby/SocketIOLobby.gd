@@ -25,10 +25,12 @@ func connect_to_server(token: String) -> void:
 	if client.state == client.State.CONNECTED:
 		print("Already connected, refreshing directly")
 		is_ready = true
-		emit_signal("socket_ready")
-		#refresh()
+		call_deferred("emit_socket_ready")
 		return
 	client.connect_socket({ "token": token })
+
+func emit_socket_ready() -> void:
+	emit_signal("socket_ready")
 
 func _on_connected(ns: String) -> void:
 	print("Socket connected!", ns)

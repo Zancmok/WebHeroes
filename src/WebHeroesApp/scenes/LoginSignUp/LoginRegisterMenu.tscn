@@ -147,7 +147,3 @@ text = "Submit
 "
 
 [node name="CallZancock" type="HTTPRequest" parent="."]
-
-[node name="SocketIO" type="Node" parent="."]
-script = ExtResource("5_yhkbl")
-metadata/_custom_type_script = "uid://cuxf4hokgo2tf"

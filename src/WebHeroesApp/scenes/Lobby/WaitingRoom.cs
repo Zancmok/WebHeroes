@@ -82,6 +82,9 @@ public partial class WaitingRoom : Control
 
 	private void OnSocketReady()
 	{
+		var gameState = GetNode<Node>("/root/GameState");
+		string lobbyName = gameState.Get("lobby_name").AsString();
+		socketIOLobby.Call("join_lobby", lobbyName);
 		socketIOLobby.Call("get_lobby");
 	}
 	
