@@ -9,6 +9,7 @@ public partial class WaitingRoom : Control
 	private VBoxContainer playerList;
 	private Button startButton;
 	private Button leaveButton;
+	private string _lobbyName;
  
 	public override void _Ready()
 	{
@@ -30,12 +31,13 @@ public partial class WaitingRoom : Control
 		socketIOLobby.Connect("get_lobby_received", new Callable(this, nameof(OnGetLobby)));
 		socketIOLobby.Connect("game_started", new Callable(this, nameof(OnGameStarted)));
 		socketIOLobby.Connect("lobby_closed", new Callable(this, nameof(OnLobbyClosed)));
+		socketIOLobby.Connect("join_lobby_confirmed", new Callable(this, nameof(OnJoinLobbyConfirmed)));
  
 		var gameState 		= GetNode<Node>("/root/GameState");
 		string token 		= gameState.Get("token").AsString();
-		string savedName	= gameState.Get("lobby_name").AsString();
+		_lobbyName			= gameState.Get("lobby_name").AsString();
  
-		lobbyNameLabel.Text = savedName;
+		lobbyNameLabel.Text = _lobbyName;
 
 		socketIOLobby.Connect("socket_ready", new Callable(this, nameof(OnSocketReady)));
 		socketIOLobby.Call("connect_to_server", token);
@@ -45,22 +47,41 @@ public partial class WaitingRoom : Control
 	{
 		return;
 	}
+
+	private void OnJoinLobbyConfirmed()
+	{
+		GD.Print("[WaitingRoom] Join confirmed, requesting lobby data");
+		socketIOLobby.Call("get_lobby");
+	}
  
 	private void OnGetLobby(Variant data)
 	{
-		// Unwrap array wrapper
+		GD.Print("[WaitingRoom] OnGetLobby fired, raw: ", data);
+
 		var array = data.AsGodotArray();
-		if (array == null || array.Count == 0) return;
+		if (array == null || array.Count == 0)
+		{
+			GD.Print("[WaitingRoom] OnGetLobby: array empty");
+			return;
+		}
 		
 		var dict = array[0].AsGodotDictionary();
-		if (dict == null) return;
+		if (dict == null)
+		{
+			GD.Print("[WaitingRoom] OnGetLobby: dict null");
+			return;
+		}
 
 		if (dict.TryGetValue("owner", out var ownerVar))
 		{
 			var owner = ownerVar.AsGodotDictionary();
-			GD.Print(owner.ToString());
 			lobbyOwnerLabel.Text = $"Owner: {owner["member_name"].AsString()}";
 			startButton.Visible = true;
+			GD.Print("[WaitingRoom] Start button shown for owner: ", owner["member_name"].AsString());
+		}
+		else
+		{
+			GD.Print("[WaitingRoom] OnGetLobby: no owner key, keys present: ", dict.Keys);
 		}
 
 		if (dict.TryGetValue("members", out var membersVar))
@@ -82,10 +103,8 @@ public partial class WaitingRoom : Control
 
 	private void OnSocketReady()
 	{
-		var gameState = GetNode<Node>("/root/GameState");
-		string lobbyName = gameState.Get("lobby_name").AsString();
-		socketIOLobby.Call("join_lobby", lobbyName);
-		socketIOLobby.Call("get_lobby");
+		GD.Print("[WaitingRoom] Socket ready, joining: ", _lobbyName);
+		socketIOLobby.Call("join_lobby", _lobbyName);
 	}
 	
 	private async void OnGameStarted()
@@ -102,7 +121,6 @@ public partial class WaitingRoom : Control
  
 	public void OnLeavePressed()
 	{
-		// socketIOLobby.Call("disconnect_from_server");
 		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
 	}
  
