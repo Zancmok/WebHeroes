@@ -14,7 +14,8 @@ public partial class WaitingRoom : Control
  
 	public override void _Ready()
 	{
-		socketIOLobby = GetNode<Node>("SocketIOLobby");
+		var gameState 	= GetNode<Node>("/root/GameState");
+		socketIOLobby 	= GetNode<Node>("SocketIOLobby");
  
 		lobbyNameLabel 	= GetNode<Label>("VBoxContainer/LobbyName");
 		lobbyOwnerLabel = GetNode<Label>("VBoxContainer/Owner");
@@ -22,7 +23,14 @@ public partial class WaitingRoom : Control
 		startButton 	= GetNode<Button>("VBoxContainer/StartButton");
 		leaveButton 	= GetNode<Button>("VBoxContainer/LeaveButton");
  
-		startButton.Visible = false;
+		if (gameState.Get("is_lobby_owner").AsBool() == true)
+		{
+			startButton.Visible = true;
+		}
+		else
+		{
+			startButton.Visible = false;
+		}
 		leaveButton.Visible = true;
 
 		startButton.Pressed += () => OnStartPressed();
@@ -34,7 +42,7 @@ public partial class WaitingRoom : Control
 		socketIOLobby.Connect("lobby_closed", new Callable(this, nameof(OnLobbyClosed)));
 		socketIOLobby.Connect("join_lobby_confirmed", new Callable(this, nameof(OnJoinLobbyConfirmed)));
  
-		var gameState 		= GetNode<Node>("/root/GameState");
+		
 		string token 		= gameState.Get("token").AsString();
 		_lobbyName			= gameState.Get("lobby_name").AsString();
  
