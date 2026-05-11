@@ -104,6 +104,7 @@ public partial class WaitingRoom : Control
 	{
 		GD.Print("[WaitingRoom] Socket ready, joining: ", _lobbyName);
 		socketIOLobby.Call("join_lobby", _lobbyName);
+		socketIOLobby.Call("get_lobby");
 	}
 	
 	private async void OnGameStarted()
