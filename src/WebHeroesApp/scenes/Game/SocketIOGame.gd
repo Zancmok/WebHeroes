@@ -52,9 +52,6 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	print("[SocketIOGame] RAW event: '", event, "'")
 	match event:
-		"lobby-management:join-lobby":
-			emit_signal("socket_ready")
-			_request_game_data()  # Request game data after joining the lobby
 		"game-management:get-game-data":
 			emit_signal("get_game_data_received", data)
 		"game-management:end-turn":

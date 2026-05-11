@@ -88,7 +88,6 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 			GD.Print(jsonString);
  
 			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
-			httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 		}
 		else
 		{

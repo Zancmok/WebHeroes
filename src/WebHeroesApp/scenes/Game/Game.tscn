@@ -16,7 +16,7 @@ script = ExtResource("2_1asa3")
 [node name="DebugLabel" type="Label" parent="."]
 offset_right = 40.0
 offset_bottom = 23.0
-text = "YESSSSSSSSSSSSSSSSS"
+text = ""
 
 [node name="HexBoard" type="Node2D" parent="."]
 script = ExtResource("4_1asa3")
