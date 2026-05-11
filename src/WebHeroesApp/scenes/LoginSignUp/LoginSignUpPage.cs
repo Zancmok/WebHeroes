@@ -12,6 +12,8 @@ public partial class LoginSignUpPage : Control
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;
+	private string _pendingLoginJson = null;
+	private string _pendingLoginUsername = null;
  
 	public override void _Ready()
 	{
@@ -56,9 +58,14 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 	}
 	else if (doc.TryGetProperty("object_type", out var typeProp)
 			 && typeProp.GetString() == "success-response"
-			 && responseCode == 201)
+			 && responseCode == 201
+			 && _pendingLoginJson != null)
 	{
-		Login();
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("username", _pendingLoginUsername ?? "");
+		httpQueue.Enqueue($"{realHttps}/user-management/login", _pendingLoginJson);
+		_pendingLoginJson = null;
+		_pendingLoginUsername = null;
 	}
 }
  
@@ -86,8 +93,10 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
  
 			string jsonString = Json.Stringify(jsonData);
 			GD.Print(jsonString);
- 
-			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
+
+			_pendingLoginJson = jsonString;
+			_pendingLoginUsername = usernameData;
+			httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
 		}
 		else
 		{

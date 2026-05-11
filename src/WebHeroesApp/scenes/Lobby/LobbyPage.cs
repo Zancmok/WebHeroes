@@ -82,6 +82,8 @@ public partial class LobbyPage : Control
  
 		if (dict.TryGetValue("object_type", out var type) && type.AsString() == "success-response")
 		{
+			var gameState = GetNode<Node>("/root/GameState");
+			gameState.Set("is_lobby_owner", true);
 			GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 		}
 	}
@@ -176,7 +178,7 @@ public partial class LobbyPage : Control
 			{
 				var gameState = GetNode<Node>("/root/GameState");
 				gameState.Set("lobby_name", capturedName);
-				socketIOLobby.Call("join_lobby", capturedName);
+				gameState.Set("is_lobby_owner", false);
 				GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 			};
  

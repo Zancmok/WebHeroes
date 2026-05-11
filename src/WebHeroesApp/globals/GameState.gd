@@ -3,6 +3,7 @@ extends Node
 var token: String = ""
 var username: String = ""
 var lobby_name: String = ""
+var is_lobby_owner: bool = false
 var socket: SocketIO = null
 
 func _notification(what: int) -> void:

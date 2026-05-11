@@ -105,8 +105,18 @@ public partial class WaitingRoom : Control
 
 	private void OnSocketReady()
 	{
-		GD.Print("[WaitingRoom] Socket ready, joining: ", _lobbyName);
-		socketIOLobby.Call("join_lobby", _lobbyName);
+		var gameState = GetNode<Node>("/root/GameState");
+		bool isOwner = gameState.Get("is_lobby_owner").AsBool();
+		if(isOwner)
+		{
+			GD.Print("[WaitingRoom] Socket ready, fetching Lobby as owner");
+			socketIOLobby.Call("get_lobby");
+		}
+		else
+		{
+			GD.Print("[WaitingRoom] Socket ready, joining: ", _lobbyName);
+			socketIOLobby.Call("join_lobby", _lobbyName);
+		}
 	}
 	
 	private async void OnGameStarted()
