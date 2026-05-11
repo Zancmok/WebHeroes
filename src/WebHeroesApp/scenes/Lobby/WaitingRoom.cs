@@ -10,6 +10,7 @@ public partial class WaitingRoom : Control
 	private Button startButton;
 	private Button leaveButton;
 	private string _lobbyName;
+	private Timer _pollTimer;
  
 	public override void _Ready()
 	{
@@ -57,6 +58,7 @@ public partial class WaitingRoom : Control
 	private void OnGetLobby(Variant data)
 	{
 		GD.Print("[WaitingRoom] OnGetLobby fired, raw: ", data);
+		_pollTimer?.Stop();
 
 		var array = data.AsGodotArray();
 		if (array == null || array.Count == 0)
@@ -105,6 +107,13 @@ public partial class WaitingRoom : Control
 		GD.Print("[WaitingRoom] Socket ready, joining: ", _lobbyName);
 		socketIOLobby.Call("join_lobby", _lobbyName);
 		socketIOLobby.Call("get_lobby");
+
+		_pollTimer = new Timer();
+		_pollTimer.WaitTime = 2.0;
+		_pollTimer.Autostart = false;
+		_pollTimer.Timeout += () => socketIOLobby.Call("get_lobby");
+		AddChild(_pollTimer);
+		_pollTimer.Start();
 	}
 	
 	private async void OnGameStarted()
