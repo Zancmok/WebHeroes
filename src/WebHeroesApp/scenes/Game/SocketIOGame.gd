@@ -20,19 +20,20 @@ func _ready() -> void:
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
+		print("[SocketIOGame] Already connected, requesting game data")
 		is_ready = true
+		client.emit("lobby-management:join-lobby", { "lobby_name": GameState.lobby_name })
 		_request_game_data()
-		#var lobby_name = GameState.lobby_name
-		#client.emit("lobby-management:join-lobby", { "lobby_name": lobby_name })
+		emit_signal("socket_ready")
 		return
 	client.connect_socket({ "token": token })
 
 func _on_connected(_ns: String) -> void:
 	print("[SocketIOGame] Socket connected")
 	is_ready = true
+	client.emit("lobby-management:join-lobby", { "lobby_name": GameState.lobby_name })
 	_request_game_data()
 	emit_signal("socket_ready")
-	#client.emit("lobby-management:join-lobby")
 
 func _request_game_data() -> void:
 	print("[SocketIOGame] Requesting game data NOW")
