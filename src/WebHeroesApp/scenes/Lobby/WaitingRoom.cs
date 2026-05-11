@@ -132,6 +132,7 @@ public partial class WaitingRoom : Control
  
 	public void OnStartPressed()
 	{
+		GD.Print("[WaitingRoom] Start pressed, emitting start_game");
 		startButton.Disabled = true;
 		socketIOLobby.Call("start_game");
 	}

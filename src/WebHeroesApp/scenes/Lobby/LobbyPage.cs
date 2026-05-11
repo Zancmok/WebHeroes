@@ -179,6 +179,7 @@ public partial class LobbyPage : Control
 				var gameState = GetNode<Node>("/root/GameState");
 				gameState.Set("lobby_name", capturedName);
 				gameState.Set("is_lobby_owner", false);
+				socketIOLobby.Call("join_lobby", capturedName);
 				GetTree().ChangeSceneToFile("res://scenes/Lobby/waiting_room.tscn");
 			};
  

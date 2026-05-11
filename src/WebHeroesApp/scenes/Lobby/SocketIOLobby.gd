@@ -24,9 +24,11 @@ func _on_namespace_connected(ns: String) -> void:
 func connect_to_server(token: String) -> void:
 	print("connect_to_server called, state=", client.state)
 	if client.state == client.State.CONNECTED:
-		print("Already connected, refreshing directly")
-		is_ready = true
-		call_deferred("emit_socket_ready")
+		print("Already connected, forcing reconnect to sync room membership")
+		is_ready = false
+		client.disconnect_socket()
+		await get_tree().create_timer(0.2).timeout
+		client.connect_socket({ "token": token })
 		return
 	client.connect_socket({ "token": token })
 
