@@ -20,16 +20,20 @@ func _ready() -> void:
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
-		print("[SocketIOGame] Already connected, requesting game data")
-		is_ready = true
-		client.emit("lobby-management:join-lobby", { "lobby_name": GameState.lobby_name })
-		_request_game_data()
-		emit_signal("socket_ready")
+		print("[SocketIOGame] Already connected, forcing reconnect to rebind session")
+		is_ready = false
+		client.disconnect_socket()
+		await get_tree().create_timer(0.2).timeout
+		client.connect_socket({ "token": token })
 		return
 	client.connect_socket({ "token": token })
 
 func _on_connected(_ns: String) -> void:
 	print("[SocketIOGame] Socket connected")
+	# Re-establish event_received in case disconnect_socket() wiped it
+	if not client.event_received.is_connected(_on_event_received):
+		print("[SocketIOGame] Re-connecting event_received after reconnect")
+		client.event_received.connect(_on_event_received)
 	is_ready = true
 	client.emit("lobby-management:join-lobby", { "lobby_name": GameState.lobby_name })
 	_request_game_data()
@@ -53,9 +57,9 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event: ", event, " data: ", data)
 	print("[SocketIOGame] RAW event: '", event, "'")
 	match event:
-		"game-management:get-game-data":
+		"get-game-data":
 			emit_signal("get_game_data_received", data)
-		"game-management:end-turn":
+		"end-turn":
 			emit_signal("end_turn_received", data)
-		"game-management:build":
+		"build":
 			emit_signal("build_received", data)
