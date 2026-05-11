@@ -96,7 +96,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 
 			_pendingLoginJson = jsonString;
 			_pendingLoginUsername = usernameData;
-			httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
+			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
 		}
 		else
 		{

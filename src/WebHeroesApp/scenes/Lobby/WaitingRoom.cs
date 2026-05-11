@@ -75,11 +75,8 @@ public partial class WaitingRoom : Control
 		if (dict.TryGetValue("owner", out var ownerVar))
 		{
 			var owner = ownerVar.AsGodotDictionary();
-			string ownerName = owner["owner_name"].AsString();
-			lobbyOwnerLabel.Text = $"Owner: {ownerName}";
-			var gameState = GetNode<Node>("/root/GameState");
-			startButton.Visible = ownerName == gameState.Get("username").AsString();
-			GD.Print("[WaitingRoom] Owner: ", ownerName, ", me: ",gameState.Get("username").AsString());
+			lobbyOwnerLabel.Text = $"Owner: {owner["member_name"].AsString()}";
+			startButton.Visible = true;
 		}
 		else
 		{
