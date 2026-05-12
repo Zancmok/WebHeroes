@@ -20,10 +20,11 @@ func _ready() -> void:
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
-		print("[SocketIOGame] Already connected - requesting data")
+		print("[SocketIOGame] Connected - forcing fresh reconnect for game session")
 		is_ready = true
-		_request_game_data()
-		emit_signal("socket_ready")
+		client.disconnect_socket()
+		await get_tree().create_timer(0.2).timeout
+		client.connect_socket({ "token": token })
 		return
 	print("[SocketIOGame] Not connected — connecting fresh")
 	client.connect_socket({ "token": token })
@@ -45,8 +46,10 @@ func emit_build(recipe_id: String, location: Array) -> void:
 	client.emit("game-management:build", { "recipe_id": recipe_id, "location": location })
 
 func _exit_tree() -> void:
-	client.event_received.disconnect(_on_event_received)
-	client.socket_connected.disconnect(_on_connected)
+	if client.event_received.is_connected(_on_event_received):
+		client.event_received.disconnect(_on_event_received)
+	if client.socket_connected.is_connected(_on_connected):
+		client.socket_connected.disconnect(_on_connected)
 
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 	print("[SocketIOGame] Event received: ", event, " data: ", data)

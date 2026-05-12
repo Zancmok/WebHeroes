@@ -68,8 +68,8 @@ func disconnect_from_server() -> void:
 	is_ready = false
 
 func _exit_tree() -> void:
-	client.event_received.disconnect(_on_event_received)
-	client.socket_connected.disconnect(_on_connected)
+	if client.socket_connected.is_connected(_on_connected):
+		client.socket_connected.disconnect(_on_connected)
 	if client.namespace_connected.is_connected(_on_namespace_connected):
 		client.namespace_connected.disconnect(_on_namespace_connected)
 
