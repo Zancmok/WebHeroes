@@ -12,7 +12,7 @@ signal socket_ready()
 func _ready() -> void:
 	print("[SocketIOGame] _ready")
 	client.event_received.connect(_on_event_received)
-	client.socket_connected.connect(_on_connected)  # fixed
+	client.socket_connected.connect(_on_connected)
 
 	print("[SocketIOGame] client node: ", client)
 	print("[SocketIOGame] event_received connected: ", client.event_received.get_connections())
@@ -20,27 +20,22 @@ func _ready() -> void:
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
 	if client.state == client.State.CONNECTED:
-		print("[SocketIOGame] Already connected, forcing reconnect to rebind session")
-		is_ready = false
-		client.disconnect_socket()
-		await get_tree().create_timer(0.2).timeout
-		client.connect_socket({ "token": token })
+		print("[SocketIOGame] Already connected - requesting data")
+		is_ready = true
+		_request_game_data()
+		emit_signal("socket_ready")
 		return
+	print("[SocketIOGame] Not connected — connecting fresh")
 	client.connect_socket({ "token": token })
 
 func _on_connected(_ns: String) -> void:
-	print("[SocketIOGame] Socket connected")
-	# Re-establish event_received in case disconnect_socket() wiped it
-	if not client.event_received.is_connected(_on_event_received):
-		print("[SocketIOGame] Re-connecting event_received after reconnect")
-		client.event_received.connect(_on_event_received)
+	print("[SocketIOGame] Socket connected", _ns)
 	is_ready = true
-	client.emit("lobby-management:join-lobby", { "lobby_name": GameState.lobby_name })
 	_request_game_data()
 	emit_signal("socket_ready")
 
 func _request_game_data() -> void:
-	print("[SocketIOGame] Requesting game data NOW")
+	print("[SocketIOGame] Requesting game data")
 	client.emit("game-management:get-game-data")
 
 func emit_end_turn() -> void:
@@ -54,12 +49,12 @@ func _exit_tree() -> void:
 	client.socket_connected.disconnect(_on_connected)
 
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
-	print("[SocketIOGame] Event: ", event, " data: ", data)
-	print("[SocketIOGame] RAW event: '", event, "'")
+	print("[SocketIOGame] Event received: ", event, " data: ", data)
 	match event:
-		"get-game-data":
+		"game-management:get-game-data":
+			print("[SocketIOGame] game data received")
 			emit_signal("get_game_data_received", data)
-		"end-turn":
+		"game-management:end-turn":
 			emit_signal("end_turn_received", data)
-		"build":
+		"game-management:build":
 			emit_signal("build_received", data)
