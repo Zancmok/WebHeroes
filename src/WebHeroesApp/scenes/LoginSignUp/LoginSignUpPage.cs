@@ -9,6 +9,7 @@ public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
 	private string realHttps = "https://webheroes.duckdns.org:9027";
+	private string localhost = "http://webheroes.duckdns.org:9026";
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;

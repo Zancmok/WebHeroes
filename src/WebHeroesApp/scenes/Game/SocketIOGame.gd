@@ -13,9 +13,13 @@ func _ready() -> void:
 	print("[SocketIOGame] _ready")
 	client.event_received.connect(_on_event_received)
 	client.socket_connected.connect(_on_connected)
+	client.namespace_connected.connect(_on_namespace_connected)
 
 	print("[SocketIOGame] client node: ", client)
 	print("[SocketIOGame] event_received connected: ", client.event_received.get_connections())
+
+func _on_namespace_connected(ns: String) -> void:
+	print("[SocketIOGame] Namespace connected: ", ns)
 
 func connect_to_server(token: String) -> void:
 	print("[SocketIOGame] connect_to_server, state=", client.state)
