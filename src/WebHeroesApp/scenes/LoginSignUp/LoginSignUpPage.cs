@@ -4,12 +4,13 @@ using System.Text;
 using SilenkLibrary;
 using System.Text.Json;
 using System.Collections.Generic;
+using System.Diagnostics;
  
 public partial class LoginSignUpPage : Control
 {
 	private UtilityClass utilityClass;
 	private string realHttps = "https://webheroes.duckdns.org:9027";
-	private string localhost = "http://webheroes.duckdns.org:9026";
+	private string  http = "http://webheroes.duckdns.org:9027";
 	private HttpRequest httpRequest;
 	private HttpQueue httpQueue;
 	public string currentUserToken;
@@ -21,6 +22,9 @@ public partial class LoginSignUpPage : Control
 		httpRequest = GetNode<HttpRequest>("CallZancock");
 		httpRequest.RequestCompleted += OnRequestCompleted;
 		httpQueue = new HttpQueue(httpRequest);
+		Debugger.Break();
+		GD.Print("smeh");
+		
  
 		Button signUpSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/Submit");
 		signUpSubmit.Pressed += () =>
@@ -64,7 +68,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 	{
 		var gameState = GetNode<Node>("/root/GameState");
 		gameState.Set("username", _pendingLoginUsername ?? "");
-		httpQueue.Enqueue($"{realHttps}/user-management/login", _pendingLoginJson);
+		httpQueue.Enqueue($"{http}/user-management/login", _pendingLoginJson);
 		_pendingLoginJson = null;
 		_pendingLoginUsername = null;
 	}
@@ -97,7 +101,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 
 			_pendingLoginJson = jsonString;
 			_pendingLoginUsername = usernameData;
-			httpQueue.Enqueue($"{realHttps}/user-management/signup", jsonString);
+			httpQueue.Enqueue($"{http}/user-management/signup", jsonString);
 		}
 		else
 		{
@@ -125,7 +129,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 		string jsonString = Json.Stringify(jsonData);
 		GD.Print(jsonString);
  
-		httpQueue.Enqueue($"{realHttps}/user-management/login", jsonString);
+		httpQueue.Enqueue($"{http}/user-management/login", jsonString);
 	}
  
 	public override void _UnhandledInput(InputEvent @event)
@@ -134,7 +138,7 @@ private void OnRequestCompleted(long result, long responseCode, string[] headers
 		{
 			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
 			{
-				GD.Print($"{realHttps}");
+				GD.Print($"{http}");
 				GD.Print(currentUserToken);
 			}
 		}
