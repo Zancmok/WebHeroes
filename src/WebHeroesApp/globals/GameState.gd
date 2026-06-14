@@ -22,7 +22,7 @@ func _logout_and_quit() -> void:
 	var headers = ["Content-Type: application/json"]
 	var body = JSON.stringify({ "token": token })
 	var err = http.request(
-		"https://webheroes.duckdns.org:9027/user-management/logout",
+		"http://webheroes.duckdns.org:9027/user-management/logout",
 		headers,
 		HTTPClient.METHOD_POST,
 		body
@@ -33,5 +33,5 @@ func _logout_and_quit() -> void:
 
 func _ready() -> void:
 	socket = SocketIO.new()
-	socket.base_url = "https://webheroes.duckdns.org:9027"
+	socket.base_url = "http://webheroes.duckdns.org:9027"
 	add_child(socket)

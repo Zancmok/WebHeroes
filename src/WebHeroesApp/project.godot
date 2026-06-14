@@ -33,6 +33,11 @@ project/assembly_name="WebHeroesApp"
 
 enabled=PackedStringArray("res://addons/godot-socketio/plugin.cfg")
 
+[network]
+
+limits/packet_peer_stream/max_buffer_po2=64
+limits/webrtc/max_channel_in_buffer_kb=71
+
 [rendering]
 
 textures/canvas_textures/default_texture_filter=0

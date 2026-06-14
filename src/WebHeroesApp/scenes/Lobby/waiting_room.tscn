@@ -1,8 +1,7 @@
-[gd_scene load_steps=4 format=3 uid="uid://chmt4e0rc2iwr"]
+[gd_scene load_steps=3 format=3 uid="uid://chmt4e0rc2iwr"]
 
 [ext_resource type="Script" uid="uid://dd8qa1osblyyh" path="res://scenes/Lobby/WaitingRoom.cs" id="1_0q7jc"]
 [ext_resource type="Script" uid="uid://d00o3j3ku7fkk" path="res://scenes/Lobby/SocketIOLobby.gd" id="2_7ybcl"]
-[ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="3_kaaxg"]
 
 [node name="WaitingRoom" type="Control"]
 layout_mode = 3
