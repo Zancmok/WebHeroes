@@ -20,18 +20,18 @@ Add the Socket.IO node to your tree and fill out the parameters in the Inspector
 @onready var client: SocketIO = $SocketIO
 
 func _ready() -> void:
-    client.socket_connected.connect(_on_socket_connected)
-    client.event_received.connect(_on_event_received)
+	client.socket_connected.connect(_on_socket_connected)
+	client.event_received.connect(_on_event_received)
 
 func _on_connect_pressed() -> void:
-    client.connect_socket()
+	client.connect_socket()
 
 func _on_socket_connected() -> void:
-    client.emit("hello")
-    client.emit("some_event", { "value": 10 })
+	client.emit("hello")
+	client.emit("some_event", { "value": 10 })
 
 func _on_event_received(event: String, data: Variant, ns: String) -> void:
-    print("event %s with %s as data received" % [event, data])
+	print("event %s with %s as data received" % [event, data])
 ```
 
 ## Features

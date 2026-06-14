@@ -1,9 +1,17 @@
-webheroes.duckdns.org:9027 {
+#webheroes.duckdns.org:9027 {
+#    reverse_proxy web_heroes_server:5000
+#    encode gzip
+#    tls {
+#        dns duckdns {env.DUCKDNS_TOKEN}
+#    }
+#    log {
+#        output file /var/log/caddy/caddy.log
+#        format console
+#    }
+#}
+
+http://webheroes.duckdns.org:9027 {
     reverse_proxy web_heroes_server:5000
-    encode gzip
-    tls {
-        dns duckdns {env.DUCKDNS_TOKEN}
-    }
     log {
         output file /var/log/caddy/caddy.log
         format console
@@ -12,7 +20,6 @@ webheroes.duckdns.org:9027 {
 
 localhost:80 {
     reverse_proxy web_heroes_server:5000
-    encode gzip
     log {
         output file /var/log/caddy/caddy.log
         format console

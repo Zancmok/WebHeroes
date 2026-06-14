@@ -29,7 +29,7 @@ from ZancmokLib.EHTTPCode import EHTTPCode
 from ZancmokLib.FlaskUtil import FlaskUtil
 from ZancmokLib.StaticClass import StaticClass
 from ZancmokLib.SocketBlueprint import SocketBlueprint
-from WebHeroes.Responses import dictify
+from WebHeroes.Responses import dictify, SuccessResponse
 
 
 class GameManagement(StaticClass):

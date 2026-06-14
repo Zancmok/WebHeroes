@@ -41,10 +41,15 @@ class WebHeroes(StaticClass):
     app: Flask = Flask(
         __name__,
         template_folder=config.TEMPLATES_PATH,
-        static_folder=config.STATIC_PATH
+        static_folder=config.STATIC_PATH,
     )
 
-    socket_io: SocketIO = SocketIO(app)
+    socket_io: SocketIO = SocketIO(
+        app,
+        logger=True,
+        engineio_logger=True,
+        http_compression=False
+    )
 
     @staticmethod
     def run() -> None:
