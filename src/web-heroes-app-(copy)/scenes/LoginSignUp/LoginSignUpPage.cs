@@ -1,0 +1,146 @@
+using Godot;
+using System;
+using System.Text;
+using SilenkLibrary;
+using System.Text.Json;
+using System.Collections.Generic;
+using System.Diagnostics;
+ 
+public partial class LoginSignUpPage : Control
+{
+	private UtilityClass utilityClass;
+	private string realHttps = "https://webheroes.duckdns.org:9027";
+	private string  http = "http://webheroes.duckdns.org:9027";
+	private HttpRequest httpRequest;
+	private HttpQueue httpQueue;
+	public string currentUserToken;
+	private string _pendingLoginJson = null;
+	private string _pendingLoginUsername = null;
+ 
+	public override void _Ready()
+	{
+		httpRequest = GetNode<HttpRequest>("CallZancock");
+		httpRequest.RequestCompleted += OnRequestCompleted;
+		httpQueue = new HttpQueue(httpRequest);
+		Debugger.Break();
+		GD.Print("smeh");
+		
+ 
+		Button signUpSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/Submit");
+		signUpSubmit.Pressed += () =>
+		{
+			SignUp();
+		};
+ 
+		Button loginSubmit = GetNode<Button>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/Submit");
+		loginSubmit.Pressed += () =>
+		{
+			Login();
+		};
+	}
+ 
+private void OnRequestCompleted(long result, long responseCode, string[] headers, byte[] body)
+{
+	GD.Print("Response code: ", responseCode);
+	string json = Encoding.UTF8.GetString(body);
+	GD.Print("Response body: ", json);
+
+	httpQueue.OnCompleted();
+
+	if (string.IsNullOrEmpty(json)) return;
+
+	var doc = JsonDocument.Parse(json).RootElement;
+
+	if (doc.TryGetProperty("token", out var tokenProp))
+	{
+		currentUserToken = tokenProp.GetString();
+		GD.Print("Token saved: ", currentUserToken);
+
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("token", currentUserToken);
+
+		GetTree().ChangeSceneToFile("res://scenes/Lobby/Lobby.tscn");
+	}
+	else if (doc.TryGetProperty("object_type", out var typeProp)
+			 && typeProp.GetString() == "success-response"
+			 && responseCode == 201
+			 && _pendingLoginJson != null)
+	{
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("username", _pendingLoginUsername ?? "");
+		httpQueue.Enqueue($"{http}/user-management/login", _pendingLoginJson);
+		_pendingLoginJson = null;
+		_pendingLoginUsername = null;
+	}
+}
+ 
+	private void SignUp()
+	{
+		utilityClass = new UtilityClass();
+		LineEdit username = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/UsernameInput/UsernameLine");
+		LineEdit password = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/PasswordInput/PasswordLine");
+		LineEdit repeatPassword = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormSignUp/VBoxContainer/HBoxContainer/VBoxContainer/RepeatPassword/RepeatPasswordLine");
+ 
+		string usernameData = username.Text;
+		string passwordData = password.Text;
+		string repeatPasswordData = repeatPassword.Text;
+ 
+		if (passwordData == repeatPasswordData)
+		{
+			var gameState = GetNode<Node>("/root/GameState");
+			gameState.Set("username", usernameData);
+ 
+			var jsonData = new Godot.Collections.Dictionary
+			{
+				{"username", usernameData},
+				{"password", passwordData}
+			};
+ 
+			string jsonString = Json.Stringify(jsonData);
+			GD.Print(jsonString);
+
+			_pendingLoginJson = jsonString;
+			_pendingLoginUsername = usernameData;
+			httpQueue.Enqueue($"{http}/user-management/signup", jsonString);
+		}
+		else
+		{
+			AcceptDialog alert = utilityClass.CreateAcceptDialog(this, "Warning", "Your password does not match your repeated password!");
+		}
+	}
+ 
+	private void Login()
+	{
+		LineEdit username = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/UsernameInput/UsernameLine");
+		LineEdit password = GetNode<LineEdit>("CenterContainer_BasePlate/BoxContainer/VBoxContainer/FormLogin/VBoxContainer/PasswordInput/PasswordLine");
+ 
+		string usernameData = username.Text;
+		string passwordData = password.Text;
+ 
+		var gameState = GetNode<Node>("/root/GameState");
+		gameState.Set("username", usernameData);
+ 
+		var jsonData = new Godot.Collections.Dictionary
+		{
+			{"username", usernameData},
+			{"password", passwordData}
+		};
+ 
+		string jsonString = Json.Stringify(jsonData);
+		GD.Print(jsonString);
+ 
+		httpQueue.Enqueue($"{http}/user-management/login", jsonString);
+	}
+ 
+	public override void _UnhandledInput(InputEvent @event)
+	{
+		if (@event is InputEventKey eventKey)
+		{
+			if (eventKey.Pressed && eventKey.Keycode == Key.F3)
+			{
+				GD.Print($"{http}");
+				GD.Print(currentUserToken);
+			}
+		}
+	}
+}

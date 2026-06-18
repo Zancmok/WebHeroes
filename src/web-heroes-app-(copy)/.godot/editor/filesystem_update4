@@ -1,0 +1,9 @@
+res://scenes/LoginSignUp/TabsWork.cs
+res://scenes/LoginSignUp/SignUpVisuals.cs
+res://scenes/Lobby/WaitingRoom.cs
+res://scenes/Lobby/LobbyPage.cs
+res://scenes/LoginSignUp/LoginSignUpPage.cs
+res://scenes/LoginSignUp/LoginVisuals.cs
+res://scenes/Game/Game.cs
+res://scenes/LoginSignUp/UserManagement.cs
+res://scenes/Lobby/UserManagementLobby.cs

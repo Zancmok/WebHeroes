@@ -1,0 +1,47 @@
+; Engine configuration file.
+; It's best edited using the editor UI and not directly,
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
+
+config_version=5
+
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
+[application]
+
+config/name="WebHeroesApp (Copy)"
+run/main_scene="uid://cjeqi5byhfp8h"
+config/quit_on_go_back=false
+config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+config/icon="res://icon.svg"
+
+[autoload]
+
+GameState="*res://globals/GameState.gd"
+
+[display]
+
+window/size/viewport_width=1920
+window/size/viewport_height=1080
+
+[dotnet]
+
+project/assembly_name="WebHeroesApp"
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/godot-socketio/plugin.cfg")
+
+[network]
+
+limits/packet_peer_stream/max_buffer_po2=64
+limits/webrtc/max_channel_in_buffer_kb=71
+
+[rendering]
+
+textures/canvas_textures/default_texture_filter=0
