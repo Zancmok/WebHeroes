@@ -10,6 +10,7 @@ var recipes: Array = []
 var my_resources: Dictionary = {}
 var is_ready: bool = false
 var _requested_once := false
+var _joined_lobby := false
 
 signal socket_ready()
 signal get_game_data_received(data: Dictionary)
@@ -51,25 +52,28 @@ func _on_connected(_ns: String) -> void:
 	_join_lobby_then_request_game_data()
 
 func _join_lobby_then_request_game_data() -> void:
-	# Same as web game.js: re-join the remembered lobby, then ask for data.
+	# Same as web game.js: re-join the remembered lobby once, then ask for data.
+	# Re-joining on every refresh can duplicate room/server bookkeeping and makes
+	# long games noisier.
 	var lobby_name := str(GameState.lobby_name).strip_edges()
-	if lobby_name != "":
+	if not _joined_lobby and lobby_name != "":
 		emit_signal("socket_status", "Joining lobby %s…" % lobby_name)
 		client.emit("lobby-management:join-lobby", {"lobby_name": lobby_name})
+		_joined_lobby = true
 		await get_tree().create_timer(0.25).timeout
 	_request_game_data()
 
 func _request_game_data() -> void:
 	if _requested_once:
-		# Still allow explicit refreshes, but do not spam on duplicate connected events.
-		pass
+		return
 	_requested_once = true
 	emit_signal("socket_status", "Requesting game data…")
 	client.emit("game-management:get-game-data")
 
 func refresh_game_data() -> void:
+	# Lightweight sync used after build/end-turn safety timers. Do not re-join.
 	_requested_once = false
-	_join_lobby_then_request_game_data()
+	_request_game_data()
 
 func emit_end_turn() -> void:
 	# The Flask-SocketIO handler takes no payload. Sending {} can make the
