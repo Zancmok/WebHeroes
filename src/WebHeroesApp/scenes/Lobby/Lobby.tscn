@@ -1,10 +1,9 @@
-[gd_scene load_steps=4 format=3 uid="uid://1ajpqc57yl8q"]
+[gd_scene format=3 uid="uid://1ajpqc57yl8q"]
 
 [ext_resource type="Script" uid="uid://bcif6l4wfeiud" path="res://scenes/Lobby/LobbyPage.cs" id="1_15t2a"]
-[ext_resource type="Script" uid="uid://cuxf4hokgo2tf" path="res://addons/godot-socketio/socketio.gd" id="4_oev3y"]
 [ext_resource type="Script" uid="uid://d00o3j3ku7fkk" path="res://scenes/Lobby/SocketIOLobby.gd" id="4_ry2qp"]
 
-[node name="lobby" type="Control"]
+[node name="lobby" type="Control" unique_id=543875289]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
@@ -13,7 +12,7 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_15t2a")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="MarginContainer" type="MarginContainer" parent="." unique_id=168998365]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -25,58 +24,58 @@ theme_override_constants/margin_top = 10
 theme_override_constants/margin_right = 150
 theme_override_constants/margin_bottom = 10
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer" unique_id=2019235923]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 0
 
-[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1326699527]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ButtonCreateGame" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonCreateGame" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=490417100]
 layout_mode = 2
 text = "CREATE NEW LOBBY"
 
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1092750181]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer"]
+[node name="ButtonBack" type="Button" parent="MarginContainer/VBoxContainer/HBoxContainer" unique_id=1859293987]
 layout_mode = 2
 text = "BACK"
 
-[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="HBoxContainer2" type="HBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=152540666]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="Label" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=679249903]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 text = "HOST NAME"
 
-[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="Label2" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=835603309]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "JOIN"
 
-[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="Label3" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=2045727315]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_stretch_ratio = 3.0
 text = "GAME DESCRIPTION"
 
-[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2"]
+[node name="Label4" type="Label" parent="MarginContainer/VBoxContainer/HBoxContainer2" unique_id=2031381646]
 layout_mode = 2
 size_flags_horizontal = 3
 text = "PLAYERS"
 
-[node name="LobbyList" type="VBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="LobbyList" type="VBoxContainer" parent="MarginContainer/VBoxContainer" unique_id=1886297321]
 layout_mode = 2
 size_flags_horizontal = 3
 
-[node name="SocketIOLobby" type="Node" parent="."]
+[node name="SocketIOLobby" type="Node" parent="." unique_id=2000859326]
 script = ExtResource("4_ry2qp")
 
-[node name="CallZancmok" type="HTTPRequest" parent="."]
+[node name="CallZancmok" type="HTTPRequest" parent="." unique_id=785135418]
