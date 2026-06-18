@@ -24,6 +24,8 @@ signal toggle_outer(show_outer: bool)
 var _active_recipe_btn: Button = null
 var _show_numbers := true
 var _show_outer := true
+var _last_recipes: Array = []
+var _last_recipe_signatures: Dictionary = {}
 
 func _ready() -> void:
 	game_over_overlay.visible = false
@@ -77,40 +79,68 @@ func update_resources(resources: Dictionary) -> void:
 		resources_grid.add_child(amt_lbl)
 
 func update_recipes(p_recipes: Array, p_my_resources: Dictionary, is_my_turn: bool) -> void:
+	# Match the web client behavior, but be safer: never let an empty/partial
+	# socket update erase the recipe panel. The server sends recipes only in
+	# get-game-data; end-turn/build packets do not contain them.
+	if not p_recipes.is_empty():
+		_last_recipes = p_recipes.duplicate(true)
+	elif not _last_recipes.is_empty():
+		p_recipes = _last_recipes
+
 	_clear(recipes_list)
 	_active_recipe_btn = null
+
 	if p_recipes.is_empty():
 		var placeholder := Label.new()
 		placeholder.text = "No build recipes"
 		recipes_list.add_child(placeholder)
 		return
-	for recipe in p_recipes:
-		var result: Dictionary = recipe.get("result", {})
-		var obj_type := str(result.get("object_type", ""))
-		var result_type := ""
-		if "road" in obj_type:
-			result_type = "road"
-		elif "settlement" in obj_type:
-			result_type = "settlement"
-		else:
+
+	var rendered := 0
+	for recipe_var in p_recipes:
+		var recipe: Dictionary = recipe_var if recipe_var is Dictionary else {}
+		if recipe.is_empty():
 			continue
+
+		var result: Dictionary = {}
+		var result_value = recipe.get("result", {})
+		if result_value is Dictionary:
+			result = result_value
+		var result_type := _recipe_result_type(recipe)
+		if result_type == "":
+			# Unknown recipe result: keep it visible as disabled instead of silently
+			# making buttons disappear after state changes.
+			result_type = "settlement"
+
 		var can_afford := is_my_turn
-		for ing in recipe.get("ingredients", []):
-			if int(p_my_resources.get(ing.get("resource", ""), 0)) < int(ing.get("amount", 0)):
+		var ingredients: Array = []
+		var ingredients_value = recipe.get("ingredients", [])
+		if ingredients_value is Array:
+			ingredients = ingredients_value
+		for ing_var in ingredients:
+			var ing: Dictionary = ing_var if ing_var is Dictionary else {}
+			if int(p_my_resources.get(str(ing.get("resource", "")), 0)) < int(ing.get("amount", 0)):
 				can_afford = false
 				break
+
 		var cost_parts: Array = []
-		for ing in recipe.get("ingredients", []):
+		for ing_var in ingredients:
+			var ing: Dictionary = ing_var if ing_var is Dictionary else {}
 			cost_parts.append("%d %s" % [int(ing.get("amount", 0)), _pretty_resource(str(ing.get("resource", "")))])
+
 		var btn := Button.new()
 		var cost_text := _join_text_parts(cost_parts, ", ") if cost_parts.size() > 0 else "free"
-		btn.text = "%s\n%s" % [result.get("display_name", recipe.get("display_name", "Build")), cost_text]
+		btn.text = "%s\n%s" % [str(result.get("display_name", recipe.get("display_name", "Build"))), cost_text]
 		btn.disabled = not can_afford
 		btn.toggle_mode = true
 		btn.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		btn.tooltip_text = "Not enough resources or not your turn" if not can_afford else "Select placement mode"
+
 		var captured_name := str(recipe.get("name", ""))
 		var captured_type := result_type
 		btn.pressed.connect(func():
+			if btn.disabled:
+				return
 			if _active_recipe_btn == btn:
 				_active_recipe_btn = null
 				btn.button_pressed = false
@@ -123,6 +153,12 @@ func update_recipes(p_recipes: Array, p_my_resources: Dictionary, is_my_turn: bo
 			emit_signal("build_pressed", captured_name, captured_type)
 		)
 		recipes_list.add_child(btn)
+		rendered += 1
+
+	if rendered == 0:
+		var placeholder := Label.new()
+		placeholder.text = "No usable build recipes"
+		recipes_list.add_child(placeholder)
 
 func show_dice(number: int) -> void:
 	dice_value.text = str(number) if number > 0 else "—"
@@ -185,7 +221,6 @@ func show_game_over(data: Dictionary, p_players: Array, p_my_index: int) -> void
 	show_status("Game over.")
 
 func _on_end_turn_pressed() -> void:
-	print("[GameUI] End turn pressed")
 	emit_signal("end_turn_pressed")
 
 func _on_toggle_numbers_pressed() -> void:
@@ -209,6 +244,25 @@ func _join_text_parts(parts: Array, separator: String) -> String:
 			text += separator
 		text += str(parts[i])
 	return text
+
+
+func _recipe_result_type(recipe: Dictionary) -> String:
+	var result: Dictionary = {}
+	var result_value = recipe.get("result", {})
+	if result_value is Dictionary:
+		result = result_value
+	var check := "%s %s %s %s" % [
+		str(result.get("object_type", "")),
+		str(result.get("name", "")),
+		str(result.get("display_name", "")),
+		str(recipe.get("name", ""))
+	]
+	check = check.to_lower()
+	if "road" in check:
+		return "road"
+	if "settlement" in check or "village" in check or "city" in check or "town" in check:
+		return "settlement"
+	return ""
 
 func _pretty_resource(resource_id: String) -> String:
 	var parts := resource_id.split(":")

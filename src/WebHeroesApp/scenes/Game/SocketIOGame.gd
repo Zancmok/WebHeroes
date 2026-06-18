@@ -11,6 +11,8 @@ var my_resources: Dictionary = {}
 var is_ready: bool = false
 var _requested_once := false
 var _joined_lobby := false
+var _refresh_in_flight := false
+var _last_refresh_ms := 0
 
 signal socket_ready()
 signal get_game_data_received(data: Dictionary)
@@ -71,7 +73,13 @@ func _request_game_data() -> void:
 	client.emit("game-management:get-game-data")
 
 func refresh_game_data() -> void:
-	# Lightweight sync used after build/end-turn safety timers. Do not re-join.
+	# App-side resync only. Debounced so repeated build/end-turn actions cannot
+	# pile up many get-game-data packets and eventually destabilize the client.
+	var now := Time.get_ticks_msec()
+	if _refresh_in_flight or now - _last_refresh_ms < 750:
+		return
+	_refresh_in_flight = true
+	_last_refresh_ms = now
 	_requested_once = false
 	_request_game_data()
 
@@ -86,7 +94,9 @@ func emit_build(recipe_id: String, location: Array) -> void:
 	client.emit("game-management:build", {"recipe_id": recipe_id, "location": location})
 
 func _on_event_received(event: String, data: Variant, _ns: String) -> void:
-	print("[SocketIOGame] event=", event)
+	# Ignore malformed/empty events defensively, but keep the socket library untouched.
+	if event == "":
+		return
 	match event:
 		"lobby-management:join-lobby":
 			emit_signal("socket_status", "Lobby joined. Waiting for game state…")
@@ -100,62 +110,92 @@ func _on_event_received(event: String, data: Variant, _ns: String) -> void:
 			_handle_game_over(_unwrap(data))
 
 func _handle_get_game_data(data: Dictionary) -> void:
-	my_index = int(data.get("my_index", -1))
-	current_user_index = int(data.get("current_user_index", 0))
-	players = data.get("players", [])
+	# Do not let empty/malformed socket packets wipe the current UI state.
+	# Some Socket.IO packets can arrive without a usable payload; the web client
+	# effectively ignores those because its state object is only rebuilt from a
+	# complete get-game-data response.
+	if data.is_empty() or not data.has("players") or not data.has("prototypes"):
+		_refresh_in_flight = false
+		return
 
-	recipes = []
+	my_index = int(data.get("my_index", my_index))
+	current_user_index = int(data.get("current_user_index", current_user_index))
+	players = data.get("players", players)
+
+	var next_recipes: Array = []
 	for p in data.get("prototypes", []):
 		var pd: Dictionary = p if p is Dictionary else {}
 		if pd.get("object_type", "") == "recipe-s_prototype":
-			recipes.append(pd)
+			next_recipes.append(pd)
+	# Keep the last known recipes if a partial response does not contain them.
+	if not next_recipes.is_empty():
+		recipes = next_recipes
 
 	if my_index >= 0 and my_index < players.size():
-		my_resources = (players[my_index] as Dictionary).get("resources", {})
-	else:
-		my_resources = {}
+		var me: Dictionary = players[my_index] if players[my_index] is Dictionary else {}
+		if me.has("resources"):
+			my_resources = me.get("resources", my_resources)
 
+	_refresh_in_flight = false
+	_requested_once = true
 	emit_signal("socket_status", "")
 	emit_signal("get_game_data_received", data)
 
 func _handle_end_turn(data: Dictionary) -> void:
+	# Ignore empty end-turn packets. Never replace players/resources with empty data.
+	if data.is_empty() or (not data.has("next_user_index") and not data.has("players")):
+		return
+
 	var old_resources: Array = []
 	for p in players:
-		old_resources.append((p as Dictionary).get("resources", {}).duplicate())
+		var pd: Dictionary = p if p is Dictionary else {}
+		old_resources.append(pd.get("resources", {}).duplicate())
 
 	current_user_index = int(data.get("next_user_index", current_user_index))
-	players = data.get("players", players)
+	if data.has("players") and data.get("players") is Array and not data.get("players").is_empty():
+		players = data.get("players", players)
 
 	if my_index >= 0 and my_index < players.size():
-		my_resources = (players[my_index] as Dictionary).get("resources", {})
+		var me: Dictionary = players[my_index] if players[my_index] is Dictionary else {}
+		if me.has("resources"):
+			my_resources = me.get("resources", my_resources)
 
 	var gains: Dictionary = {}
 	for i in players.size():
-		var p: Dictionary = players[i]
+		var p: Dictionary = players[i] if players[i] is Dictionary else {}
 		var old: Dictionary = old_resources[i] if i < old_resources.size() else {}
 		var player_gains: Dictionary = {}
-		for res in p.get("resources", {}):
-			var delta := int(p["resources"][res]) - int(old.get(res, 0))
+		var res_dict: Dictionary = p.get("resources", {})
+		for res in res_dict:
+			var delta := int(res_dict[res]) - int(old.get(res, 0))
 			if delta > 0:
 				player_gains[res] = delta
 		if not player_gains.is_empty():
 			gains[str(i)] = player_gains
 
 	var out := data.duplicate(true)
+	out["players"] = players
+	out["next_user_index"] = current_user_index
 	out["gains"] = gains
 	out["my_resources"] = my_resources
 	emit_signal("end_turn_received", out)
 
 func _handle_build(data: Dictionary) -> void:
+	# Ignore malformed build packets instead of clearing/refreshing UI state.
+	if data.is_empty() or not data.has("player") or not data.has("location") or not data.has("building"):
+		return
 	var player_data: Dictionary = data.get("player", {})
-	var color_name := str(player_data.get("color_type", {}).get("name", ""))
-	for i in players.size():
-		var p: Dictionary = players[i]
-		if str(p.get("color_type", {}).get("name", "")) == color_name:
-			players[i] = player_data
-			if i == my_index:
-				my_resources = player_data.get("resources", my_resources)
-			break
+	var color_type: Dictionary = player_data.get("color_type", {}) if player_data.has("color_type") else {}
+	var color_name := str(color_type.get("name", ""))
+	if color_name != "":
+		for i in players.size():
+			var p: Dictionary = players[i] if players[i] is Dictionary else {}
+			var pct: Dictionary = p.get("color_type", {})
+			if str(pct.get("name", "")) == color_name:
+				players[i] = player_data
+				if i == my_index and player_data.has("resources"):
+					my_resources = player_data.get("resources", my_resources)
+				break
 	emit_signal("build_received", data)
 
 func _handle_game_over(data: Dictionary) -> void:

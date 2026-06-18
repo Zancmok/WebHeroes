@@ -13,6 +13,8 @@ public partial class Game : Node2D
 	private Array _recipes = new Array();
 	private Dictionary _myResources = new Dictionary();
 	private string _pendingRecipeName = "";
+	private string _lastSentRecipeName = "";
+	private bool _optimisticCostApplied = false;
 
 	public override void _Ready()
 	{
@@ -40,7 +42,6 @@ public partial class Game : Node2D
 
 	private void OnSocketReady()
 	{
-		GD.Print("[Game] Socket ready");
 		_debugLabel.Text = "Socket connected, waiting for game data...";
 	}
 
@@ -58,6 +59,11 @@ public partial class Game : Node2D
 		else
 			data = raw.AsGodotDictionary();
 
+		if (!data.TryGetValue("players", out var playersGuard) || playersGuard.AsGodotArray().Count == 0)
+		{
+			return;
+		}
+
 		var hexBoard = GetNode<Node2D>("HexBoard");
 		hexBoard.Call("load_game_data", data);
 
@@ -72,18 +78,24 @@ public partial class Game : Node2D
 
 		if (data.TryGetValue("prototypes", out var pr))
 		{
-			_recipes = new Array();
+			var nextRecipes = new Array();
 			foreach (var p in pr.AsGodotArray())
 			{
 				if (p.AsGodotDictionary().TryGetValue("object_type", out var ot) &&
 					ot.AsString() == "recipe-s_prototype")
-					_recipes.Add(p);
+					nextRecipes.Add(p);
 			}
+			// Keep the previous recipe list if a partial/invalid packet did not include recipes.
+			if (nextRecipes.Count > 0)
+				_recipes = nextRecipes;
 		}
 
 		if (_myIndex >= 0 && _myIndex < _players.Count)
-			_myResources = _players[_myIndex].AsGodotDictionary()
-				.TryGetValue("resources", out var res) ? res.AsGodotDictionary() : new Dictionary();
+		{
+			var me = _players[_myIndex].AsGodotDictionary();
+			if (me.TryGetValue("resources", out var res))
+				_myResources = res.AsGodotDictionary();
+		}
 
 		var isMyTurn = _currentIndex == _myIndex;
 		_gameUI.Call("update_players",    _players, _currentIndex, _myIndex);
@@ -107,12 +119,19 @@ public partial class Game : Node2D
 		_currentIndex = data.TryGetValue("next_user_index", out var ni) ? ni.AsInt32() : 0;
 		_players      = data.TryGetValue("players",         out var pl) ? pl.AsGodotArray() : _players;
 
-		if (_myIndex >= 0 && _myIndex < _players.Count)
-			_myResources = _players[_myIndex].AsGodotDictionary()
-				.TryGetValue("resources", out var res) ? res.AsGodotDictionary() : new Dictionary();
+		if (data.TryGetValue("my_resources", out var myResVar))
+			_myResources = myResVar.AsGodotDictionary();
+		else if (_myIndex >= 0 && _myIndex < _players.Count)
+		{
+			var me = _players[_myIndex].AsGodotDictionary();
+			if (me.TryGetValue("resources", out var res))
+				_myResources = res.AsGodotDictionary();
+		}
 
 		int rolled = data.TryGetValue("rolled_number", out var r) ? r.AsInt32() : 0;
 
+		_optimisticCostApplied = false;
+		_lastSentRecipeName = "";
 		var isMyTurn = _currentIndex == _myIndex;
 		GetNode<Node2D>("HexBoard").Call("flash_matching_tiles", rolled);
 		_gameUI.Call("show_dice",         rolled);
@@ -132,8 +151,6 @@ public partial class Game : Node2D
 			data = arr[0].AsGodotDictionary();
 		else
 			data = raw.AsGodotDictionary();
-
-		GD.Print("[Game] Build received: ", data);
 
 		if (!data.TryGetValue("location", out var locVar))   return;
 		if (!data.TryGetValue("building", out var buildVar)) return;
@@ -164,28 +181,32 @@ public partial class Game : Node2D
 
 			_players[i] = player;
 
-			if (i == _myIndex && player.TryGetValue("resources", out var resVar))
+			if (i == _myIndex)
 			{
-				_myResources = resVar.AsGodotDictionary();
+				if (player.TryGetValue("resources", out var resVar))
+				{
+					// Authoritative server resources. This corrects the optimistic local
+					// deduction if the server changed anything else.
+					_myResources = resVar.AsGodotDictionary();
+				}
+
+				_optimisticCostApplied = false;
+				_lastSentRecipeName = "";
 				var isMyTurn = _currentIndex == _myIndex;
 				_gameUI.Call("update_resources", _myResources);
 				_gameUI.Call("update_recipes",   _recipes, _myResources, isMyTurn);
 				_gameUI.Call("update_players",   _players, _currentIndex, _myIndex);
 			}
+
 			break;
 		}
 	}
 
-	private async void OnEndTurnPressed()
+	private void OnEndTurnPressed()
 	{
-		GD.Print("[Game] End turn pressed");
 		_gameUI.Call("set_end_turn_enabled", false);
 		_gameUI.Call("show_status", "Ending turn...");
 		_socketIOGame.Call("emit_end_turn");
-
-		// Safety refresh: if the broadcast is missed, pull server state shortly after.
-		await ToSignal(GetTree().CreateTimer(0.8), SceneTreeTimer.SignalName.Timeout);
-		_socketIOGame.Call("refresh_game_data");
 	}
 
 	private void OnToggleNumbers(bool showNumbers)
@@ -229,20 +250,52 @@ public partial class Game : Node2D
 		_gameUI.Call("show_status", resultType == "road" ? "Click a highlighted edge to build a road. Esc cancels." : "Click a highlighted corner/settlement. Esc cancels.");
 	}
 
-	private async void OnPlacementSelected(string recipeId, Array location)
+	private void OnPlacementSelected(string recipeId, Array location)
 	{
-		GD.Print("[Game] Placement selected: ", recipeId, " at ", location);
+		_lastSentRecipeName = recipeId;
+		_optimisticCostApplied = ApplyLocalRecipeCost(recipeId);
+		if (_optimisticCostApplied)
+		{
+			var isMyTurn = _currentIndex == _myIndex;
+			_gameUI.Call("update_resources", _myResources);
+			_gameUI.Call("update_recipes", _recipes, _myResources, isMyTurn);
+		}
+
 		_socketIOGame.Call("emit_build", recipeId, location);
 		_pendingRecipeName = "";
 		GetNode<Node2D>("HexBoard").Call("exit_placement_mode");
 		_gameUI.Call("show_status", "Build sent. Waiting for server...");
-
-		// Safety refresh: keeps resources/board synced even if the build broadcast
-		// is delayed or the local event update misses a field.
-		await ToSignal(GetTree().CreateTimer(0.8), SceneTreeTimer.SignalName.Timeout);
-		_socketIOGame.Call("refresh_game_data");
 	}
 
+	private bool ApplyLocalRecipeCost(string recipeName)
+	{
+		if (string.IsNullOrEmpty(recipeName)) return false;
+
+		foreach (var recipeVar in _recipes)
+		{
+			var recipe = recipeVar.AsGodotDictionary();
+			if (!recipe.TryGetValue("name", out var nameVar) || nameVar.AsString() != recipeName)
+				continue;
+
+			if (!recipe.TryGetValue("ingredients", out var ingredientsVar))
+				return false;
+
+			var ingredients = ingredientsVar.AsGodotArray();
+			foreach (var ingVar in ingredients)
+			{
+				var ing = ingVar.AsGodotDictionary();
+				if (!ing.TryGetValue("resource", out var resVar)) continue;
+				if (!ing.TryGetValue("amount", out var amountVar)) continue;
+
+				var key = resVar.AsString();
+				var amount = amountVar.AsInt32();
+				var current = _myResources.TryGetValue(key, out var curVar) ? curVar.AsInt32() : 0;
+				_myResources[key] = Mathf.Max(0, current - amount);
+			}
+			return true;
+		}
+		return false;
+	}
 
 	private void OnGameOverReceived(Variant raw)
 	{
@@ -252,7 +305,6 @@ public partial class Game : Node2D
 		else
 			data = raw.AsGodotDictionary();
 
-		GD.Print("[Game] Game over: ", data);
 		_gameUI.Call("set_end_turn_enabled", false);
 		_gameUI.Call("show_game_over", data, _players, _myIndex);
 	}
